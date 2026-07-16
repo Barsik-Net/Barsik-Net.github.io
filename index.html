@@ -254,6 +254,66 @@
             opacity: 0.5;
             margin-top: 4px;
         }
+        .post-actions {
+            display: flex;
+            gap: 16px;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid var(--border);
+        }
+        .post-actions button {
+            background: none;
+            border: none;
+            color: var(--text);
+            opacity: 0.6;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 0;
+            transition: 0.2s;
+        }
+        .post-actions button:hover { opacity: 1; }
+        .post-actions button.liked { opacity: 1; color: #ff3b30; }
+        .comments-section {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid var(--border);
+        }
+        .comment {
+            display: flex;
+            gap: 8px;
+            padding: 6px 0;
+            font-size: 14px;
+        }
+        .comment .name { font-weight: 600; }
+        .comment-input {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        .comment-input input {
+            flex: 1;
+            padding: 6px 12px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            background: var(--bg);
+            color: var(--text);
+            outline: none;
+            font-size: 13px;
+        }
+        .comment-input input:focus { border-color: var(--primary); }
+        .comment-input button {
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: none;
+            background: var(--primary);
+            color: white;
+            font-weight: 600;
+            font-size: 12px;
+            cursor: pointer;
+        }
         .reels-strip {
             display: flex;
             gap: 12px;
@@ -455,6 +515,7 @@
             color: var(--primary);
         }
         .btn-sm.danger { background: #ff3b30; }
+        .btn-sm.success { background: #34c759; }
         .profile-header {
             display: flex;
             flex-direction: column;
@@ -623,6 +684,8 @@
         .post-header .name-wrapper {
             font-weight: 600;
         }
+        
+        /* ============ ФИКС ФОТО ============ */
         .post-media-container {
             position: relative;
             width: 100%;
@@ -630,6 +693,10 @@
             overflow: hidden;
             background: var(--bg);
             margin: 8px 0;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .post-media-container img {
             width: 100%;
@@ -653,6 +720,56 @@
             display: block;
             margin-top: 4px;
         }
+        .post-media-container .loading {
+            padding: 30px;
+            text-align: center;
+            color: var(--text);
+            opacity: 0.5;
+        }
+        
+        /* ============ АДМИНКА ============ */
+        .admin-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        .admin-stat {
+            background: var(--card);
+            padding: 14px;
+            border-radius: var(--radius);
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+        .admin-stat .num {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        .admin-stat .label {
+            font-size: 12px;
+            opacity: 0.6;
+            margin-top: 2px;
+        }
+        .admin-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .admin-actions .btn-sm {
+            width: 100%;
+            text-align: center;
+        }
+        .admin-user-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .admin-user-item .info { flex: 1; }
+        .admin-user-item .info .name { font-weight: 600; }
+        .admin-user-item .info .username { font-size: 12px; opacity: 0.6; }
         
         @media (max-width: 480px) {
             .page { padding: 8px 10px 70px; }
@@ -667,7 +784,7 @@
             .post-content { font-size: 14px; }
             .post-media-container img { 
                 max-height: 250px;
-                min-height: 80px;
+                min-height: 60px;
             }
             .post-time { font-size: 10px; }
             .reel-circle .avatar { width: 48px; height: 48px; }
@@ -706,6 +823,11 @@
             .reel-view .close { top: 16px; right: 16px; font-size: 24px; }
             .reel-view img { max-height: 60vh; }
             .reel-view .user-label { font-size: 16px; }
+            .admin-stats { grid-template-columns: 1fr 1fr; gap: 6px; }
+            .admin-stat { padding: 10px; }
+            .admin-stat .num { font-size: 22px; }
+            .post-actions button { font-size: 12px; }
+            .comment { font-size: 13px; }
         }
     </style>
 </head>
@@ -819,6 +941,36 @@
         </div>
     </div>
 
+    <!-- ============ АДМИНКА ============ -->
+    <div id="pageAdmin" class="page">
+        <h3 style="margin-bottom:12px;">👑 Админ-панель</h3>
+        <div class="admin-stats" id="adminStats">
+            <div class="admin-stat">
+                <div class="num" id="statUsers">0</div>
+                <div class="label">👤 Пользователей</div>
+            </div>
+            <div class="admin-stat">
+                <div class="num" id="statOnline">0</div>
+                <div class="label">🟢 Онлайн</div>
+            </div>
+            <div class="admin-stat">
+                <div class="num" id="statPosts">0</div>
+                <div class="label">📝 Постов</div>
+            </div>
+            <div class="admin-stat">
+                <div class="num" id="statReels">0</div>
+                <div class="label">📹 Рилсов</div>
+            </div>
+        </div>
+        
+        <h4 style="margin:12px 0 8px;">👥 Все пользователи</h4>
+        <div id="adminUserList"></div>
+        
+        <div class="admin-actions" style="margin-top:12px;">
+            <button class="btn-sm" id="adminRefresh" style="background:var(--primary);">🔄 Обновить</button>
+        </div>
+    </div>
+
     <div class="bottom-nav" id="bottomNav">
         <button class="nav-item active" data-page="pageFeed"><span>🏠</span>Лента</button>
         <button class="nav-item" data-page="pageChats"><span>💬</span>ЛС</button>
@@ -826,6 +978,7 @@
         <button class="nav-item" data-page="pageGroups"><span>👥</span>Группы</button>
         <button class="nav-item" data-page="pageFriends"><span>🤝</span>Друзья</button>
         <button class="nav-item" data-page="pageProfile"><span>👤</span>Профиль</button>
+        <button class="nav-item admin-only" data-page="pageAdmin" style="display:none;"><span>👑</span>Админ</button>
     </div>
 </div>
 
@@ -851,6 +1004,7 @@ let isDark = false;
 let isAppActive = true;
 let reelCleanupInterval = null;
 let chatListeners = {};
+let isAdmin = false;
 
 const $ = id => document.getElementById(id);
 
@@ -905,6 +1059,48 @@ function hideBottomNav() {
             p.style.paddingBottom = '12px';
         }
     });
+}
+
+// ============ ЗАГРУЗКА ФОТО С ПРОВЕРКОЙ ============
+function loadImageWithFallback(imgElement, src, fallbackText = '🖼️') {
+    if (!imgElement) return;
+    imgElement.src = src;
+    imgElement.crossOrigin = 'anonymous';
+    imgElement.referrerPolicy = 'no-referrer';
+    imgElement.loading = 'lazy';
+    
+    imgElement.onload = function() {
+        this.style.display = 'block';
+        const container = this.parentElement;
+        const fallback = container.querySelector('.fallback');
+        if (fallback) fallback.remove();
+        const loading = container.querySelector('.loading');
+        if (loading) loading.remove();
+    };
+    
+    imgElement.onerror = function() {
+        this.style.display = 'none';
+        const container = this.parentElement;
+        // Удаляем loading если есть
+        const loading = container.querySelector('.loading');
+        if (loading) loading.remove();
+        // Проверяем есть ли уже fallback
+        if (!container.querySelector('.fallback')) {
+            const fallback = document.createElement('div');
+            fallback.className = 'fallback';
+            fallback.innerHTML = `${fallbackText}<br><span>Попробуйте обновить</span>`;
+            container.appendChild(fallback);
+        }
+    };
+    
+    // Показываем загрузку
+    const container = imgElement.parentElement;
+    if (!container.querySelector('.loading') && !container.querySelector('.fallback')) {
+        const loading = document.createElement('div');
+        loading.className = 'loading';
+        loading.textContent = '⏳ Загрузка...';
+        container.appendChild(loading);
+    }
 }
 
 // Auth switch
@@ -972,11 +1168,19 @@ function enterApp() {
     isAppActive = true;
     auth.style.display = 'none';
     app.style.display = 'flex';
+    
+    // Проверка админа
+    isAdmin = currentUser.username === 'BarsikNet';
+    if (isAdmin) {
+        document.querySelector('.admin-only').style.display = 'flex';
+    }
+    
     loadAllUsers();
     renderFeed();
     renderChatList();
     renderFriends();
     renderProfile();
+    renderAdminPanel();
     updateOnlineStatus();
     if (isDark) document.body.classList.add('dark');
     else document.body.classList.remove('dark');
@@ -1028,6 +1232,7 @@ function loadAllUsers() {
         renderFriends();
         renderReelsStrip();
         renderFeed();
+        renderAdminPanel();
         if (currentChat) renderChatMessages(currentChat);
     });
 }
@@ -1070,7 +1275,8 @@ document.querySelectorAll('.nav-item').forEach(btn => {
             pageSearch: '🔍 Поиск',
             pageGroups: '👥 Группы',
             pageFriends: '🤝 Друзья',
-            pageProfile: '👤 Профиль'
+            pageProfile: '👤 Профиль',
+            pageAdmin: '👑 Админ'
         };
         pageTitle.textContent = titles[pageId] || 'BarsikNet';
         if (pageId === 'pageChats') {
@@ -1083,10 +1289,11 @@ document.querySelectorAll('.nav-item').forEach(btn => {
         if (pageId === 'pageFriends') renderFriends();
         if (pageId === 'pageFeed') { renderFeed(); renderReelsStrip(); }
         if (pageId === 'pageProfile') renderProfile();
+        if (pageId === 'pageAdmin') renderAdminPanel();
     };
 });
 
-// ============ ПОСТЫ ============
+// ============ ПОСТЫ С ЛАЙКАМИ И КОММЕНТАМИ ============
 publishPostBtn.onclick = () => {
     const text = postText.value.trim();
     const imageUrl = postImage.value.trim();
@@ -1102,7 +1309,9 @@ publishPostBtn.onclick = () => {
     const newRef = ref.push();
     const post = {
         text: text,
-        time: Date.now()
+        time: Date.now(),
+        likes: {},
+        comments: {}
     };
     if (imageUrl) post.url = imageUrl;
     newRef.set(post).then(() => {
@@ -1111,6 +1320,33 @@ publishPostBtn.onclick = () => {
         renderFeed();
     }).catch(e => alert('Ошибка: ' + e.message));
 };
+
+function toggleLike(postKey, username) {
+    const postRef = db.ref('users/' + username + '/posts/' + postKey + '/likes/' + currentUser.username);
+    postRef.once('value', snap => {
+        if (snap.val()) {
+            postRef.remove().then(() => renderFeed());
+        } else {
+            postRef.set(true).then(() => renderFeed());
+        }
+    });
+}
+
+function addComment(postKey, username) {
+    const input = document.getElementById('commentInput_' + postKey);
+    if (!input) return;
+    const text = input.value.trim();
+    if (!text) return;
+    const ref = db.ref('users/' + username + '/posts/' + postKey + '/comments');
+    ref.push().set({
+        text: text,
+        from: currentUser.username,
+        time: Date.now()
+    }).then(() => {
+        input.value = '';
+        renderFeed();
+    });
+}
 
 function renderFeed() {
     if (!currentUser) return;
@@ -1127,8 +1363,8 @@ function renderFeed() {
             posts.push({ 
                 ...userPosts[key], 
                 username: u, 
-                name: userData.name || u, 
-                key 
+                name: userData.name || u,
+                postKey: key
             });
         }
     }
@@ -1143,6 +1379,9 @@ function renderFeed() {
     for (const p of posts) {
         const card = document.createElement('div');
         card.className = 'post-card';
+        card.id = 'post_' + p.postKey;
+        
+        // Header
         const header = document.createElement('div');
         header.className = 'post-header';
         const av = document.createElement('div');
@@ -1153,10 +1392,9 @@ function renderFeed() {
             img.src = user.avatar;
             img.alt = 'avatar';
             img.loading = 'lazy';
-            img.onerror = function() {
-                this.style.display = 'none';
-                av.textContent = '🐱';
-            };
+            img.crossOrigin = 'anonymous';
+            img.referrerPolicy = 'no-referrer';
+            img.onerror = function() { this.style.display = 'none'; av.textContent = '🐱'; };
             av.appendChild(img);
         } else {
             av.textContent = (user && user.avatar) || '🐱';
@@ -1170,12 +1408,11 @@ function renderFeed() {
         nameSpan.textContent = p.name || p.username;
         nameWrapper.appendChild(nameSpan);
         const badge = getVerifiedBadge(p.username);
-        if (badge) {
-            nameWrapper.innerHTML += badge;
-        }
+        if (badge) nameWrapper.innerHTML += badge;
         header.appendChild(nameWrapper);
         card.appendChild(header);
         
+        // Text
         if (p.text) {
             const text = document.createElement('div');
             text.className = 'post-content';
@@ -1183,24 +1420,17 @@ function renderFeed() {
             card.appendChild(text);
         }
         
+        // ============ ФИКС ФОТО ============
         if (p.url && p.url.match(/\.(jpeg|jpg|gif|png|webp|svg|bmp|ico)/i)) {
             const container = document.createElement('div');
             container.className = 'post-media-container';
             
             const img = document.createElement('img');
-            img.src = p.url;
             img.alt = 'медиа';
-            img.loading = 'lazy';
-            img.crossOrigin = 'anonymous';
-            img.referrerPolicy = 'no-referrer';
+            container.appendChild(img);
             
-            img.onerror = function() {
-                this.style.display = 'none';
-                const fallback = document.createElement('div');
-                fallback.className = 'fallback';
-                fallback.innerHTML = '🖼️ Фото не загрузилось<br><span>Попробуйте обновить</span>';
-                container.appendChild(fallback);
-            };
+            // Используем функцию загрузки с проверкой
+            loadImageWithFallback(img, p.url, '🖼️ Фото не загрузилось');
             
             img.onclick = function(e) {
                 e.stopPropagation();
@@ -1209,14 +1439,79 @@ function renderFeed() {
                 }
             };
             
-            container.appendChild(img);
             card.appendChild(container);
         }
         
+        // Time
         const timeDiv = document.createElement('div');
         timeDiv.className = 'post-time';
         timeDiv.textContent = new Date(p.time).toLocaleString();
         card.appendChild(timeDiv);
+        
+        // ============ ЛАЙКИ И КОММЕНТЫ ============
+        const actions = document.createElement('div');
+        actions.className = 'post-actions';
+        
+        const likesCount = p.likes ? Object.keys(p.likes).length : 0;
+        const isLiked = p.likes && p.likes[currentUser.username];
+        
+        const likeBtn = document.createElement('button');
+        likeBtn.className = isLiked ? 'liked' : '';
+        likeBtn.innerHTML = `❤️ ${likesCount}`;
+        likeBtn.onclick = () => toggleLike(p.postKey, p.username);
+        actions.appendChild(likeBtn);
+        
+        const commentsCount = p.comments ? Object.keys(p.comments).length : 0;
+        const commentBtn = document.createElement('button');
+        commentBtn.textContent = `💬 ${commentsCount}`;
+        commentBtn.onclick = () => {
+            const section = document.getElementById('comments_' + p.postKey);
+            if (section) {
+                section.style.display = section.style.display === 'none' ? 'block' : 'none';
+            }
+        };
+        actions.appendChild(commentBtn);
+        card.appendChild(actions);
+        
+        // ============ КОММЕНТАРИИ ============
+        const commentsSection = document.createElement('div');
+        commentsSection.className = 'comments-section';
+        commentsSection.id = 'comments_' + p.postKey;
+        commentsSection.style.display = 'none';
+        
+        if (p.comments) {
+            const commentsArr = Object.values(p.comments);
+            commentsArr.sort((a,b) => (a.time||0) - (b.time||0));
+            for (const c of commentsArr) {
+                const div = document.createElement('div');
+                div.className = 'comment';
+                const name = document.createElement('span');
+                name.className = 'name';
+                name.textContent = c.from + ':';
+                div.appendChild(name);
+                const text = document.createElement('span');
+                text.textContent = c.text;
+                div.appendChild(text);
+                commentsSection.appendChild(div);
+            }
+        }
+        
+        const commentInput = document.createElement('div');
+        commentInput.className = 'comment-input';
+        const input = document.createElement('input');
+        input.id = 'commentInput_' + p.postKey;
+        input.placeholder = 'Написать комментарий...';
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') addComment(p.postKey, p.username);
+        });
+        const sendBtn = document.createElement('button');
+        sendBtn.textContent = '➤';
+        sendBtn.onclick = () => addComment(p.postKey, p.username);
+        commentInput.appendChild(input);
+        commentInput.appendChild(sendBtn);
+        commentsSection.appendChild(commentInput);
+        card.appendChild(commentsSection);
+        
         feedPosts.appendChild(card);
     }
 }
@@ -1290,10 +1585,9 @@ function renderReelsStrip() {
             img.src = user.avatar;
             img.alt = 'avatar';
             img.loading = 'lazy';
-            img.onerror = function() {
-                this.style.display = 'none';
-                avatarDiv.textContent = '🐱';
-            };
+            img.crossOrigin = 'anonymous';
+            img.referrerPolicy = 'no-referrer';
+            img.onerror = function() { this.style.display = 'none'; avatarDiv.textContent = '🐱'; };
             avatarDiv.appendChild(img);
         } else {
             avatarDiv.textContent = (user && user.avatar) || '🐱';
@@ -1303,9 +1597,7 @@ function renderReelsStrip() {
         const label = document.createElement('span');
         label.textContent = reel.username;
         const badge = getVerifiedBadge(reel.username, 'small');
-        if (badge) {
-            label.innerHTML += badge;
-        }
+        if (badge) label.innerHTML += badge;
         div.appendChild(label);
         
         div.onclick = () => {
@@ -1316,6 +1608,89 @@ function renderReelsStrip() {
         reelsStrip.appendChild(div);
     }
 }
+
+// ============ АДМИН ПАНЕЛЬ ============
+function renderAdminPanel() {
+    if (!isAdmin) return;
+    
+    const users = Object.keys(allUsersCache);
+    let online = 0;
+    let totalPosts = 0;
+    let totalReels = 0;
+    
+    for (const u of users) {
+        const data = allUsersCache[u];
+        if (data && data.online) online++;
+        if (data && data.posts) totalPosts += Object.keys(data.posts).length;
+        if (data && data.reels) totalReels += Object.keys(data.reels).length;
+    }
+    
+    $('statUsers').textContent = users.length;
+    $('statOnline').textContent = online;
+    $('statPosts').textContent = totalPosts;
+    $('statReels').textContent = totalReels;
+    
+    // Список пользователей
+    const list = $('adminUserList');
+    list.innerHTML = '';
+    for (const u of users) {
+        const data = allUsersCache[u];
+        if (!data) continue;
+        const div = document.createElement('div');
+        div.className = 'admin-user-item';
+        div.innerHTML = `
+            <div class="info">
+                <div class="name">${data.name || u} ${data.online ? '🟢' : '⚫'} ${data.verified ? '✅' : ''}</div>
+                <div class="username">@${u}</div>
+            </div>
+            <div style="display:flex; gap:4px; flex-wrap:wrap;">
+                <button class="btn-sm success" onclick="adminVerify('${u}')" style="font-size:10px; padding:2px 8px;">✅</button>
+                <button class="btn-sm danger" onclick="adminDeleteUser('${u}')" style="font-size:10px; padding:2px 8px;">🗑️</button>
+            </div>
+        `;
+        list.appendChild(div);
+    }
+}
+
+// Админ функции
+window.adminVerify = function(username) {
+    if (!isAdmin) return;
+    const ref = db.ref('users/' + username + '/verified');
+    ref.once('value', snap => {
+        ref.set(!snap.val()).then(() => {
+            renderAdminPanel();
+            renderFeed();
+            renderChatList();
+            renderFriends();
+            renderSearch();
+            renderReelsStrip();
+            renderProfile();
+        });
+    });
+};
+
+window.adminDeleteUser = function(username) {
+    if (!isAdmin) return;
+    if (username === 'BarsikNet') {
+        alert('Нельзя удалить главного админа!');
+        return;
+    }
+    if (confirm(`Удалить пользователя @${username}?`)) {
+        db.ref('users/' + username).remove().then(() => {
+            renderAdminPanel();
+            renderFeed();
+            renderChatList();
+            renderFriends();
+            renderSearch();
+            renderReelsStrip();
+        });
+    }
+};
+
+$('adminRefresh').onclick = () => {
+    renderAdminPanel();
+    alert('✅ Обновлено!');
+};
 
 // ============ ЧАТ ============
 
@@ -1344,10 +1719,9 @@ function renderChatList() {
             img.src = user.avatar;
             img.alt = 'avatar';
             img.loading = 'lazy';
-            img.onerror = function() {
-                this.style.display = 'none';
-                av.textContent = '🐱';
-            };
+            img.crossOrigin = 'anonymous';
+            img.referrerPolicy = 'no-referrer';
+            img.onerror = function() { this.style.display = 'none'; av.textContent = '🐱'; };
             av.appendChild(img);
         } else {
             av.textContent = user.avatar || '🐱';
@@ -1362,9 +1736,7 @@ function renderChatList() {
         nameSpan.textContent = user.name || u;
         nameWrapper.appendChild(nameSpan);
         const badge = getVerifiedBadge(u);
-        if (badge) {
-            nameWrapper.innerHTML += badge;
-        }
+        if (badge) nameWrapper.innerHTML += badge;
         info.appendChild(nameWrapper);
         const statusDiv = document.createElement('div');
         statusDiv.className = 'status';
@@ -1568,9 +1940,7 @@ function renderSearch() {
         nameSpan.textContent = user.name || u;
         nameWrapper.appendChild(nameSpan);
         const badge = getVerifiedBadge(u);
-        if (badge) {
-            nameWrapper.innerHTML += badge;
-        }
+        if (badge) nameWrapper.innerHTML += badge;
         info.appendChild(nameWrapper);
         const uname = document.createElement('div');
         uname.className = 'username';
@@ -1667,9 +2037,7 @@ function renderFriends() {
         nameSpan.textContent = user.name || u;
         nameWrapper.appendChild(nameSpan);
         const badge = getVerifiedBadge(u);
-        if (badge) {
-            nameWrapper.innerHTML += badge;
-        }
+        if (badge) nameWrapper.innerHTML += badge;
         info.appendChild(nameWrapper);
         const uname = document.createElement('div');
         uname.className = 'username';
@@ -1695,10 +2063,9 @@ function renderProfile() {
         img.src = user.avatar;
         img.alt = 'avatar';
         img.loading = 'lazy';
-        img.onerror = function() {
-            this.style.display = 'none';
-            profileAvatar.textContent = '🐱';
-        };
+        img.crossOrigin = 'anonymous';
+        img.referrerPolicy = 'no-referrer';
+        img.onerror = function() { this.style.display = 'none'; profileAvatar.textContent = '🐱'; };
         profileAvatar.innerHTML = '';
         profileAvatar.appendChild(img);
     } else {
@@ -1782,8 +2149,10 @@ chatInput.addEventListener('keydown', e => { if (e.key === 'Enter') chatSend.cli
 postText.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); publishPostBtn.click(); } });
 
 console.log('🐱 BarsikNet готов!');
-console.log('📱 Адаптировано для iPhone (safe-area-inset)');
-console.log('📸 Фото в постах на телефонах');
+console.log('📱 Адаптировано для iPhone');
+console.log('❤️ Лайки и 💬 комментарии добавлены!');
+console.log('👑 Админ-панель доступна для BarsikNet');
+console.log('🖼️ Фикс загрузки фото');
 </script>
 </body>
 </html>
