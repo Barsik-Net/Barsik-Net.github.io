@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>BarsikNet</title>
     
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
@@ -25,6 +25,8 @@
             --shadow: 0 2px 12px rgba(0,0,0,0.08);
             --radius: 16px;
             --online: #34c759;
+            --safe-top: env(safe-area-inset-top, 0px);
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
         }
         .dark {
             --bg: #0f0f1a;
@@ -40,15 +42,18 @@
             color: var(--text);
             transition: background 0.3s, color 0.3s;
             height: 100vh;
+            height: 100dvh;
             overflow: hidden;
             display: flex;
             flex-direction: column;
+            padding-top: var(--safe-top);
+            padding-bottom: var(--safe-bottom);
         }
         #auth {
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            height: 100%;
             background: var(--bg);
             padding: 20px;
         }
@@ -117,7 +122,7 @@
         #app {
             display: none;
             flex-direction: column;
-            height: 100vh;
+            height: 100%;
             max-width: 480px;
             margin: 0 auto;
             width: 100%;
@@ -126,6 +131,7 @@
         }
         .header {
             padding: 12px 16px;
+            padding-top: calc(12px + var(--safe-top));
             background: var(--card);
             border-bottom: 1px solid var(--border);
             display: flex;
@@ -134,6 +140,9 @@
             flex-shrink: 0;
             transition: background 0.3s;
             min-height: 56px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
         .header h2 {
             font-size: 20px;
@@ -170,12 +179,19 @@
             border-top: 1px solid var(--border);
             display: flex;
             justify-content: space-around;
-            padding: 6px 0 env(safe-area-inset-bottom);
+            padding: 6px 0;
+            padding-bottom: calc(6px + var(--safe-bottom));
             flex-shrink: 0;
             z-index: 100;
             transition: background 0.3s;
             backdrop-filter: blur(8px);
             background: rgba(var(--card-rgb, 255,255,255), 0.92);
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+        .bottom-nav.hidden {
+            transform: translateY(100%);
+            opacity: 0;
+            pointer-events: none;
         }
         .dark .bottom-nav { --card-rgb: 26,26,46; }
         .nav-item {
@@ -233,15 +249,6 @@
         }
         .avatar.online { border-color: var(--online); }
         .post-content { margin: 6px 0 10px; word-wrap: break-word; }
-        .post-media {
-            width: 100%;
-            border-radius: 12px;
-            margin: 8px 0;
-            max-height: 400px;
-            object-fit: contain;
-            background: var(--bg);
-            display: block;
-        }
         .post-time {
             font-size: 11px;
             opacity: 0.5;
@@ -649,16 +656,26 @@
         
         @media (max-width: 480px) {
             .page { padding: 8px 10px 70px; }
-            .header { padding: 8px 12px; min-height: 48px; }
+            .header { 
+                padding: 8px 12px; 
+                padding-top: calc(8px + var(--safe-top));
+                min-height: 44px;
+            }
             .header h2 { font-size: 17px; }
             .post-card { padding: 10px 12px; margin-bottom: 8px; }
             .post-header .avatar { width: 32px; height: 32px; font-size: 16px; }
             .post-content { font-size: 14px; }
-            .post-media-container img { max-height: 250px; }
+            .post-media-container img { 
+                max-height: 250px;
+                min-height: 80px;
+            }
             .post-time { font-size: 10px; }
             .reel-circle .avatar { width: 48px; height: 48px; }
             .reel-circle span { font-size: 10px; max-width: 50px; }
-            .bottom-nav { padding: 4px 0; }
+            .bottom-nav { 
+                padding: 4px 0; 
+                padding-bottom: calc(4px + var(--safe-bottom));
+            }
             .nav-item { font-size: 10px; min-width: 40px; padding: 2px 4px; }
             .nav-item span { font-size: 16px; }
             .chat-item { padding: 8px 0; }
@@ -802,7 +819,7 @@
         </div>
     </div>
 
-    <div class="bottom-nav">
+    <div class="bottom-nav" id="bottomNav">
         <button class="nav-item active" data-page="pageFeed"><span>🏠</span>Лента</button>
         <button class="nav-item" data-page="pageChats"><span>💬</span>ЛС</button>
         <button class="nav-item" data-page="pageSearch"><span>🔍</span>Поиск</button>
@@ -859,6 +876,7 @@ const settingsAvatarUrl = $('settingsAvatarUrl'), settingsSaveAvatar = $('settin
 const emojiGrid = $('emojiGrid');
 const reelView = $('reelView'), reelImage = $('reelImage'), reelUserLabel = $('reelUserLabel'), reelClose = $('reelClose');
 const onlineStatus = $('onlineStatus');
+const bottomNav = $('bottomNav');
 
 // ============ ГАЛОЧКА ============
 function getVerifiedBadge(username, size = 'normal') {
@@ -868,6 +886,25 @@ function getVerifiedBadge(username, size = 'normal') {
         return `<span class="verified-badge${sizeClass}">✓</span>`;
     }
     return '';
+}
+
+// ============ УПРАВЛЕНИЕ ПАНЕЛЬЮ ============
+function showBottomNav() {
+    bottomNav.classList.remove('hidden');
+    document.querySelectorAll('.page').forEach(p => {
+        if (p.id !== 'pageChats') {
+            p.style.paddingBottom = '80px';
+        }
+    });
+}
+
+function hideBottomNav() {
+    bottomNav.classList.add('hidden');
+    document.querySelectorAll('.page').forEach(p => {
+        if (p.id !== 'pageChats') {
+            p.style.paddingBottom = '12px';
+        }
+    });
 }
 
 // Auth switch
@@ -943,6 +980,7 @@ function enterApp() {
     updateOnlineStatus();
     if (isDark) document.body.classList.add('dark');
     else document.body.classList.remove('dark');
+    showBottomNav();
     
     if (reelCleanupInterval) clearInterval(reelCleanupInterval);
     reelCleanupInterval = setInterval(cleanupOldReels, 300000);
@@ -1039,6 +1077,7 @@ document.querySelectorAll('.nav-item').forEach(btn => {
             chatWindow.classList.remove('active');
             chatList.style.display = 'block';
             renderChatList();
+            showBottomNav();
         }
         if (pageId === 'pageSearch') renderSearch();
         if (pageId === 'pageFriends') renderFriends();
@@ -1153,6 +1192,7 @@ function renderFeed() {
             img.alt = 'медиа';
             img.loading = 'lazy';
             img.crossOrigin = 'anonymous';
+            img.referrerPolicy = 'no-referrer';
             
             img.onerror = function() {
                 this.style.display = 'none';
@@ -1346,6 +1386,7 @@ function openChat(username) {
     currentChat = username;
     chatList.style.display = 'none';
     chatWindow.classList.add('active');
+    hideBottomNav();
     
     document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
     document.querySelector('[data-page="pageChats"]').classList.add('active');
@@ -1497,6 +1538,7 @@ chatBack.onclick = () => {
     chatList.style.display = 'block';
     currentChat = null;
     renderChatList();
+    showBottomNav();
 };
 
 // ============ ПОИСК ============
@@ -1643,7 +1685,7 @@ function renderFriends() {
     }
 }
 
-// ============ ПРОФИЛЬ (МГНОВЕННОЕ ОБНОВЛЕНИЕ) ============
+// ============ ПРОФИЛЬ ============
 
 function renderProfile() {
     if (!currentUser) return;
@@ -1676,7 +1718,6 @@ function renderProfile() {
     else themeToggle.classList.remove('active');
 }
 
-// ============ МГНОВЕННОЕ ОБНОВЛЕНИЕ АВАТАРА ============
 settingsSaveAvatar.onclick = () => {
     const url = settingsAvatarUrl.value.trim();
     if (!url) return;
@@ -1685,9 +1726,7 @@ settingsSaveAvatar.onclick = () => {
         return;
     }
     db.ref('users/' + currentUser.username + '/avatar').set(url).then(() => {
-        // Мгновенно обновляем в currentUser
         currentUser.avatar = url;
-        // Обновляем все UI на глазах
         renderProfile();
         renderFeed();
         renderChatList();
@@ -1695,7 +1734,7 @@ settingsSaveAvatar.onclick = () => {
         renderSearch();
         renderReelsStrip();
         alert('✅ Аватар обновлён!');
-    }).catch(e => alert('Ошибка: ' + e.message));
+    });
 };
 
 settingsSaveName.onclick = () => {
@@ -1743,9 +1782,8 @@ chatInput.addEventListener('keydown', e => { if (e.key === 'Enter') chatSend.cli
 postText.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); publishPostBtn.click(); } });
 
 console.log('🐱 BarsikNet готов!');
-console.log('📱 Адаптировано для телефонов');
-console.log('🔗 Аватарки через ссылки');
-console.log('⚡ Мгновенное обновление аватара без перезагрузки');
+console.log('📱 Адаптировано для iPhone (safe-area-inset)');
+console.log('📸 Фото в постах на телефонах');
 </script>
 </body>
 </html>
