@@ -66,17 +66,11 @@
             pointer-events: auto !important;
             opacity: 1 !important;
         }
-        
+
         /* ============ АНИМАЦИИ ============ */
         @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px) scale(0.95);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
+            from { opacity: 0; transform: translateY(30px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
         }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(20px); }
@@ -98,27 +92,10 @@
             0%, 100% { transform: scale(1); opacity: 0.7; }
             50% { transform: scale(1.05); opacity: 1; }
         }
-        @keyframes typewriter {
-            from { width: 0; }
-            to { width: 100%; }
-        }
-        @keyframes blink {
-            0%, 100% { border-color: var(--primary); }
-            50% { border-color: transparent; }
-        }
-        
-        .anim-fade-up {
-            animation: fadeInUp 0.6s ease forwards;
-        }
-        .anim-fade {
-            animation: fadeIn 0.5s ease forwards;
-        }
-        .anim-slide {
-            animation: slideInLeft 0.5s ease forwards;
-        }
-        .anim-pop {
-            animation: popIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
-        }
+        .anim-fade-up { animation: fadeInUp 0.6s ease forwards; }
+        .anim-fade { animation: fadeIn 0.5s ease forwards; }
+        .anim-slide { animation: slideInLeft 0.5s ease forwards; }
+        .anim-pop { animation: popIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards; }
         .anim-shimmer {
             background: linear-gradient(90deg, var(--text) 0%, var(--primary) 30%, var(--text) 60%);
             background-size: 200% 100%;
@@ -126,17 +103,7 @@
             -webkit-text-fill-color: transparent;
             animation: shimmer 2s linear infinite;
         }
-        .anim-pulse {
-            animation: pulse 1.8s ease-in-out infinite;
-        }
-        .anim-typewriter {
-            overflow: hidden;
-            white-space: nowrap;
-            border-right: 3px solid var(--primary);
-            animation: typewriter 2s steps(20) forwards, blink 0.8s step-end infinite;
-            width: 0;
-            display: inline-block;
-        }
+        .anim-pulse { animation: pulse 1.8s ease-in-out infinite; }
         .anim-delay-1 { animation-delay: 0.1s; }
         .anim-delay-2 { animation-delay: 0.2s; }
         .anim-delay-3 { animation-delay: 0.3s; }
@@ -177,9 +144,7 @@
             color: var(--primary);
             margin-top: 4px;
         }
-        .auth-box .logo h1 span {
-            color: var(--text);
-        }
+        .auth-box .logo h1 span { color: var(--text); }
         .auth-box .logo .sub {
             font-size: 13px;
             opacity: 0.4;
@@ -231,7 +196,7 @@
             margin-bottom: 10px;
             min-height: 20px;
         }
-        
+
         /* ============ ПРИЛОЖЕНИЕ ============ */
         #app {
             display: none;
@@ -282,7 +247,7 @@
             -webkit-overflow-scrolling: touch;
         }
         .page.active { display: block; }
-        
+
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -298,7 +263,6 @@
             padding-bottom: calc(6px + var(--safe-bottom));
             flex-shrink: 0;
             z-index: 100;
-            transition: background 0.3s;
             backdrop-filter: blur(8px);
             background: rgba(var(--card-rgb, 255,255,255), 0.92);
             transition: transform 0.3s ease, opacity 0.3s ease;
@@ -326,8 +290,48 @@
         }
         .nav-item.active { opacity: 1; color: var(--primary); }
         .nav-item span { font-size: 18px; line-height: 1.2; }
-        
+
         /* ============ ПОСТЫ ============ */
+        .create-post-area {
+            background: var(--card);
+            border-radius: var(--radius);
+            padding: 12px;
+            margin-bottom: 12px;
+            border: 1px solid var(--border);
+            animation: fadeIn 0.4s ease;
+        }
+        .create-post-area textarea {
+            width: 100%;
+            padding: 10px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: var(--bg);
+            color: var(--text);
+            resize: vertical;
+            min-height: 60px;
+            font-family: inherit;
+            outline: none;
+            font-size: 14px;
+        }
+        .create-post-area textarea:focus { border-color: var(--primary); }
+        .create-post-area .actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+            align-items: center;
+        }
+        .create-post-area .actions input {
+            flex: 1;
+            padding: 8px 12px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            background: var(--bg);
+            color: var(--text);
+            outline: none;
+            font-size: 13px;
+        }
+        .create-post-area .actions input:focus { border-color: var(--primary); }
+
         .post-card {
             background: var(--card);
             border-radius: var(--radius);
@@ -371,7 +375,7 @@
             height: 80px;
             font-size: 36px;
         }
-        .post-content { margin: 6px 0 10px; word-wrap: break-word; }
+        .post-content { margin: 6px 0 10px; word-wrap: break-word; font-size: 15px; line-height: 1.5; }
         .post-time {
             font-size: 11px;
             opacity: 0.5;
@@ -399,6 +403,51 @@
         }
         .post-actions button:hover { opacity: 1; }
         .post-actions button.liked { opacity: 1; color: #ff3b30; }
+        .post-media-container {
+            position: relative;
+            width: 100%;
+            border-radius: 12px;
+            overflow: hidden;
+            background: var(--bg);
+            margin: 8px 0;
+            min-height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border);
+        }
+        .post-media-container img {
+            width: 100%;
+            display: block;
+            border-radius: 12px;
+            max-height: 400px;
+            object-fit: contain;
+            background: var(--bg);
+            min-height: 100px;
+        }
+        .post-media-container .fallback {
+            padding: 20px;
+            text-align: center;
+            background: var(--bg);
+            border-radius: 12px;
+            color: var(--text);
+            opacity: 0.6;
+            font-size: 13px;
+            width: 100%;
+        }
+        .post-media-container .fallback span {
+            font-size: 11px;
+            display: block;
+            margin-top: 4px;
+            opacity: 0.5;
+        }
+        .post-media-container .loading {
+            padding: 30px;
+            text-align: center;
+            color: var(--text);
+            opacity: 0.5;
+            font-size: 13px;
+        }
         .comments-section {
             margin-top: 10px;
             padding-top: 10px;
@@ -437,7 +486,7 @@
             font-size: 12px;
             cursor: pointer;
         }
-        
+
         /* ============ РИЛСЫ ============ */
         #reelPublishArea {
             display: flex;
@@ -446,7 +495,7 @@
             padding: 12px;
             border-radius: var(--radius);
             border: 1px solid var(--border);
-            margin-bottom: 12px;
+            margin-bottom: 8px;
             animation: fadeIn 0.4s ease;
         }
         #reelPublishArea input {
@@ -457,10 +506,9 @@
             background: var(--bg);
             color: var(--text);
             outline: none;
+            font-size: 13px;
         }
-        #reelPublishArea input:focus {
-            border-color: var(--primary);
-        }
+        #reelPublishArea input:focus { border-color: var(--primary); }
         .reels-strip {
             display: flex;
             gap: 12px;
@@ -528,6 +576,8 @@
             font-size: 28px;
             cursor: pointer;
             opacity: 0.7;
+            background: none;
+            border: none;
         }
         .reel-view .user-label {
             color: white;
@@ -535,7 +585,7 @@
             font-size: 18px;
             font-weight: 500;
         }
-        
+
         /* ============ ЧАТЫ ============ */
         .chat-list { margin-bottom: 12px; }
         .chat-item {
@@ -605,7 +655,9 @@
             background: var(--bg);
             color: var(--text);
             outline: none;
+            font-size: 14px;
         }
+        .chat-input input:focus { border-color: var(--primary); }
         .chat-input button {
             padding: 10px 18px;
             border-radius: 24px;
@@ -614,6 +666,7 @@
             color: white;
             font-weight: 600;
             cursor: pointer;
+            font-size: 14px;
         }
         .back-btn {
             background: none;
@@ -629,7 +682,7 @@
             padding: 4px;
             color: #ff9500;
         }
-        
+
         /* ============ ПОИСК И ДРУЗЬЯ ============ */
         .search-input {
             width: 100%;
@@ -663,7 +716,7 @@
             font-weight: 600;
         }
         .user-card .info .username { font-size: 13px; opacity: 0.6; }
-        
+
         /* ============ КНОПКИ ============ */
         .btn-sm {
             padding: 6px 16px;
@@ -687,7 +740,7 @@
         .btn-sm.success { background: #34c759; }
         .btn-sm.warning { background: #ff9500; }
         .btn-sm.banned { background: #8e8e93; }
-        
+
         /* ============ ПРОФИЛЬ ============ */
         .profile-header {
             display: flex;
@@ -724,7 +777,7 @@
             font-size: 12px;
             opacity: 0.6;
         }
-        
+
         /* ============ ВЕРИФИКАЦИЯ ============ */
         .verified-badge {
             display: inline-flex;
@@ -751,7 +804,7 @@
             align-items: center;
             gap: 4px;
         }
-        
+
         /* ============ НАСТРОЙКИ ============ */
         .settings-group {
             display: flex;
@@ -815,7 +868,7 @@
             transition: 0.2s;
         }
         .emoji-grid button:active { transform: scale(0.9); }
-        
+
         /* ============ АДМИНКА ============ */
         .admin-stats {
             display: grid;
@@ -869,7 +922,7 @@
             flex-wrap: wrap;
         }
         .admin-mode-toggle .label { font-weight: 600; }
-        
+
         /* ============ МОДАЛКА ПРОФИЛЯ ============ */
         #userProfileModal {
             display: none;
@@ -895,13 +948,11 @@
             position: relative;
             animation: popIn 0.4s ease;
         }
-        
+
         /* ============ ПРОСТЫЕ КЛАССЫ ============ */
         .text-center { text-align: center; }
-        .mt-8 { margin-top: 8px; }
-        .mb-8 { margin-bottom: 8px; }
         .op-5 { opacity: 0.5; }
-        
+
         /* ============ МЕДИА ЗАПРОСЫ ============ */
         @media (max-width: 480px) {
             .page { padding: 8px 10px 70px; }
@@ -931,6 +982,10 @@
             .admin-stats { grid-template-columns: 1fr 1fr; gap: 6px; }
             .admin-stat { padding: 10px; }
             .admin-stat .num { font-size: 22px; }
+            #reelPublishArea { flex-wrap: wrap; }
+            #reelPublishArea input { min-width: 100px; }
+            .create-post-area .actions { flex-wrap: wrap; }
+            .create-post-area .actions input { min-width: 80px; }
         }
     </style>
 </head>
@@ -964,22 +1019,28 @@
 
     <!-- ЛЕНТА -->
     <div id="pageFeed" class="page active">
-        <!-- РИЛСЫ - ТЕПЕРЬ СВЕРХУ -->
+        <!-- ПОЛЕ ДЛЯ ПОСТА (СВЕРХУ) -->
+        <div class="create-post-area" id="createPostArea">
+            <textarea id="postText" placeholder="Что нового?"></textarea>
+            <div class="actions">
+                <input id="postImage" placeholder="Ссылка на фото" />
+                <button class="btn-sm" id="publishPostBtn">📝 Опубликовать</button>
+            </div>
+        </div>
+
+        <!-- РИЛСЫ (ПОСЛЕ ПОСТА) -->
         <div id="reelPublishArea">
             <input id="reelInput" placeholder="Ссылка на фото (рилс)" />
             <button class="btn-sm" id="publishReelBtn">📹 Рилс</button>
         </div>
-        <div class="reels-strip" id="reelsStrip"></div>
-        <div style="font-size:11px; opacity:0.4; text-align:center; margin-bottom:12px;">Рилсы удаляются через 1 час</div>
-        
-        <!-- ПОСТЫ -->
-        <div class="create-post-area" id="createPostArea">
-            <textarea id="postText" placeholder="Что нового?"></textarea>
-            <div class="actions" style="display:flex; gap:8px; margin-top:8px; align-items:center;">
-                <input id="postImage" placeholder="Ссылка на фото" style="flex:1; padding:8px 12px; border-radius:20px; border:1px solid var(--border); background:var(--bg); color:var(--text); outline:none;" />
-                <button class="btn-sm" id="publishPostBtn">📝 Пост</button>
-            </div>
+        <div style="font-size:11px; opacity:0.4; text-align:center; margin-bottom:12px;">
+            Рилсы удаляются через 1 час
         </div>
+
+        <!-- РИЛС-КРУГИ -->
+        <div class="reels-strip" id="reelsStrip"></div>
+
+        <!-- ПОСТЫ -->
         <div id="feedPosts"></div>
     </div>
 
@@ -1122,7 +1183,7 @@
 
 <!-- ============ ПРОСМОТР РИЛСА ============ -->
 <div class="reel-view" id="reelView">
-    <span class="close" id="reelClose">✕</span>
+    <button class="close" id="reelClose">✕</button>
     <img id="reelImage" src="" alt="рилс" />
     <div class="user-label" id="reelUserLabel">@user</div>
 </div>
@@ -1151,7 +1212,6 @@ let chatListeners = {};
 let isAdmin = false;
 let viewedUser = null;
 let readonlyMode = false;
-let chatRequests = {}; // для отслеживания запросов на чат
 
 const $ = id => document.getElementById(id);
 
@@ -1611,10 +1671,8 @@ function renderFeed() {
         if (p.url) {
             const container = document.createElement('div');
             container.className = 'post-media-container';
-            container.style.cssText = 'position:relative; width:100%; border-radius:12px; overflow:hidden; background:var(--bg); margin:8px 0; min-height:120px; display:flex; align-items:center; justify-content:center; border:1px solid var(--border);';
             const img = document.createElement('img');
             img.alt = 'медиа';
-            img.style.cssText = 'width:100%; display:block; border-radius:12px; max-height:400px; object-fit:contain; background:var(--bg); min-height:100px;';
             container.appendChild(img);
             loadImageWithFallback(img, p.url, '🖼️ Фото не загрузилось');
             img.onclick = function(e) {
@@ -1724,7 +1782,7 @@ publishPostBtn.onclick = () => {
 };
 
 // ============================================================
-// РИЛСЫ (ТЕПЕРЬ СВЕРХУ)
+// РИЛСЫ
 // ============================================================
 publishReelBtn.onclick = () => {
     if (readonlyMode) { alert('📖 Режим чтения! Публикация запрещена.'); return; }
@@ -1811,24 +1869,44 @@ function renderReelsStrip() {
     }
 }
 
-reelClose.onclick = () => reelView.classList.remove('active');
-reelView.onclick = (e) => { if (e.target === reelView) reelView.classList.remove('active'); };
+// ============================================================
+// ЗАКРЫТИЕ РИЛСА
+// ============================================================
+function closeReelView() {
+    reelView.classList.remove('active');
+    reelImage.src = '';
+    reelUserLabel.textContent = '';
+}
+
+if (reelClose) {
+    reelClose.addEventListener('click', function(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        closeReelView();
+    });
+}
+
+if (reelView) {
+    reelView.addEventListener('click', function(e) {
+        if (e.target === this) closeReelView();
+    });
+}
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && reelView.classList.contains('active')) closeReelView();
+});
 
 // ============================================================
-// ЧАТЫ - РАСШИРЕННАЯ ЛОГИКА
+// ЧАТЫ
 // ============================================================
 function renderChatList() {
     if (!currentUser) return;
     chatList.innerHTML = '';
     
-    // Собираем все чаты: друзья + те, с кем есть сообщения
     const allChatPartners = new Set();
-    
-    // 1. Друзья
     const friends = Object.keys(currentUser.friends || {});
     friends.forEach(u => allChatPartners.add(u));
     
-    // 2. Те, с кем есть переписка (даже если не друзья)
     db.ref('messages').once('value', snap => {
         const msgs = snap.val() || {};
         for (const chatId in msgs) {
@@ -1840,7 +1918,6 @@ function renderChatList() {
             }
         }
         
-        // Сортируем: сначала друзья, потом остальные
         const sortedPartners = Array.from(allChatPartners).sort((a, b) => {
             const aIsFriend = currentUser.friends && currentUser.friends[a];
             const bIsFriend = currentUser.friends && currentUser.friends[b];
@@ -2033,7 +2110,6 @@ function sendMessage(text, username) {
     ref.push().set({ text, time: Date.now(), from: currentUser.username });
     chatInput.value = '';
     renderChatMessages(username);
-    // Обновляем список чатов, чтобы появился у собеседника
     renderChatList();
 }
 
@@ -2080,7 +2156,7 @@ chatBack.onclick = () => {
 chatInput.addEventListener('keydown', e => { if (e.key === 'Enter') chatSend.click(); });
 
 // ============================================================
-// ДРУЗЬЯ - С ВОЗМОЖНОСТЬЮ ОТПИСАТЬСЯ
+// ДРУЗЬЯ
 // ============================================================
 function renderFriends() {
     if (!currentUser) return;
@@ -2128,7 +2204,6 @@ function renderFriends() {
             chatBtn.onclick = () => { openChat(u); };
             btnGroup.appendChild(chatBtn);
             
-            // Кнопка отписаться (удалить из друзей)
             const unfriendBtn = document.createElement('button');
             unfriendBtn.className = 'btn-sm danger';
             unfriendBtn.textContent = '🚫 Отписаться';
@@ -2152,10 +2227,8 @@ function renderFriends() {
 
 function unfriendUser(username) {
     if (readonlyMode) { alert('📖 Режим чтения!'); return; }
-    // Удаляем из друзей у обоих
     db.ref('users/' + currentUser.username + '/friends/' + username).remove();
     db.ref('users/' + username + '/friends/' + currentUser.username).remove();
-    // Также удаляем из подписок
     db.ref('users/' + currentUser.username + '/following/' + username).remove();
     db.ref('users/' + username + '/followers/' + currentUser.username).remove();
     
@@ -2702,33 +2775,6 @@ if (readonlyToggle) {
 }
 
 // ============================================================
-// ЗАКРЫТИЕ РИЛСА
-// ============================================================
-function closeReelView() {
-    reelView.classList.remove('active');
-    reelImage.src = '';
-    reelUserLabel.textContent = '';
-}
-
-if (reelClose) {
-    reelClose.addEventListener('click', function(e) {
-        e.stopPropagation();
-        e.preventDefault();
-        closeReelView();
-    });
-}
-
-if (reelView) {
-    reelView.addEventListener('click', function(e) {
-        if (e.target === this) closeReelView();
-    });
-}
-
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape' && reelView.classList.contains('active')) closeReelView();
-});
-
-// ============================================================
 // ЗАПУСК
 // ============================================================
 authPassword.addEventListener('keydown', e => { if (e.key === 'Enter') authBtn.click(); });
@@ -2739,7 +2785,7 @@ console.log('✨ Что нового:');
 console.log('1. Анимации при появлении');
 console.log('2. Чаты появляются у обоих после 1 сообщения');
 console.log('3. Кнопка "Отписаться" в друзьях');
-console.log('4. Рилсы теперь сверху ленты');
+console.log('4. Рилсы теперь вверху ленты');
 console.log('5. Лента рекомендаций в разработке');
 </script>
 </body>
