@@ -647,204 +647,56 @@
             margin-top: 4px;
         }
         
-        /* ============ АДАПТИВ ДЛЯ ТЕЛЕФОНОВ ============ */
-        @media (max-width: 480px) {
-            .page {
-                padding: 8px 10px 70px;
-            }
-            
-            .header {
-                padding: 8px 12px;
-                min-height: 48px;
-            }
-            .header h2 {
-                font-size: 17px;
-            }
-            
-            .post-card {
-                padding: 10px 12px;
-                margin-bottom: 8px;
-            }
-            .post-header .avatar {
-                width: 32px;
-                height: 32px;
-                font-size: 16px;
-            }
-            .post-content {
-                font-size: 14px;
-            }
-            .post-media-container img {
-                max-height: 250px;
-            }
-            .post-time {
-                font-size: 10px;
-            }
-            
-            .reel-circle .avatar {
-                width: 48px;
-                height: 48px;
-            }
-            .reel-circle span {
-                font-size: 10px;
-                max-width: 50px;
-            }
-            
-            .bottom-nav {
-                padding: 4px 0;
-            }
-            .nav-item {
-                font-size: 10px;
-                min-width: 40px;
-                padding: 2px 4px;
-            }
-            .nav-item span {
-                font-size: 16px;
-            }
-            
-            .chat-item {
-                padding: 8px 0;
-            }
-            .chat-item .avatar {
-                width: 36px;
-                height: 36px;
-                font-size: 16px;
-            }
-            .chat-message {
-                font-size: 14px;
-                padding: 8px 12px;
-            }
-            .chat-input input {
-                font-size: 14px;
-                padding: 8px 12px;
-            }
-            .chat-input button {
-                padding: 8px 14px;
-                font-size: 14px;
-            }
-            
-            .search-input {
-                font-size: 14px;
-                padding: 10px 14px;
-            }
-            .user-card {
-                padding: 10px 12px;
-            }
-            .user-card .info .name-wrapper {
-                font-size: 14px;
-            }
-            .user-card .info .username {
-                font-size: 12px;
-            }
-            .btn-sm {
-                font-size: 11px;
-                padding: 4px 12px;
-            }
-            
-            .profile-header .avatar {
-                width: 64px;
-                height: 64px;
-                font-size: 28px;
-            }
-            .profile-header .name-wrapper {
-                font-size: 18px;
-            }
-            .profile-header .username {
-                font-size: 14px;
-            }
-            
-            .create-post-area {
-                padding: 8px;
-            }
-            .create-post-area textarea {
-                font-size: 14px;
-                min-height: 40px;
-                padding: 8px;
-            }
-            .create-post-area .actions input {
-                font-size: 13px;
-                padding: 6px 10px;
-            }
-            .create-post-area .actions .btn-sm {
-                font-size: 11px;
-                padding: 4px 10px;
-            }
-            
-            .verified-badge {
-                width: 14px;
-                height: 14px;
-                font-size: 8px;
-            }
-            .verified-badge-sm {
-                width: 12px;
-                height: 12px;
-                font-size: 6px;
-            }
-            
-            #reelInput {
-                font-size: 13px;
-                padding: 6px 10px;
-            }
-            
-            input, textarea {
-                font-size: 14px !important;
-            }
-            
-            .settings-row {
-                padding: 8px 0;
-                flex-wrap: wrap;
-                gap: 6px;
-            }
-            .settings-row label {
-                font-size: 14px;
-            }
-            .settings-row input {
-                font-size: 13px !important;
-                padding: 4px 8px;
-                max-width: 120px !important;
-            }
-            
-            .emoji-grid button {
-                font-size: 22px;
-                padding: 2px 6px;
-            }
-            
-            .reel-view .close {
-                top: 16px;
-                right: 16px;
-                font-size: 24px;
-            }
-            .reel-view img {
-                max-height: 60vh;
-            }
-            .reel-view .user-label {
-                font-size: 16px;
-            }
+        #cropModal canvas {
+            cursor: grab;
+            touch-action: none;
+        }
+        #cropModal canvas:active {
+            cursor: grabbing;
         }
         
-        @media (max-width: 380px) {
-            .nav-item {
-                font-size: 9px;
-                min-width: 32px;
-                padding: 2px 2px;
-            }
-            .nav-item span {
-                font-size: 14px;
-            }
-            .bottom-nav {
-                padding: 2px 0;
-            }
-            .post-card {
-                padding: 8px 10px;
-            }
-            .chat-message {
-                font-size: 13px;
-                padding: 6px 10px;
-            }
-            .verified-badge {
-                width: 12px;
-                height: 12px;
-                font-size: 6px;
-            }
+        @media (max-width: 480px) {
+            .page { padding: 8px 10px 70px; }
+            .header { padding: 8px 12px; min-height: 48px; }
+            .header h2 { font-size: 17px; }
+            .post-card { padding: 10px 12px; margin-bottom: 8px; }
+            .post-header .avatar { width: 32px; height: 32px; font-size: 16px; }
+            .post-content { font-size: 14px; }
+            .post-media-container img { max-height: 250px; }
+            .post-time { font-size: 10px; }
+            .reel-circle .avatar { width: 48px; height: 48px; }
+            .reel-circle span { font-size: 10px; max-width: 50px; }
+            .bottom-nav { padding: 4px 0; }
+            .nav-item { font-size: 10px; min-width: 40px; padding: 2px 4px; }
+            .nav-item span { font-size: 16px; }
+            .chat-item { padding: 8px 0; }
+            .chat-item .avatar { width: 36px; height: 36px; font-size: 16px; }
+            .chat-message { font-size: 14px; padding: 8px 12px; }
+            .chat-input input { font-size: 14px; padding: 8px 12px; }
+            .chat-input button { padding: 8px 14px; font-size: 14px; }
+            .search-input { font-size: 14px; padding: 10px 14px; }
+            .user-card { padding: 10px 12px; }
+            .user-card .info .name-wrapper { font-size: 14px; }
+            .user-card .info .username { font-size: 12px; }
+            .btn-sm { font-size: 11px; padding: 4px 12px; }
+            .profile-header .avatar { width: 64px; height: 64px; font-size: 28px; }
+            .profile-header .name-wrapper { font-size: 18px; }
+            .profile-header .username { font-size: 14px; }
+            .create-post-area { padding: 8px; }
+            .create-post-area textarea { font-size: 14px; min-height: 40px; padding: 8px; }
+            .create-post-area .actions input { font-size: 13px; padding: 6px 10px; }
+            .create-post-area .actions .btn-sm { font-size: 11px; padding: 4px 10px; }
+            .verified-badge { width: 14px; height: 14px; font-size: 8px; }
+            .verified-badge-sm { width: 12px; height: 12px; font-size: 6px; }
+            #reelInput { font-size: 13px; padding: 6px 10px; }
+            input, textarea { font-size: 14px !important; }
+            .settings-row { padding: 8px 0; flex-wrap: wrap; gap: 6px; }
+            .settings-row label { font-size: 14px; }
+            .settings-row input { font-size: 13px !important; padding: 4px 8px; max-width: 120px !important; }
+            .emoji-grid button { font-size: 22px; padding: 2px 6px; }
+            .reel-view .close { top: 16px; right: 16px; font-size: 24px; }
+            .reel-view img { max-height: 60vh; }
+            .reel-view .user-label { font-size: 16px; }
         }
     </style>
 </head>
@@ -945,9 +797,12 @@
                 <button class="btn-sm" id="settingsSaveName">Сохранить</button>
             </div>
             <div class="settings-row" style="flex-direction:column; align-items:stretch; gap:8px;">
-                <label>Аватар (ссылка на фото)</label>
-                <input id="settingsAvatarUrl" placeholder="URL фото" style="width:100%;" />
-                <button class="btn-sm" id="settingsSaveAvatar">Установить</button>
+                <label>Аватар</label>
+                <input id="settingsAvatarUrl" placeholder="Ссылка на фото" style="width:100%;" />
+                <div style="display:flex; gap:8px;">
+                    <button class="btn-sm" id="settingsSaveAvatar" style="flex:1;">Установить</button>
+                    <button class="btn-sm" id="cropUploadBtn" style="flex:1;">📷 Выбрать фото</button>
+                </div>
                 <div style="margin-top:4px;">
                     <label style="font-size:13px;">Или смайлик:</label>
                     <div class="emoji-grid" id="emojiGrid">
@@ -1016,7 +871,7 @@ const emojiGrid = $('emojiGrid');
 const reelView = $('reelView'), reelImage = $('reelImage'), reelUserLabel = $('reelUserLabel'), reelClose = $('reelClose');
 const onlineStatus = $('onlineStatus');
 
-// ============ ФУНКЦИЯ ДЛЯ ГАЛОЧКИ ============
+// ============ ГАЛОЧКА ============
 function getVerifiedBadge(username, size = 'normal') {
     const user = allUsersCache[username];
     if (user && user.verified === true) {
@@ -1265,7 +1120,7 @@ function renderFeed() {
         const av = document.createElement('div');
         av.className = 'avatar';
         const user = allUsersCache[p.username];
-        if (user && user.avatar && user.avatar.startsWith('http')) {
+        if (user && user.avatar && (user.avatar.startsWith('http') || user.avatar.startsWith('data:image'))) {
             const img = document.createElement('img');
             img.src = user.avatar;
             img.alt = 'avatar';
@@ -1401,7 +1256,7 @@ function renderReelsStrip() {
         const avatarDiv = document.createElement('div');
         avatarDiv.className = 'avatar';
         const user = allUsersCache[reel.username];
-        if (user && user.avatar && user.avatar.startsWith('http')) {
+        if (user && user.avatar && (user.avatar.startsWith('http') || user.avatar.startsWith('data:image'))) {
             const img = document.createElement('img');
             img.src = user.avatar;
             img.alt = 'avatar';
@@ -1433,6 +1288,261 @@ function renderReelsStrip() {
     }
 }
 
+// ============ ОБРЕЗКА АВАТАРКИ ============
+
+let cropModal = null;
+let cropCanvas = null;
+let cropCtx = null;
+let cropImage = null;
+let cropScale = 1;
+let cropOffsetX = 0;
+let cropOffsetY = 0;
+let isDraggingCrop = false;
+let dragStartX = 0;
+let dragStartY = 0;
+let dragOffsetX = 0;
+let dragOffsetY = 0;
+
+function createCropModal() {
+    const modal = document.createElement('div');
+    modal.id = 'cropModal';
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.85);
+        z-index: 999;
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    `;
+    
+    modal.innerHTML = `
+        <div style="background: var(--card); border-radius: 20px; padding: 20px; max-width: 400px; width: 100%;">
+            <h3 style="text-align:center; margin-bottom:12px;">🖼️ Обрезка аватара</h3>
+            <div style="position:relative; width:100%; max-width:300px; margin:0 auto; aspect-ratio:1/1; overflow:hidden; border-radius:50%; background:var(--bg); border:2px solid var(--border);">
+                <canvas id="cropCanvas"></canvas>
+            </div>
+            <div style="display:flex; gap:8px; margin-top:12px; justify-content:center; flex-wrap:wrap;">
+                <button class="btn-sm" id="cropZoomIn">➕</button>
+                <button class="btn-sm" id="cropZoomOut">➖</button>
+                <button class="btn-sm" id="cropReset">🔄</button>
+            </div>
+            <div style="display:flex; gap:8px; margin-top:12px;">
+                <button class="btn-sm outline" id="cropCancel" style="flex:1;">Отмена</button>
+                <button class="btn-sm" id="cropSave" style="flex:1;">Сохранить</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    return modal;
+}
+
+function openCropModal(imageUrl) {
+    if (!cropModal) {
+        cropModal = createCropModal();
+    }
+    
+    cropModal.style.display = 'flex';
+    cropCanvas = document.getElementById('cropCanvas');
+    cropCtx = cropCanvas.getContext('2d');
+    
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = function() {
+        cropImage = img;
+        cropScale = 1;
+        cropOffsetX = 0;
+        cropOffsetY = 0;
+        setupCanvas();
+        drawCrop();
+    };
+    img.onerror = function() {
+        alert('Не удалось загрузить изображение. Попробуйте другую ссылку.');
+        cropModal.style.display = 'none';
+    };
+    img.src = imageUrl;
+    
+    document.getElementById('cropZoomIn').onclick = () => {
+        cropScale *= 1.2;
+        drawCrop();
+    };
+    document.getElementById('cropZoomOut').onclick = () => {
+        cropScale /= 1.2;
+        if (cropScale < 0.5) cropScale = 0.5;
+        drawCrop();
+    };
+    document.getElementById('cropReset').onclick = () => {
+        cropScale = 1;
+        cropOffsetX = 0;
+        cropOffsetY = 0;
+        drawCrop();
+    };
+    document.getElementById('cropCancel').onclick = () => {
+        cropModal.style.display = 'none';
+    };
+    document.getElementById('cropSave').onclick = saveCroppedAvatar;
+    
+    // Drag для перемещения
+    cropCanvas.onmousedown = startCropDrag;
+    cropCanvas.onmousemove = moveCropDrag;
+    cropCanvas.onmouseup = endCropDrag;
+    cropCanvas.onmouseleave = endCropDrag;
+    
+    cropCanvas.ontouchstart = (e) => {
+        e.preventDefault();
+        const touch = e.touches[0];
+        const rect = cropCanvas.getBoundingClientRect();
+        startCropDrag({ clientX: touch.clientX, clientY: touch.clientY });
+    };
+    cropCanvas.ontouchmove = (e) => {
+        e.preventDefault();
+        const touch = e.touches[0];
+        moveCropDrag({ clientX: touch.clientX, clientY: touch.clientY });
+    };
+    cropCanvas.ontouchend = endCropDrag;
+}
+
+function setupCanvas() {
+    const container = cropCanvas.parentElement;
+    const size = Math.min(container.clientWidth, container.clientHeight, 300);
+    cropCanvas.width = size;
+    cropCanvas.height = size;
+    cropCanvas.style.width = size + 'px';
+    cropCanvas.style.height = size + 'px';
+}
+
+function drawCrop() {
+    if (!cropImage || !cropCtx) return;
+    
+    const canvas = cropCanvas;
+    const ctx = cropCtx;
+    const size = canvas.width;
+    
+    ctx.clearRect(0, 0, size, size);
+    ctx.fillStyle = '#e8e8f0';
+    ctx.fillRect(0, 0, size, size);
+    
+    const imgAspect = cropImage.width / cropImage.height;
+    let drawWidth = size * cropScale;
+    let drawHeight = drawWidth / imgAspect;
+    
+    if (drawHeight < size * cropScale) {
+        drawHeight = size * cropScale;
+        drawWidth = drawHeight * imgAspect;
+    }
+    
+    const x = (size - drawWidth) / 2 + cropOffsetX * cropScale;
+    const y = (size - drawHeight) / 2 + cropOffsetY * cropScale;
+    
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(size/2, size/2, size/2, 0, Math.PI * 2);
+    ctx.closePath();
+    ctx.clip();
+    
+    ctx.drawImage(cropImage, x, y, drawWidth, drawHeight);
+    ctx.restore();
+    
+    ctx.strokeStyle = '#1da1f2';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.arc(size/2, size/2, size/2 - 2, 0, Math.PI * 2);
+    ctx.stroke();
+}
+
+function startCropDrag(e) {
+    if (!cropImage) return;
+    isDraggingCrop = true;
+    const rect = cropCanvas.getBoundingClientRect();
+    const scaleX = cropCanvas.width / rect.width;
+    const scaleY = cropCanvas.height / rect.height;
+    dragStartX = (e.clientX - rect.left) * scaleX;
+    dragStartY = (e.clientY - rect.top) * scaleY;
+    dragOffsetX = cropOffsetX;
+    dragOffsetY = cropOffsetY;
+    cropCanvas.style.cursor = 'grabbing';
+}
+
+function moveCropDrag(e) {
+    if (!isDraggingCrop || !cropImage) return;
+    const rect = cropCanvas.getBoundingClientRect();
+    const scaleX = cropCanvas.width / rect.width;
+    const scaleY = cropCanvas.height / rect.height;
+    const currentX = (e.clientX - rect.left) * scaleX;
+    const currentY = (e.clientY - rect.top) * scaleY;
+    
+    const dx = (currentX - dragStartX) / cropScale;
+    const dy = (currentY - dragStartY) / cropScale;
+    
+    cropOffsetX = dragOffsetX + dx;
+    cropOffsetY = dragOffsetY + dy;
+    
+    drawCrop();
+}
+
+function endCropDrag() {
+    isDraggingCrop = false;
+    if (cropCanvas) cropCanvas.style.cursor = 'grab';
+}
+
+function saveCroppedAvatar() {
+    if (!cropImage || !cropCanvas) return;
+    
+    const saveCanvas = document.createElement('canvas');
+    saveCanvas.width = 200;
+    saveCanvas.height = 200;
+    const saveCtx = saveCanvas.getContext('2d');
+    
+    const size = cropCanvas.width;
+    const imgAspect = cropImage.width / cropImage.height;
+    let drawWidth = size * cropScale;
+    let drawHeight = drawWidth / imgAspect;
+    
+    if (drawHeight < size * cropScale) {
+        drawHeight = size * cropScale;
+        drawWidth = drawHeight * imgAspect;
+    }
+    
+    const x = (size - drawWidth) / 2 + cropOffsetX * cropScale;
+    const y = (size - drawHeight) / 2 + cropOffsetY * cropScale;
+    
+    saveCtx.save();
+    saveCtx.beginPath();
+    saveCtx.arc(100, 100, 100, 0, Math.PI * 2);
+    saveCtx.closePath();
+    saveCtx.clip();
+    
+    const scale = 200 / size;
+    saveCtx.drawImage(cropImage, 
+        x * scale, y * scale, 
+        drawWidth * scale, drawHeight * scale,
+        0, 0, 200, 200
+    );
+    saveCtx.restore();
+    
+    const dataUrl = saveCanvas.toDataURL('image/png');
+    
+    const ref = db.ref('users/' + currentUser.username + '/avatar');
+    ref.set(dataUrl).then(() => {
+        cropModal.style.display = 'none';
+        renderProfile();
+        renderFeed();
+        renderChatList();
+        renderFriends();
+        renderSearch();
+        renderReelsStrip();
+        alert('✅ Аватар обновлён!');
+    }).catch(e => {
+        alert('Ошибка сохранения: ' + e.message);
+    });
+}
+
 // ============ ЧАТ ============
 
 function getChatId(user1, user2) {
@@ -1455,7 +1565,7 @@ function renderChatList() {
         item.className = 'chat-item';
         const av = document.createElement('div');
         av.className = 'avatar';
-        if (user.avatar && user.avatar.startsWith('http')) {
+        if (user.avatar && (user.avatar.startsWith('http') || user.avatar.startsWith('data:image'))) {
             const img = document.createElement('img');
             img.src = user.avatar;
             img.alt = 'avatar';
@@ -1804,7 +1914,7 @@ function renderFriends() {
 function renderProfile() {
     if (!currentUser) return;
     const user = currentUser;
-    if (user.avatar && user.avatar.startsWith('http')) {
+    if (user.avatar && (user.avatar.startsWith('http') || user.avatar.startsWith('data:image'))) {
         const img = document.createElement('img');
         img.src = user.avatar;
         img.alt = 'avatar';
@@ -1823,10 +1933,31 @@ function renderProfile() {
     profileBadge.innerHTML = badge;
     profileUsername.textContent = '@' + user.username;
     settingsName.value = user.name || '';
-    settingsAvatarUrl.value = user.avatar && user.avatar.startsWith('http') ? user.avatar : '';
+    if (user.avatar && user.avatar.startsWith('http')) {
+        settingsAvatarUrl.value = user.avatar;
+    } else {
+        settingsAvatarUrl.value = '';
+    }
     if (isDark) themeToggle.classList.add('active');
     else themeToggle.classList.remove('active');
 }
+
+// Кнопка выбора фото для обрезки
+document.getElementById('cropUploadBtn').onclick = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            openCropModal(ev.target.result);
+        };
+        reader.readAsDataURL(file);
+    };
+    input.click();
+};
 
 themeToggle.onclick = () => {
     isDark = !isDark;
@@ -1847,7 +1978,15 @@ settingsSaveAvatar.onclick = () => {
         alert('Введите корректную ссылку');
         return;
     }
-    db.ref('users/' + currentUser.username + '/avatar').set(url);
+    db.ref('users/' + currentUser.username + '/avatar').set(url).then(() => {
+        renderProfile();
+        renderFeed();
+        renderChatList();
+        renderFriends();
+        renderSearch();
+        renderReelsStrip();
+        alert('✅ Аватар обновлён!');
+    });
 };
 
 emojiGrid.querySelectorAll('button').forEach(btn => {
@@ -1855,6 +1994,12 @@ emojiGrid.querySelectorAll('button').forEach(btn => {
         const emoji = btn.textContent;
         db.ref('users/' + currentUser.username + '/avatar').set(emoji);
         settingsAvatarUrl.value = '';
+        renderProfile();
+        renderFeed();
+        renderChatList();
+        renderFriends();
+        renderSearch();
+        renderReelsStrip();
     };
 });
 
@@ -1868,6 +2013,7 @@ postText.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey
 
 console.log('🐱 BarsikNet готов!');
 console.log('📱 Адаптировано для телефонов');
+console.log('🖼️ Обрезка аватара - нажми "Выбрать фото" в профиле');
 </script>
 </body>
 </html>
