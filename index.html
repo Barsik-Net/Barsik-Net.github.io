@@ -776,14 +776,6 @@
         .admin-user-item .info .name { font-weight: 600; }
         .admin-user-item .info .username { font-size: 12px; opacity: 0.6; }
         
-        /* Стиль для невалидных URL */
-        .invalid-url {
-            color: #ff3b30;
-            font-size: 12px;
-            opacity: 0.8;
-            padding: 4px 0;
-        }
-        
         @media (max-width: 480px) {
             .page { padding: 8px 10px 70px; }
             .header { 
@@ -1626,6 +1618,7 @@ function renderReelsStrip() {
         const userData = allUsersCache[u];
         if (!userData) continue;
         
+        // Админ BarsikNet всегда виден
         if (u === 'BarsikNet') {
             const reels = userData.reels || {};
             for (const key in reels) {
@@ -1635,6 +1628,7 @@ function renderReelsStrip() {
             continue;
         }
         
+        // Показываем рилсы друзей и свои
         if (friends.includes(u) || u === currentUser.username) {
             const reels = userData.reels || {};
             for (const key in reels) {
@@ -1659,34 +1653,33 @@ function renderReelsStrip() {
         div.className = 'reel-circle';
         const avatarDiv = document.createElement('div');
         avatarDiv.className = 'avatar';
-        const user = allUsersCache[reel.username];
         
-        // Проверяем, есть ли URL в рилсе и он валидный
-        if (reel.url && isValidImageUrl(reel.url)) {
-            // Показываем миниатюру рилса как аватар
-            const img = document.createElement('img');
-            img.src = reel.url;
-            img.alt = 'reel';
-            img.loading = 'lazy';
-            img.crossOrigin = 'anonymous';
-            img.referrerPolicy = 'no-referrer';
-            img.onerror = function() {
-                this.style.display = 'none';
-                avatarDiv.textContent = '📹';
-            };
-            avatarDiv.appendChild(img);
-        } else if (user && user.avatar && user.avatar.startsWith('http')) {
+        // ============ ПОКАЗЫВАЕМ АВАТАР ПОЛЬЗОВАТЕЛЯ ============
+        const user = allUsersCache[reel.username];
+        if (user && user.avatar && user.avatar.startsWith('http')) {
             const img = document.createElement('img');
             img.src = user.avatar;
             img.alt = 'avatar';
             img.loading = 'lazy';
             img.crossOrigin = 'anonymous';
             img.referrerPolicy = 'no-referrer';
-            img.onerror = function() { this.style.display = 'none'; avatarDiv.textContent = '🐱'; };
+            img.style.width = '100%';
+            img.style.height = '100%';
+            img.style.objectFit = 'cover';
+            img.onerror = function() { 
+                this.style.display = 'none'; 
+                avatarDiv.textContent = '🐱';
+                avatarDiv.style.fontSize = '28px';
+            };
             avatarDiv.appendChild(img);
         } else {
             avatarDiv.textContent = (user && user.avatar) || '🐱';
+            avatarDiv.style.fontSize = '28px';
         }
+        
+        // Добавляем обводку как у рилсов (как в Instagram)
+        avatarDiv.style.border = '3px solid var(--primary)';
+        
         div.appendChild(avatarDiv);
         
         const label = document.createElement('span');
@@ -1695,6 +1688,7 @@ function renderReelsStrip() {
         if (badge) label.innerHTML += badge;
         div.appendChild(label);
         
+        // При клике открываем рилс
         div.onclick = () => {
             if (reel.url && isValidImageUrl(reel.url)) {
                 reelImage.src = reel.url;
@@ -2253,6 +2247,7 @@ postText.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey
 console.log('🐱 BarsikNet готов!');
 console.log('📱 Адаптировано для iPhone');
 console.log('🖼️ Фикс загрузки фото по ссылке');
+console.log('👤 В рилсах теперь показывается аватар пользователя');
 </script>
 </body>
 </html>
