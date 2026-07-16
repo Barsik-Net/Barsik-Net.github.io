@@ -66,6 +66,84 @@
             pointer-events: auto !important;
             opacity: 1 !important;
         }
+        
+        /* ============ АНИМАЦИИ ============ */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(0.8) rotate(-5deg); }
+            to { opacity: 1; transform: scale(1) rotate(0deg); }
+        }
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.7; }
+            50% { transform: scale(1.05); opacity: 1; }
+        }
+        @keyframes typewriter {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+        @keyframes blink {
+            0%, 100% { border-color: var(--primary); }
+            50% { border-color: transparent; }
+        }
+        
+        .anim-fade-up {
+            animation: fadeInUp 0.6s ease forwards;
+        }
+        .anim-fade {
+            animation: fadeIn 0.5s ease forwards;
+        }
+        .anim-slide {
+            animation: slideInLeft 0.5s ease forwards;
+        }
+        .anim-pop {
+            animation: popIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+        }
+        .anim-shimmer {
+            background: linear-gradient(90deg, var(--text) 0%, var(--primary) 30%, var(--text) 60%);
+            background-size: 200% 100%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shimmer 2s linear infinite;
+        }
+        .anim-pulse {
+            animation: pulse 1.8s ease-in-out infinite;
+        }
+        .anim-typewriter {
+            overflow: hidden;
+            white-space: nowrap;
+            border-right: 3px solid var(--primary);
+            animation: typewriter 2s steps(20) forwards, blink 0.8s step-end infinite;
+            width: 0;
+            display: inline-block;
+        }
+        .anim-delay-1 { animation-delay: 0.1s; }
+        .anim-delay-2 { animation-delay: 0.2s; }
+        .anim-delay-3 { animation-delay: 0.3s; }
+        .anim-delay-4 { animation-delay: 0.4s; }
+        .anim-delay-5 { animation-delay: 0.5s; }
+
+        /* ============ АВТОРИЗАЦИЯ ============ */
         #auth {
             display: flex;
             justify-content: center;
@@ -76,55 +154,72 @@
         }
         .auth-box {
             background: var(--card);
-            padding: 32px 28px;
+            padding: 40px 32px;
             border-radius: var(--radius);
             box-shadow: var(--shadow);
             width: 100%;
-            max-width: 360px;
+            max-width: 380px;
             transition: background 0.3s;
+            animation: fadeInUp 0.7s ease;
         }
-        .auth-box h1 {
+        .auth-box .logo {
             text-align: center;
-            margin-bottom: 24px;
-            font-weight: 700;
+            margin-bottom: 28px;
+        }
+        .auth-box .logo .icon {
+            font-size: 48px;
+            display: block;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        .auth-box .logo h1 {
             font-size: 28px;
+            font-weight: 800;
             color: var(--primary);
+            margin-top: 4px;
+        }
+        .auth-box .logo h1 span {
+            color: var(--text);
+        }
+        .auth-box .logo .sub {
+            font-size: 13px;
+            opacity: 0.4;
+            margin-top: 2px;
         }
         .auth-box input {
             width: 100%;
             padding: 12px 16px;
-            margin-bottom: 14px;
+            margin-bottom: 12px;
             border: 1.5px solid var(--border);
             border-radius: 12px;
             background: var(--bg);
             color: var(--text);
             font-size: 15px;
             outline: none;
+            transition: 0.3s;
         }
         .auth-box input:focus {
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(74,108,247,0.15);
+            box-shadow: 0 0 0 4px rgba(74,108,247,0.12);
         }
-        .auth-box button {
+        .auth-box .auth-btn {
             width: 100%;
-            padding: 12px;
+            padding: 13px;
             background: var(--primary);
             color: white;
             border: none;
             border-radius: 12px;
             font-size: 16px;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
-            transition: 0.2s;
-            margin-top: 4px;
+            transition: 0.3s;
+            margin-top: 6px;
         }
-        .auth-box button:hover { opacity: 0.9; transform: scale(0.98); }
+        .auth-box .auth-btn:hover { opacity: 0.9; transform: scale(0.98); }
         .auth-box .switch {
             text-align: center;
             margin-top: 16px;
             font-size: 14px;
-            color: var(--text);
-            opacity: 0.7;
+            opacity: 0.6;
             cursor: pointer;
             transition: 0.2s;
         }
@@ -136,6 +231,8 @@
             margin-bottom: 10px;
             min-height: 20px;
         }
+        
+        /* ============ ПРИЛОЖЕНИЕ ============ */
         #app {
             display: none;
             flex-direction: column;
@@ -185,6 +282,7 @@
             -webkit-overflow-scrolling: touch;
         }
         .page.active { display: block; }
+        
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -216,19 +314,21 @@
             border: none;
             color: var(--text);
             opacity: 0.5;
-            font-size: 12px;
+            font-size: 11px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 4px 8px;
+            padding: 4px 6px;
             cursor: pointer;
             transition: 0.2s;
             font-weight: 500;
-            min-width: 52px;
+            min-width: 40px;
         }
         .nav-item.active { opacity: 1; color: var(--primary); }
-        .nav-item span { font-size: 20px; line-height: 1.2; }
-        .post-card, .user-card {
+        .nav-item span { font-size: 18px; line-height: 1.2; }
+        
+        /* ============ ПОСТЫ ============ */
+        .post-card {
             background: var(--card);
             border-radius: var(--radius);
             padding: 14px 16px;
@@ -236,6 +336,7 @@
             box-shadow: var(--shadow);
             transition: background 0.3s, box-shadow 0.3s;
             border: 1px solid var(--border);
+            animation: fadeIn 0.4s ease;
         }
         .post-header {
             display: flex;
@@ -251,7 +352,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 600;
             color: var(--primary);
             flex-shrink: 0;
@@ -336,12 +437,37 @@
             font-size: 12px;
             cursor: pointer;
         }
+        
+        /* ============ РИЛСЫ ============ */
+        #reelPublishArea {
+            display: flex;
+            gap: 8px;
+            background: var(--card);
+            padding: 12px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            margin-bottom: 12px;
+            animation: fadeIn 0.4s ease;
+        }
+        #reelPublishArea input {
+            flex: 1;
+            padding: 8px 12px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            background: var(--bg);
+            color: var(--text);
+            outline: none;
+        }
+        #reelPublishArea input:focus {
+            border-color: var(--primary);
+        }
         .reels-strip {
             display: flex;
             gap: 12px;
             overflow-x: auto;
             padding: 8px 0 12px;
             scrollbar-width: none;
+            animation: fadeIn 0.5s ease;
         }
         .reels-strip::-webkit-scrollbar { display: none; }
         .reel-circle {
@@ -384,6 +510,7 @@
             align-items: center;
             justify-content: center;
             padding: 20px;
+            animation: fadeIn 0.3s ease;
         }
         .reel-view.active { display: flex; }
         .reel-view img {
@@ -392,31 +519,24 @@
             border-radius: 16px;
             box-shadow: 0 8px 40px rgba(0,0,0,0.6);
             object-fit: contain;
-            user-select: none;
-            -webkit-user-drag: none;
         }
         .reel-view .close {
             position: absolute;
             top: 30px;
             right: 24px;
             color: white;
-            font-size: 32px;
+            font-size: 28px;
             cursor: pointer;
-            opacity: 0.8;
-            transition: opacity 0.2s;
-            z-index: 201;
-            background: none;
-            border: none;
-            padding: 8px 12px;
-            font-weight: 300;
+            opacity: 0.7;
         }
-        .reel-view .close:hover { opacity: 1; }
         .reel-view .user-label {
             color: white;
             margin-top: 16px;
             font-size: 18px;
             font-weight: 500;
         }
+        
+        /* ============ ЧАТЫ ============ */
         .chat-list { margin-bottom: 12px; }
         .chat-item {
             display: flex;
@@ -426,6 +546,7 @@
             border-bottom: 1px solid var(--border);
             cursor: pointer;
             transition: 0.2s;
+            animation: slideInLeft 0.4s ease;
         }
         .chat-item:active { opacity: 0.6; }
         .chat-item .info { flex: 1; }
@@ -459,6 +580,7 @@
             color: #1a1a2e;
             align-self: flex-start;
             word-wrap: break-word;
+            animation: fadeIn 0.3s ease;
         }
         .dark .chat-message {
             background: #2a2a3e;
@@ -501,6 +623,14 @@
             cursor: pointer;
             padding: 4px 8px;
         }
+        .msg-limit-warning {
+            font-size: 12px;
+            text-align: center;
+            padding: 4px;
+            color: #ff9500;
+        }
+        
+        /* ============ ПОИСК И ДРУЗЬЯ ============ */
         .search-input {
             width: 100%;
             padding: 12px 16px;
@@ -518,6 +648,12 @@
             align-items: center;
             justify-content: space-between;
             gap: 12px;
+            background: var(--card);
+            border-radius: var(--radius);
+            padding: 12px 16px;
+            margin-bottom: 10px;
+            border: 1px solid var(--border);
+            animation: fadeIn 0.3s ease;
         }
         .user-card .info { flex: 1; }
         .user-card .info .name-wrapper {
@@ -527,12 +663,14 @@
             font-weight: 600;
         }
         .user-card .info .username { font-size: 13px; opacity: 0.6; }
+        
+        /* ============ КНОПКИ ============ */
         .btn-sm {
             padding: 6px 16px;
             border-radius: 20px;
             border: none;
             font-weight: 600;
-            font-size: 13px;
+            font-size: 12px;
             cursor: pointer;
             background: var(--primary);
             color: white;
@@ -549,6 +687,8 @@
         .btn-sm.success { background: #34c759; }
         .btn-sm.warning { background: #ff9500; }
         .btn-sm.banned { background: #8e8e93; }
+        
+        /* ============ ПРОФИЛЬ ============ */
         .profile-header {
             display: flex;
             flex-direction: column;
@@ -560,11 +700,6 @@
             height: 80px;
             font-size: 36px;
             margin-bottom: 8px;
-        }
-        .profile-header .avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
         }
         .profile-header .name-wrapper {
             display: flex;
@@ -580,9 +715,7 @@
             margin: 12px 0;
             justify-content: center;
         }
-        .profile-stats .stat {
-            text-align: center;
-        }
+        .profile-stats .stat { text-align: center; }
         .profile-stats .stat .num {
             font-size: 18px;
             font-weight: 700;
@@ -591,6 +724,35 @@
             font-size: 12px;
             opacity: 0.6;
         }
+        
+        /* ============ ВЕРИФИКАЦИЯ ============ */
+        .verified-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #1da1f2;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+            border: 1.5px solid white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            font-size: 10px;
+            color: white;
+            font-weight: 700;
+            line-height: 1;
+            padding: 1px;
+        }
+        .dark .verified-badge { border-color: #1a1a2e; }
+        .verified-badge-sm { width: 14px; height: 14px; font-size: 7px; }
+        .verified-badge-big { width: 24px; height: 24px; font-size: 14px; }
+        .name-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        /* ============ НАСТРОЙКИ ============ */
         .settings-group {
             display: flex;
             flex-direction: column;
@@ -653,140 +815,6 @@
             transition: 0.2s;
         }
         .emoji-grid button:active { transform: scale(0.9); }
-        .text-center { text-align: center; }
-        .msg-limit-warning {
-            font-size: 12px;
-            text-align: center;
-            padding: 4px;
-            color: #ff9500;
-        }
-        .create-post-area {
-            background: var(--card);
-            border-radius: var(--radius);
-            padding: 12px;
-            margin-bottom: 16px;
-            border: 1px solid var(--border);
-        }
-        .create-post-area textarea {
-            width: 100%;
-            padding: 10px;
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            background: var(--bg);
-            color: var(--text);
-            resize: vertical;
-            min-height: 60px;
-            font-family: inherit;
-            outline: none;
-        }
-        .create-post-area textarea:focus {
-            border-color: var(--primary);
-        }
-        .create-post-area .actions {
-            display: flex;
-            gap: 8px;
-            margin-top: 8px;
-            align-items: center;
-        }
-        .create-post-area .actions input {
-            flex: 1;
-            padding: 8px 12px;
-            border-radius: 20px;
-            border: 1px solid var(--border);
-            background: var(--bg);
-            color: var(--text);
-            outline: none;
-        }
-        .create-post-area .actions input:focus {
-            border-color: var(--primary);
-        }
-        
-        /* ============ ГАЛОЧКА ВЕРИФИКАЦИИ ============ */
-        .verified-badge {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            background: #1da1f2;
-            border-radius: 50%;
-            width: 18px;
-            height: 18px;
-            flex-shrink: 0;
-            border: 1.5px solid white;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-            font-size: 10px;
-            color: white;
-            font-weight: 700;
-            line-height: 1;
-            padding: 1px;
-        }
-        .dark .verified-badge {
-            border-color: #1a1a2e;
-        }
-        .verified-badge-sm {
-            width: 14px;
-            height: 14px;
-            font-size: 7px;
-        }
-        .verified-badge-big {
-            width: 24px;
-            height: 24px;
-            font-size: 14px;
-        }
-        .name-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-        .post-header .name-wrapper {
-            font-weight: 600;
-        }
-        
-        /* ============ ФИКС ФОТО ============ */
-        .post-media-container {
-            position: relative;
-            width: 100%;
-            border-radius: 12px;
-            overflow: hidden;
-            background: var(--bg);
-            margin: 8px 0;
-            min-height: 120px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid var(--border);
-        }
-        .post-media-container img {
-            width: 100%;
-            display: block;
-            border-radius: 12px;
-            max-height: 400px;
-            object-fit: contain;
-            background: var(--bg);
-            min-height: 100px;
-        }
-        .post-media-container .fallback {
-            padding: 20px;
-            text-align: center;
-            background: var(--bg);
-            border-radius: 12px;
-            color: var(--text);
-            opacity: 0.6;
-            font-size: 13px;
-            width: 100%;
-        }
-        .post-media-container .fallback span {
-            font-size: 11px;
-            display: block;
-            margin-top: 4px;
-            opacity: 0.5;
-        }
-        .post-media-container .loading {
-            padding: 30px;
-            text-align: center;
-            color: var(--text);
-            opacity: 0.5;
-            font-size: 13px;
-        }
         
         /* ============ АДМИНКА ============ */
         .admin-stats {
@@ -807,20 +835,7 @@
             font-weight: 700;
             color: var(--primary);
         }
-        .admin-stat .label {
-            font-size: 12px;
-            opacity: 0.6;
-            margin-top: 2px;
-        }
-        .admin-actions {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        .admin-actions .btn-sm {
-            width: 100%;
-            text-align: center;
-        }
+        .admin-stat .label { font-size: 12px; opacity: 0.6; margin-top: 2px; }
         .admin-user-item {
             display: flex;
             align-items: center;
@@ -853,84 +868,53 @@
             margin-bottom: 16px;
             flex-wrap: wrap;
         }
-        .admin-mode-toggle .label {
-            font-weight: 600;
-        }
+        .admin-mode-toggle .label { font-weight: 600; }
         
-        /* ============ ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ ============ */
-        .user-profile-view {
-            padding: 16px 0;
-        }
-        .user-profile-view .profile-header {
-            padding: 10px 0;
-        }
-        .user-profile-view .profile-stats {
-            margin: 8px 0;
-        }
-        .user-profile-view .profile-actions {
-            display: flex;
-            gap: 8px;
+        /* ============ МОДАЛКА ПРОФИЛЯ ============ */
+        #userProfileModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 300;
+            align-items: center;
             justify-content: center;
-            margin-top: 12px;
-            flex-wrap: wrap;
+            padding: 20px;
         }
-        .user-profile-view .profile-actions .btn-sm {
-            min-width: 100px;
-        }
-        
-        /* ============ НАСТРОЙКИ ============ */
-        .settings-support {
-            margin-top: 20px;
-            padding: 16px;
+        #userProfileModal .modal-content {
             background: var(--card);
             border-radius: var(--radius);
-            border: 1px solid var(--border);
-            text-align: center;
-        }
-        .settings-support .btn-sm {
-            min-width: 150px;
-        }
-        
-        /* ============ БАН ============ */
-        .ban-badge {
-            background: #ff3b30;
-            color: white;
-            font-size: 10px;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-weight: 600;
-            margin-left: 4px;
-        }
-        .banned-user {
-            opacity: 0.6;
+            max-width: 400px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 24px;
+            position: relative;
+            animation: popIn 0.4s ease;
         }
         
+        /* ============ ПРОСТЫЕ КЛАССЫ ============ */
+        .text-center { text-align: center; }
+        .mt-8 { margin-top: 8px; }
+        .mb-8 { margin-bottom: 8px; }
+        .op-5 { opacity: 0.5; }
+        
+        /* ============ МЕДИА ЗАПРОСЫ ============ */
         @media (max-width: 480px) {
             .page { padding: 8px 10px 70px; }
-            .header { 
-                padding: 8px 12px; 
-                padding-top: calc(8px + var(--safe-top));
-                min-height: 44px;
-            }
+            .header { padding: 8px 12px; padding-top: calc(8px + var(--safe-top)); min-height: 44px; }
             .header h2 { font-size: 17px; }
             .post-card { padding: 10px 12px; margin-bottom: 8px; }
             .post-header .avatar { width: 32px; height: 32px; font-size: 16px; }
             .post-content { font-size: 14px; }
-            .post-media-container { 
-                min-height: 80px;
-            }
-            .post-media-container img { 
-                max-height: 250px;
-                min-height: 60px;
-            }
             .post-time { font-size: 10px; }
             .reel-circle .avatar { width: 48px; height: 48px; }
             .reel-circle span { font-size: 10px; max-width: 50px; }
-            .bottom-nav { 
-                padding: 4px 0; 
-                padding-bottom: calc(4px + var(--safe-bottom));
-            }
-            .nav-item { font-size: 10px; min-width: 40px; padding: 2px 4px; }
+            .bottom-nav { padding: 4px 0; padding-bottom: calc(4px + var(--safe-bottom)); }
+            .nav-item { font-size: 10px; min-width: 36px; padding: 2px 4px; }
             .nav-item span { font-size: 16px; }
             .chat-item { padding: 8px 0; }
             .chat-item .avatar { width: 36px; height: 36px; font-size: 16px; }
@@ -939,59 +923,37 @@
             .chat-input button { padding: 8px 14px; font-size: 14px; }
             .search-input { font-size: 14px; padding: 10px 14px; }
             .user-card { padding: 10px 12px; }
-            .user-card .info .name-wrapper { font-size: 14px; }
-            .user-card .info .username { font-size: 12px; }
             .btn-sm { font-size: 11px; padding: 4px 12px; }
             .profile-header .avatar { width: 64px; height: 64px; font-size: 28px; }
-            .profile-header .name-wrapper { font-size: 18px; }
-            .profile-header .username { font-size: 14px; }
-            .create-post-area { padding: 8px; }
-            .create-post-area textarea { font-size: 14px; min-height: 40px; padding: 8px; }
-            .create-post-area .actions input { font-size: 13px; padding: 6px 10px; }
-            .create-post-area .actions .btn-sm { font-size: 11px; padding: 4px 10px; }
             .verified-badge { width: 14px; height: 14px; font-size: 8px; }
             .verified-badge-sm { width: 12px; height: 12px; font-size: 6px; }
             .verified-badge-big { width: 20px; height: 20px; font-size: 12px; }
-            #reelInput { font-size: 13px; padding: 6px 10px; }
-            input, textarea { font-size: 14px !important; }
-            .settings-row { padding: 8px 0; flex-wrap: wrap; gap: 6px; }
-            .settings-row label { font-size: 14px; }
-            .settings-row input { font-size: 13px !important; padding: 4px 8px; max-width: 120px !important; }
-            .emoji-grid button { font-size: 22px; padding: 2px 6px; }
-            .reel-view .close { top: 16px; right: 16px; font-size: 24px; }
-            .reel-view img { max-height: 60vh; }
-            .reel-view .user-label { font-size: 16px; }
             .admin-stats { grid-template-columns: 1fr 1fr; gap: 6px; }
             .admin-stat { padding: 10px; }
             .admin-stat .num { font-size: 22px; }
-            .post-actions button { font-size: 12px; }
-            .comment { font-size: 13px; }
-            .profile-stats { gap: 16px; }
-            .profile-stats .stat .num { font-size: 16px; }
-            .profile-stats .stat .label { font-size: 11px; }
-            .avatar.big { width: 64px; height: 64px; font-size: 28px; }
-            .admin-user-item { flex-direction: column; align-items: stretch; }
-            .admin-user-item .admin-buttons { justify-content: center; }
-            .admin-mode-toggle { flex-wrap: wrap; justify-content: center; }
         }
     </style>
 </head>
 <body>
 
-<!-- AUTH -->
+<!-- ============ АВТОРИЗАЦИЯ ============ -->
 <div id="auth">
     <div class="auth-box">
-        <h1>🐱 BarsikNet</h1>
+        <div class="logo">
+            <span class="icon">🐱</span>
+            <h1><span>Barsik</span>Net</h1>
+            <div class="sub">Социальная сеть для своих</div>
+        </div>
         <div class="error" id="authError"></div>
         <input id="authUsername" placeholder="Юзернейм (без @)" />
         <input id="authName" placeholder="Имя" style="display:block;" />
         <input id="authPassword" type="password" placeholder="Пароль" />
-        <button id="authBtn">Зарегистрироваться</button>
+        <button class="auth-btn" id="authBtn">Зарегистрироваться</button>
         <div class="switch" id="authSwitch">Уже есть аккаунт? Войти</div>
     </div>
 </div>
 
-<!-- APP -->
+<!-- ============ ПРИЛОЖЕНИЕ ============ -->
 <div id="app">
     <div class="header">
         <h2 id="pageTitle">🐱 Лента</h2>
@@ -1000,23 +962,28 @@
         </div>
     </div>
 
+    <!-- ЛЕНТА -->
     <div id="pageFeed" class="page active">
-        <div class="create-post-area" id="createPostArea">
-            <textarea id="postText" placeholder="Что нового?"></textarea>
-            <div class="actions">
-                <input id="postImage" placeholder="Ссылка на фото" />
-                <button class="btn-sm" id="publishPostBtn">Опубликовать</button>
-            </div>
+        <!-- РИЛСЫ - ТЕПЕРЬ СВЕРХУ -->
+        <div id="reelPublishArea">
+            <input id="reelInput" placeholder="Ссылка на фото (рилс)" />
+            <button class="btn-sm" id="publishReelBtn">📹 Рилс</button>
         </div>
         <div class="reels-strip" id="reelsStrip"></div>
-        <div id="feedPosts"></div>
-        <div style="display:flex; gap:8px; margin-top:12px; background:var(--card); padding:12px; border-radius:var(--radius); border:1px solid var(--border);" id="reelPublishArea">
-            <input id="reelInput" placeholder="Ссылка на фото (рилс)" style="flex:1; padding:8px 12px; border-radius:20px; border:1px solid var(--border); background:var(--bg); color:var(--text); outline:none;" />
-            <button id="publishReelBtn" class="btn-sm">Рилс</button>
+        <div style="font-size:11px; opacity:0.4; text-align:center; margin-bottom:12px;">Рилсы удаляются через 1 час</div>
+        
+        <!-- ПОСТЫ -->
+        <div class="create-post-area" id="createPostArea">
+            <textarea id="postText" placeholder="Что нового?"></textarea>
+            <div class="actions" style="display:flex; gap:8px; margin-top:8px; align-items:center;">
+                <input id="postImage" placeholder="Ссылка на фото" style="flex:1; padding:8px 12px; border-radius:20px; border:1px solid var(--border); background:var(--bg); color:var(--text); outline:none;" />
+                <button class="btn-sm" id="publishPostBtn">📝 Пост</button>
+            </div>
         </div>
-        <div style="margin-top:8px; font-size:11px; opacity:0.5; text-align:center;">Рилсы удаляются через 1 час</div>
+        <div id="feedPosts"></div>
     </div>
 
+    <!-- ЧАТЫ -->
     <div id="pageChats" class="page">
         <div id="chatList" class="chat-list"></div>
         <div id="chatWindow" class="chat-window">
@@ -1037,22 +1004,26 @@
         </div>
     </div>
 
+    <!-- ПОИСК -->
     <div id="pageSearch" class="page">
         <input class="search-input" id="searchInput" placeholder="Поиск по юзернейму" />
         <div id="searchResults"></div>
     </div>
 
+    <!-- ГРУППЫ -->
     <div id="pageGroups" class="page text-center" style="padding-top:40px;">
         <span style="font-size:48px;">🏗️</span>
         <h3 style="margin-top:12px;">Группы скоро</h3>
-        <p style="opacity:0.5;">Мы работаем над этим!</p>
+        <p class="op-5">Мы работаем над этим!</p>
     </div>
 
+    <!-- ДРУЗЬЯ -->
     <div id="pageFriends" class="page">
         <h3 style="margin-bottom:12px;">🤝 Друзья</h3>
         <div id="friendsList"></div>
     </div>
 
+    <!-- ПРОФИЛЬ -->
     <div id="pageProfile" class="page">
         <div class="profile-header">
             <div class="avatar" id="profileAvatar">🐱</div>
@@ -1087,10 +1058,9 @@
         </div>
     </div>
 
-    <!-- ============ НАСТРОЙКИ ============ -->
+    <!-- НАСТРОЙКИ -->
     <div id="pageSettings" class="page">
         <h3 style="margin-bottom:16px;">⚙️ Настройки</h3>
-        
         <div class="settings-group">
             <div class="settings-row">
                 <label>Изменить ник</label>
@@ -1102,67 +1072,34 @@
                 <button class="toggle-btn" id="themeToggle"></button>
             </div>
         </div>
-        
-        <div class="settings-support">
+        <div style="margin-top:20px; padding:16px; background:var(--card); border-radius:var(--radius); border:1px solid var(--border); text-align:center;">
             <p style="margin-bottom:12px; opacity:0.7;">📧 Нужна помощь? Напишите в поддержку</p>
             <button class="btn-sm" id="supportBtn">Написать в поддержку</button>
         </div>
     </div>
 
-    <!-- ============ ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ (модальное окно) ============ -->
-    <div id="userProfileModal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.6); z-index:300; align-items:center; justify-content:center; padding:20px;">
-        <div style="background:var(--card); border-radius:var(--radius); max-width:400px; width:100%; max-height:90vh; overflow-y:auto; padding:24px; position:relative;">
-            <button onclick="closeUserProfile()" style="position:absolute; top:12px; right:16px; background:none; border:none; font-size:24px; color:var(--text); cursor:pointer;">✕</button>
-            <div id="userProfileContent"></div>
-        </div>
-    </div>
-
-    <!-- ============ АДМИНКА ============ -->
+    <!-- АДМИНКА -->
     <div id="pageAdmin" class="page">
         <h3 style="margin-bottom:12px;">👑 Админ-панель</h3>
-        
-        <!-- Режим чтения -->
         <div class="admin-mode-toggle">
             <span class="label">📖 Режим чтения:</span>
             <button class="toggle-btn" id="readonlyToggle"></button>
             <span style="font-size:12px; opacity:0.6;" id="readonlyStatus">Выключен</span>
         </div>
-        
         <div class="admin-stats" id="adminStats">
-            <div class="admin-stat">
-                <div class="num" id="statUsers">0</div>
-                <div class="label">👤 Пользователей</div>
-            </div>
-            <div class="admin-stat">
-                <div class="num" id="statOnline">0</div>
-                <div class="label">🟢 Онлайн</div>
-            </div>
-            <div class="admin-stat">
-                <div class="num" id="statPosts">0</div>
-                <div class="label">📝 Постов</div>
-            </div>
-            <div class="admin-stat">
-                <div class="num" id="statReels">0</div>
-                <div class="label">📹 Рилсов</div>
-            </div>
-            <div class="admin-stat">
-                <div class="num" id="statMessages">0</div>
-                <div class="label">💬 Сообщений</div>
-            </div>
-            <div class="admin-stat">
-                <div class="num" id="statBanned">0</div>
-                <div class="label">🔨 Забанено</div>
-            </div>
+            <div class="admin-stat"><div class="num" id="statUsers">0</div><div class="label">👤 Пользователей</div></div>
+            <div class="admin-stat"><div class="num" id="statOnline">0</div><div class="label">🟢 Онлайн</div></div>
+            <div class="admin-stat"><div class="num" id="statPosts">0</div><div class="label">📝 Постов</div></div>
+            <div class="admin-stat"><div class="num" id="statReels">0</div><div class="label">📹 Рилсов</div></div>
+            <div class="admin-stat"><div class="num" id="statMessages">0</div><div class="label">💬 Сообщений</div></div>
+            <div class="admin-stat"><div class="num" id="statBanned">0</div><div class="label">🔨 Забанено</div></div>
         </div>
-        
-        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px;">
-            <button class="btn-sm" onclick="renderAdminPanel()" style="background:var(--primary);">🔄 Обновить</button>
-        </div>
-        
+        <button class="btn-sm" onclick="renderAdminPanel()" style="margin-bottom:12px;">🔄 Обновить</button>
         <h4 style="margin:12px 0 8px;">👥 Все пользователи</h4>
         <div id="adminUserList"></div>
     </div>
 
+    <!-- НАВИГАЦИЯ -->
     <div class="bottom-nav" id="bottomNav">
         <button class="nav-item active" data-page="pageFeed"><span>🏠</span>Лента</button>
         <button class="nav-item" data-page="pageChats"><span>💬</span>ЛС</button>
@@ -1175,20 +1112,34 @@
     </div>
 </div>
 
-<!-- Reel View -->
+<!-- ============ МОДАЛКА ПРОФИЛЯ ============ -->
+<div id="userProfileModal">
+    <div class="modal-content">
+        <button onclick="closeUserProfile()" style="position:absolute; top:12px; right:16px; background:none; border:none; font-size:24px; color:var(--text); cursor:pointer;">✕</button>
+        <div id="userProfileContent"></div>
+    </div>
+</div>
+
+<!-- ============ ПРОСМОТР РИЛСА ============ -->
 <div class="reel-view" id="reelView">
-    <button class="close" id="reelCloseBtn">✕</button>
+    <span class="close" id="reelClose">✕</span>
     <img id="reelImage" src="" alt="рилс" />
     <div class="user-label" id="reelUserLabel">@user</div>
 </div>
 
 <script>
+// ============================================================
+// КОНФИГУРАЦИЯ FIREBASE
+// ============================================================
 const firebaseConfig = {
     databaseURL: "https://gggggg-4dc22-default-rtdb.firebaseio.com/"
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
+// ============================================================
+// ПЕРЕМЕННЫЕ
+// ============================================================
 let currentUser = null;
 let currentChat = null;
 let allUsersCache = {};
@@ -1200,10 +1151,11 @@ let chatListeners = {};
 let isAdmin = false;
 let viewedUser = null;
 let readonlyMode = false;
+let chatRequests = {}; // для отслеживания запросов на чат
 
 const $ = id => document.getElementById(id);
 
-// DOM refs
+// DOM элементы
 const auth = $('auth'), app = $('app');
 const authUsername = $('authUsername'), authName = $('authName'), authPassword = $('authPassword');
 const authBtn = $('authBtn'), authSwitch = $('authSwitch'), authError = $('authError');
@@ -1224,8 +1176,7 @@ const profileFriendsCount = $('profileFriendsCount'), profileFollowersCount = $(
 const themeToggle = $('themeToggle'), settingsName = $('settingsName'), settingsSaveName = $('settingsSaveName');
 const settingsAvatarUrl = $('settingsAvatarUrl'), settingsSaveAvatar = $('settingsSaveAvatar');
 const emojiGrid = $('emojiGrid');
-const reelView = $('reelView'), reelImage = $('reelImage'), reelUserLabel = $('reelUserLabel');
-const reelCloseBtn = $('reelCloseBtn');
+const reelView = $('reelView'), reelImage = $('reelImage'), reelUserLabel = $('reelUserLabel'), reelClose = $('reelClose');
 const onlineStatus = $('onlineStatus');
 const bottomNav = $('bottomNav');
 const supportBtn = $('supportBtn');
@@ -1235,7 +1186,9 @@ const userProfileContent = $('userProfileContent');
 const readonlyToggle = $('readonlyToggle');
 const readonlyStatus = $('readonlyStatus');
 
-// ============ ПРОВЕРКА URL ============
+// ============================================================
+// ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+// ============================================================
 function isValidImageUrl(url) {
     if (!url || typeof url !== 'string') return false;
     const extMatch = url.match(/\.(jpeg|jpg|gif|png|webp|svg|bmp|ico)(\?.*)?$/i);
@@ -1244,30 +1197,22 @@ function isValidImageUrl(url) {
         const parsed = new URL(url);
         const path = parsed.pathname.toLowerCase();
         if (path.includes('image') || path.includes('photo') || path.includes('picture') || 
-            path.includes('img') || path.includes('media') || path.includes('upload')) {
-            return true;
-        }
+            path.includes('img') || path.includes('media') || path.includes('upload')) return true;
         const host = parsed.hostname.toLowerCase();
         const imageHosts = ['imgur.com', 'i.imgur.com', 'ibb.co', 'imagebam.com', 'postimg.cc', 
             'imageshack.com', 'flickr.com', 'staticflickr.com', 'cloudinary.com', 
             'googleusercontent.com', 'githubusercontent.com', 'cdn.discordapp.com',
             'cdn.jsdelivr.net', 'unsplash.com', 'images.unsplash.com', 'picsum.photos',
             'placehold.co', 'loremflickr.com', 'via.placeholder.com', 'tinypic.com'];
-        if (imageHosts.some(hostname => host.includes(hostname))) {
-            return true;
-        }
+        if (imageHosts.some(hostname => host.includes(hostname))) return true;
         return false;
-    } catch {
-        return false;
-    }
+    } catch { return false; }
 }
 
-// ============ ЗАГРУЗКА ФОТО ============
 function loadImageWithFallback(imgElement, src, fallbackText = '🖼️ Не удалось загрузить') {
     if (!imgElement) return;
     const container = imgElement.parentElement;
     if (!container) return;
-    
     if (!isValidImageUrl(src)) {
         imgElement.style.display = 'none';
         const load = container.querySelector('.loading');
@@ -1281,7 +1226,6 @@ function loadImageWithFallback(imgElement, src, fallbackText = '🖼️ Не у�
         }
         return;
     }
-    
     let loading = container.querySelector('.loading');
     if (!loading) {
         loading = document.createElement('div');
@@ -1289,13 +1233,10 @@ function loadImageWithFallback(imgElement, src, fallbackText = '🖼️ Не у�
         loading.textContent = '⏳ Загрузка...';
         container.appendChild(loading);
     }
-    
     const oldFallback = container.querySelector('.fallback');
     if (oldFallback) oldFallback.remove();
-    
     imgElement.style.display = 'block';
     imgElement.src = src;
-    
     imgElement.onload = function() {
         this.style.display = 'block';
         const load = container.querySelector('.loading');
@@ -1303,7 +1244,6 @@ function loadImageWithFallback(imgElement, src, fallbackText = '🖼️ Не у�
         const fallback = container.querySelector('.fallback');
         if (fallback) fallback.remove();
     };
-    
     imgElement.onerror = function() {
         this.style.display = 'none';
         const load = container.querySelector('.loading');
@@ -1316,7 +1256,6 @@ function loadImageWithFallback(imgElement, src, fallbackText = '🖼️ Не у�
             container.appendChild(fallback);
         }
     };
-    
     setTimeout(() => {
         const load = container.querySelector('.loading');
         if (load && !imgElement.complete) {
@@ -1325,7 +1264,6 @@ function loadImageWithFallback(imgElement, src, fallbackText = '🖼️ Не у�
     }, 5000);
 }
 
-// ============ ГАЛОЧКА ============
 function getVerifiedBadge(username, size = 'normal') {
     const user = allUsersCache[username];
     if (user && user.verified === true) {
@@ -1337,7 +1275,6 @@ function getVerifiedBadge(username, size = 'normal') {
     return '';
 }
 
-// ============ БАН ============
 function isUserBanned(username) {
     const user = allUsersCache[username];
     if (!user || !user.banned) return false;
@@ -1357,13 +1294,17 @@ function getBanTimeLeft(username) {
     return Math.ceil(left / 60000);
 }
 
-// ============ СОХРАНЕНИЕ ТЕМЫ ============
-function saveTheme() {
-    try {
-        localStorage.setItem('barsiknet_theme', isDark ? 'dark' : 'light');
-    } catch (e) {}
+function getChatId(user1, user2) {
+    const users = [user1, user2].sort();
+    return users[0] + '_' + users[1];
 }
 
+// ============================================================
+// ТЕМА И РЕЖИМ ЧТЕНИЯ
+// ============================================================
+function saveTheme() {
+    try { localStorage.setItem('barsiknet_theme', isDark ? 'dark' : 'light'); } catch (e) {}
+}
 function loadTheme() {
     try {
         const theme = localStorage.getItem('barsiknet_theme');
@@ -1371,15 +1312,9 @@ function loadTheme() {
             isDark = true;
             document.body.classList.add('dark');
             if (themeToggle) themeToggle.classList.add('active');
-        } else {
-            isDark = false;
-            document.body.classList.remove('dark');
-            if (themeToggle) themeToggle.classList.remove('active');
         }
     } catch (e) {}
 }
-
-// ============ РЕЖИМ ЧТЕНИЯ ============
 function loadReadonlyMode() {
     try {
         const mode = localStorage.getItem('barsiknet_readonly');
@@ -1388,41 +1323,29 @@ function loadReadonlyMode() {
             document.body.classList.add('readonly');
             if (readonlyToggle) readonlyToggle.classList.add('active');
             if (readonlyStatus) readonlyStatus.textContent = 'Включен 🔒';
-        } else {
-            readonlyMode = false;
-            document.body.classList.remove('readonly');
-            if (readonlyToggle) readonlyToggle.classList.remove('active');
-            if (readonlyStatus) readonlyStatus.textContent = 'Выключен';
         }
     } catch (e) {}
 }
-
 function saveReadonlyMode() {
-    try {
-        localStorage.setItem('barsiknet_readonly', readonlyMode ? 'true' : 'false');
-    } catch (e) {}
+    try { localStorage.setItem('barsiknet_readonly', readonlyMode ? 'true' : 'false'); } catch (e) {}
 }
 
-// ============ УПРАВЛЕНИЕ ПАНЕЛЬЮ ============
 function showBottomNav() {
     bottomNav.classList.remove('hidden');
     document.querySelectorAll('.page').forEach(p => {
-        if (p.id !== 'pageChats') {
-            p.style.paddingBottom = '80px';
-        }
+        if (p.id !== 'pageChats') p.style.paddingBottom = '80px';
     });
 }
-
 function hideBottomNav() {
     bottomNav.classList.add('hidden');
     document.querySelectorAll('.page').forEach(p => {
-        if (p.id !== 'pageChats') {
-            p.style.paddingBottom = '12px';
-        }
+        if (p.id !== 'pageChats') p.style.paddingBottom = '12px';
     });
 }
 
-// Auth switch
+// ============================================================
+// АВТОРИЗАЦИЯ
+// ============================================================
 authName.style.display = 'block';
 authBtn.textContent = 'Зарегистрироваться';
 authSwitch.textContent = 'Уже есть аккаунт? Войти';
@@ -1435,7 +1358,6 @@ authSwitch.onclick = () => {
     authError.textContent = '';
 };
 
-// Auth
 authBtn.onclick = async () => {
     const username = authUsername.value.trim().replace(/^@/, '');
     const name = authName.value.trim();
@@ -1534,23 +1456,19 @@ async function cleanupOldReels() {
     if (!currentUser) return;
     const oneHourAgo = Date.now() - 3600000;
     const users = Object.keys(allUsersCache);
-    
     for (const username of users) {
         const userData = allUsersCache[username];
         if (!userData || !userData.reels) continue;
         const reelsRef = db.ref('users/' + username + '/reels');
         const reels = userData.reels || {};
         let hasOldReels = false;
-        
         for (const key in reels) {
             if (reels[key].time && reels[key].time < oneHourAgo) {
                 hasOldReels = true;
                 await reelsRef.child(key).remove();
             }
         }
-        if (hasOldReels) {
-            console.log(`🧹 Удалены старые рилсы для ${username}`);
-        }
+        if (hasOldReels) console.log(`🧹 Удалены старые рилсы для ${username}`);
     }
     renderReelsStrip();
 }
@@ -1578,28 +1496,21 @@ function loadAllUsers() {
 
 document.addEventListener('visibilitychange', () => {
     if (document.hidden && currentUser) {
-        db.ref('users/' + currentUser.username).update({
-            online: false,
-            lastSeen: Date.now()
-        });
+        db.ref('users/' + currentUser.username).update({ online: false, lastSeen: Date.now() });
     } else if (!document.hidden && currentUser && isAppActive) {
-        db.ref('users/' + currentUser.username).update({
-            online: true,
-            lastSeen: Date.now()
-        });
+        db.ref('users/' + currentUser.username).update({ online: true, lastSeen: Date.now() });
     }
 });
 
 window.addEventListener('beforeunload', () => {
     if (currentUser) {
-        db.ref('users/' + currentUser.username).update({
-            online: false,
-            lastSeen: Date.now()
-        });
+        db.ref('users/' + currentUser.username).update({ online: false, lastSeen: Date.now() });
     }
 });
 
-// Navigation
+// ============================================================
+// НАВИГАЦИЯ
+// ============================================================
 document.querySelectorAll('.nav-item').forEach(btn => {
     btn.onclick = () => {
         document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
@@ -1634,40 +1545,31 @@ document.querySelectorAll('.nav-item').forEach(btn => {
     };
 });
 
-// ============ ОТОБРАЖЕНИЕ ПОСТОВ ============
+// ============================================================
+// ЛЕНТА (ПОСТЫ)
+// ============================================================
 function renderFeed() {
     if (!currentUser) return;
     feedPosts.innerHTML = '';
-    
     const allUsers = Object.keys(allUsersCache);
     const posts = [];
-    
     for (const u of allUsers) {
         const userData = allUsersCache[u];
         if (!userData) continue;
         const userPosts = userData.posts || {};
         for (const key in userPosts) {
-            posts.push({ 
-                ...userPosts[key], 
-                username: u, 
-                name: userData.name || u,
-                postKey: key
-            });
+            posts.push({ ...userPosts[key], username: u, name: userData.name || u, postKey: key });
         }
     }
-    
     posts.sort((a,b) => (b.time||0) - (a.time||0));
-    
     if (posts.length === 0) {
         feedPosts.innerHTML = '<div style="text-align:center; opacity:0.5; padding:40px 0;">📝 Нет постов</div>';
         return;
     }
-    
     for (const p of posts) {
         const card = document.createElement('div');
         card.className = 'post-card';
         card.id = 'post_' + p.postKey;
-        
         const header = document.createElement('div');
         header.className = 'post-header';
         const av = document.createElement('div');
@@ -1686,21 +1588,13 @@ function renderFeed() {
             av.textContent = (user && user.avatar) || '🐱';
         }
         if (user && user.online) av.classList.add('online');
-        
         av.style.cursor = 'pointer';
-        av.onclick = (e) => {
-            e.stopPropagation();
-            openUserProfile(p.username);
-        };
+        av.onclick = (e) => { e.stopPropagation(); openUserProfile(p.username); };
         header.appendChild(av);
-        
         const nameWrapper = document.createElement('span');
         nameWrapper.className = 'name-wrapper';
         nameWrapper.style.cursor = 'pointer';
-        nameWrapper.onclick = (e) => {
-            e.stopPropagation();
-            openUserProfile(p.username);
-        };
+        nameWrapper.onclick = (e) => { e.stopPropagation(); openUserProfile(p.username); };
         const nameSpan = document.createElement('span');
         nameSpan.textContent = p.name || p.username;
         nameWrapper.appendChild(nameSpan);
@@ -1708,64 +1602,53 @@ function renderFeed() {
         if (badge) nameWrapper.innerHTML += badge;
         header.appendChild(nameWrapper);
         card.appendChild(header);
-        
         if (p.text) {
             const text = document.createElement('div');
             text.className = 'post-content';
             text.textContent = p.text;
             card.appendChild(text);
         }
-        
         if (p.url) {
             const container = document.createElement('div');
             container.className = 'post-media-container';
+            container.style.cssText = 'position:relative; width:100%; border-radius:12px; overflow:hidden; background:var(--bg); margin:8px 0; min-height:120px; display:flex; align-items:center; justify-content:center; border:1px solid var(--border);';
             const img = document.createElement('img');
             img.alt = 'медиа';
+            img.style.cssText = 'width:100%; display:block; border-radius:12px; max-height:400px; object-fit:contain; background:var(--bg); min-height:100px;';
             container.appendChild(img);
             loadImageWithFallback(img, p.url, '🖼️ Фото не загрузилось');
             img.onclick = function(e) {
                 e.stopPropagation();
-                if (window.innerWidth < 768) {
-                    window.open(this.src, '_blank');
-                }
+                if (window.innerWidth < 768) window.open(this.src, '_blank');
             };
             card.appendChild(container);
         }
-        
         const timeDiv = document.createElement('div');
         timeDiv.className = 'post-time';
         timeDiv.textContent = new Date(p.time).toLocaleString();
         card.appendChild(timeDiv);
-        
         const actions = document.createElement('div');
         actions.className = 'post-actions';
-        
         const likesCount = p.likes ? Object.keys(p.likes).length : 0;
         const isLiked = p.likes && p.likes[currentUser.username];
-        
         const likeBtn = document.createElement('button');
         likeBtn.className = isLiked ? 'liked' : '';
         likeBtn.innerHTML = `❤️ ${likesCount}`;
         likeBtn.onclick = () => toggleLike(p.postKey, p.username);
         actions.appendChild(likeBtn);
-        
         const commentsCount = p.comments ? Object.keys(p.comments).length : 0;
         const commentBtn = document.createElement('button');
         commentBtn.textContent = `💬 ${commentsCount}`;
         commentBtn.onclick = () => {
             const section = document.getElementById('comments_' + p.postKey);
-            if (section) {
-                section.style.display = section.style.display === 'none' ? 'block' : 'none';
-            }
+            if (section) section.style.display = section.style.display === 'none' ? 'block' : 'none';
         };
         actions.appendChild(commentBtn);
         card.appendChild(actions);
-        
         const commentsSection = document.createElement('div');
         commentsSection.className = 'comments-section';
         commentsSection.id = 'comments_' + p.postKey;
         commentsSection.style.display = 'none';
-        
         if (p.comments) {
             const commentsArr = Object.values(p.comments);
             commentsArr.sort((a,b) => (a.time||0) - (b.time||0));
@@ -1782,7 +1665,6 @@ function renderFeed() {
                 commentsSection.appendChild(div);
             }
         }
-        
         const commentInput = document.createElement('div');
         commentInput.className = 'comment-input';
         const input = document.createElement('input');
@@ -1798,71 +1680,41 @@ function renderFeed() {
         commentInput.appendChild(sendBtn);
         commentsSection.appendChild(commentInput);
         card.appendChild(commentsSection);
-        
         feedPosts.appendChild(card);
     }
 }
 
-// ============ ЛАЙКИ И КОММЕНТЫ ============
 function toggleLike(postKey, username) {
-    if (readonlyMode) {
-        alert('📖 Режим чтения!');
-        return;
-    }
+    if (readonlyMode) { alert('📖 Режим чтения!'); return; }
     const postRef = db.ref('users/' + username + '/posts/' + postKey + '/likes/' + currentUser.username);
     postRef.once('value', snap => {
-        if (snap.val()) {
-            postRef.remove().then(() => renderFeed());
-        } else {
-            postRef.set(true).then(() => renderFeed());
-        }
+        if (snap.val()) postRef.remove().then(() => renderFeed());
+        else postRef.set(true).then(() => renderFeed());
     });
 }
 
 function addComment(postKey, username) {
-    if (readonlyMode) {
-        alert('📖 Режим чтения!');
-        return;
-    }
+    if (readonlyMode) { alert('📖 Режим чтения!'); return; }
     const input = document.getElementById('commentInput_' + postKey);
     if (!input) return;
     const text = input.value.trim();
     if (!text) return;
     const ref = db.ref('users/' + username + '/posts/' + postKey + '/comments');
-    ref.push().set({
-        text: text,
-        from: currentUser.username,
-        time: Date.now()
-    }).then(() => {
+    ref.push().set({ text: text, from: currentUser.username, time: Date.now() }).then(() => {
         input.value = '';
         renderFeed();
     });
 }
 
-// ============ ПУБЛИКАЦИЯ ПОСТОВ ============
 publishPostBtn.onclick = () => {
-    if (readonlyMode) {
-        alert('📖 Режим чтения! Публикация запрещена.');
-        return;
-    }
+    if (readonlyMode) { alert('📖 Режим чтения! Публикация запрещена.'); return; }
     const text = postText.value.trim();
     const imageUrl = postImage.value.trim();
-    if (!text && !imageUrl) {
-        alert('Напишите текст или добавьте фото');
-        return;
-    }
-    if (imageUrl && !isValidImageUrl(imageUrl)) {
-        alert('Пожалуйста, введите корректную ссылку на изображение');
-        return;
-    }
+    if (!text && !imageUrl) { alert('Напишите текст или добавьте фото'); return; }
+    if (imageUrl && !isValidImageUrl(imageUrl)) { alert('Пожалуйста, введите корректную ссылку на изображение'); return; }
     const ref = db.ref('users/' + currentUser.username + '/posts');
     const newRef = ref.push();
-    const post = {
-        text: text,
-        time: Date.now(),
-        likes: {},
-        comments: {}
-    };
+    const post = { text, time: Date.now(), likes: {}, comments: {} };
     if (imageUrl) post.url = imageUrl;
     newRef.set(post).then(() => {
         postText.value = '';
@@ -1871,27 +1723,17 @@ publishPostBtn.onclick = () => {
     }).catch(e => alert('Ошибка: ' + e.message));
 };
 
-// ============ РИЛСЫ ============
+// ============================================================
+// РИЛСЫ (ТЕПЕРЬ СВЕРХУ)
+// ============================================================
 publishReelBtn.onclick = () => {
-    if (readonlyMode) {
-        alert('📖 Режим чтения! Публикация запрещена.');
-        return;
-    }
+    if (readonlyMode) { alert('📖 Режим чтения! Публикация запрещена.'); return; }
     const url = reelInput.value.trim();
-    if (!url) {
-        alert('Введите ссылку на фото');
-        return;
-    }
-    if (!isValidImageUrl(url)) {
-        alert('Пожалуйста, введите корректную ссылку на изображение');
-        return;
-    }
+    if (!url) { alert('Введите ссылку на фото'); return; }
+    if (!isValidImageUrl(url)) { alert('Пожалуйста, введите корректную ссылку на изображение'); return; }
     const ref = db.ref('users/' + currentUser.username + '/reels');
     const newRef = ref.push();
-    newRef.set({
-        url: url,
-        time: Date.now()
-    }).then(() => {
+    newRef.set({ url, time: Date.now() }).then(() => {
         reelInput.value = '';
         renderReelsStrip();
     }).catch(e => alert('Ошибка: ' + e.message));
@@ -1900,14 +1742,11 @@ publishReelBtn.onclick = () => {
 function renderReelsStrip() {
     if (!currentUser) return;
     reelsStrip.innerHTML = '';
-    
     const allReels = {};
     const friends = Object.keys(currentUser.friends || {});
-    
     for (const u in allUsersCache) {
         const userData = allUsersCache[u];
         if (!userData) continue;
-        
         if (u === 'BarsikNet') {
             const reels = userData.reels || {};
             for (const key in reels) {
@@ -1916,7 +1755,6 @@ function renderReelsStrip() {
             }
             continue;
         }
-        
         if (friends.includes(u) || u === currentUser.username) {
             const reels = userData.reels || {};
             for (const key in reels) {
@@ -1925,23 +1763,19 @@ function renderReelsStrip() {
             }
         }
     }
-    
     const oneHourAgo = Date.now() - 3600000;
     const sorted = Object.values(allReels)
         .filter(reel => !reel.time || reel.time > oneHourAgo)
         .sort((a,b) => (b.time||0) - (a.time||0));
-    
     if (sorted.length === 0) {
         reelsStrip.innerHTML = '<span style="opacity:0.5; font-size:13px; padding:8px 0;">📹 Нет рилсов</span>';
         return;
     }
-    
     for (const reel of sorted) {
         const div = document.createElement('div');
         div.className = 'reel-circle';
         const avatarDiv = document.createElement('div');
         avatarDiv.className = 'avatar';
-        
         const user = allUsersCache[reel.username];
         if (user && user.avatar && user.avatar.startsWith('http')) {
             const img = document.createElement('img');
@@ -1950,29 +1784,20 @@ function renderReelsStrip() {
             img.loading = 'lazy';
             img.crossOrigin = 'anonymous';
             img.referrerPolicy = 'no-referrer';
-            img.style.width = '100%';
-            img.style.height = '100%';
-            img.style.objectFit = 'cover';
-            img.onerror = function() { 
-                this.style.display = 'none'; 
-                avatarDiv.textContent = '🐱';
-                avatarDiv.style.fontSize = '28px';
-            };
+            img.style.cssText = 'width:100%; height:100%; object-fit:cover;';
+            img.onerror = function() { this.style.display = 'none'; avatarDiv.textContent = '🐱'; avatarDiv.style.fontSize = '28px'; };
             avatarDiv.appendChild(img);
         } else {
             avatarDiv.textContent = (user && user.avatar) || '🐱';
             avatarDiv.style.fontSize = '28px';
         }
-        
         avatarDiv.style.border = '3px solid var(--primary)';
         div.appendChild(avatarDiv);
-        
         const label = document.createElement('span');
         label.textContent = reel.username;
         const badge = getVerifiedBadge(reel.username, 'small');
         if (badge) label.innerHTML += badge;
         div.appendChild(label);
-        
         div.onclick = () => {
             if (reel.url && isValidImageUrl(reel.url)) {
                 reelImage.src = reel.url;
@@ -1986,470 +1811,111 @@ function renderReelsStrip() {
     }
 }
 
-// ============ ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ ============
-function openUserProfile(username) {
-    if (username === currentUser.username) {
-        document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
-        document.querySelector('[data-page="pageProfile"]').classList.add('active');
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        $('pageProfile').classList.add('active');
-        pageTitle.textContent = '👤 Профиль';
-        renderProfile();
-        return;
-    }
-    
-    viewedUser = username;
-    const user = allUsersCache[username];
-    if (!user) return;
-    
-    const isFriend = currentUser.friends && currentUser.friends[username];
-    const isFollowing = currentUser.following && currentUser.following[username];
-    const followersCount = user.followers ? Object.keys(user.followers).length : 0;
-    const friendsCount = user.friends ? Object.keys(user.friends).length : 0;
-    const isBanned = isUserBanned(username);
-    const banTimeLeft = getBanTimeLeft(username);
-    
-    let avatarHtml = '';
-    if (user.avatar && user.avatar.startsWith('http')) {
-        avatarHtml = `<img src="${user.avatar}" alt="avatar" style="width:100%;height:100%;object-fit:cover;" />`;
-    } else {
-        avatarHtml = user.avatar || '🐱';
-    }
-    
-    const badge = getVerifiedBadge(username, 'big');
-    const banBadge = isBanned ? `<span class="ban-badge">🔨 БАН</span>` : '';
-    
-    let actionsHtml = '';
-    
-    if (isBanned) {
-        actionsHtml = `<span style="color:#ff3b30;font-weight:600;">🔨 Забанен (осталось ${banTimeLeft} мин.)</span>`;
-        if (isAdmin) {
-            actionsHtml += `<button class="btn-sm success" onclick="adminUnbanUser('${username}')">Разбанить</button>`;
-        }
-    } else if (isFriend) {
-        actionsHtml = `<button class="btn-sm success" style="cursor:default;">✅ Друзья</button>`;
-        if (isAdmin) {
-            actionsHtml += `<button class="btn-sm danger" onclick="adminBanUserPrompt('${username}')">🔨 Забанить</button>`;
-        }
-    } else if (isFollowing) {
-        actionsHtml = `
-            <button class="btn-sm danger" onclick="unfollowUser('${username}')">Отписаться</button>
-            <button class="btn-sm outline" onclick="openChatFromProfile('${username}')">Написать</button>
-            ${isAdmin ? `<button class="btn-sm danger" onclick="adminBanUserPrompt('${username}')">🔨 Забанить</button>` : ''}
-        `;
-    } else {
-        actionsHtml = `
-            <button class="btn-sm" onclick="followUser('${username}')">Подписаться</button>
-            <button class="btn-sm outline" onclick="openChatFromProfile('${username}')">Написать</button>
-            ${isAdmin ? `<button class="btn-sm danger" onclick="adminBanUserPrompt('${username}')">🔨 Забанить</button>` : ''}
-        `;
-    }
-    
-    userProfileContent.innerHTML = `
-        <div class="user-profile-view">
-            <div class="profile-header">
-                <div class="avatar big">${avatarHtml}</div>
-                <div class="name-wrapper" style="font-size:22px;font-weight:700;">
-                    ${user.name || username}
-                    ${badge}
-                    ${banBadge}
-                </div>
-                <div class="username">@${username}</div>
-                <div class="profile-stats">
-                    <div class="stat">
-                        <div class="num">${friendsCount}</div>
-                        <div class="label">Друзья</div>
-                    </div>
-                    <div class="stat">
-                        <div class="num">${followersCount}</div>
-                        <div class="label">Подписчики</div>
-                    </div>
-                </div>
-                <div class="profile-actions">
-                    ${actionsHtml}
-                </div>
-            </div>
-        </div>
-    `;
-    
-    userProfileModal.style.display = 'flex';
-}
+reelClose.onclick = () => reelView.classList.remove('active');
+reelView.onclick = (e) => { if (e.target === reelView) reelView.classList.remove('active'); };
 
-function closeUserProfile() {
-    userProfileModal.style.display = 'none';
-    viewedUser = null;
-}
-
-window.followUser = function(username) {
-    if (readonlyMode) {
-        alert('📖 Режим чтения!');
-        return;
-    }
-    db.ref('users/' + currentUser.username + '/following/' + username).set(true);
-    db.ref('users/' + username + '/followers/' + currentUser.username).set(true);
-    
-    const other = allUsersCache[username];
-    if (other && other.following && other.following[currentUser.username]) {
-        db.ref('users/' + currentUser.username + '/friends/' + username).set(true);
-        db.ref('users/' + username + '/friends/' + currentUser.username).set(true);
-    }
-    
-    setTimeout(() => {
-        db.ref('users/' + currentUser.username).once('value', snap => {
-            currentUser = { ...snap.val(), username: currentUser.username };
-            closeUserProfile();
-            if (viewedUser) openUserProfile(viewedUser);
-            renderSearch();
-            renderChatList();
-            renderFriends();
-            renderReelsStrip();
-            renderProfile();
-        });
-    }, 300);
-};
-
-window.unfollowUser = function(username) {
-    if (readonlyMode) {
-        alert('📖 Режим чтения!');
-        return;
-    }
-    db.ref('users/' + currentUser.username + '/following/' + username).remove();
-    db.ref('users/' + username + '/followers/' + currentUser.username).remove();
-    
-    const isFriend = currentUser.friends && currentUser.friends[username];
-    if (isFriend) {
-        db.ref('users/' + currentUser.username + '/friends/' + username).remove();
-        db.ref('users/' + username + '/friends/' + currentUser.username).remove();
-    }
-    
-    setTimeout(() => {
-        db.ref('users/' + currentUser.username).once('value', snap => {
-            currentUser = { ...snap.val(), username: currentUser.username };
-            closeUserProfile();
-            if (viewedUser) openUserProfile(viewedUser);
-            renderSearch();
-            renderChatList();
-            renderFriends();
-            renderReelsStrip();
-            renderProfile();
-        });
-    }, 300);
-};
-
-window.openChatFromProfile = function(username) {
-    closeUserProfile();
-    setTimeout(() => {
-        openChat(username);
-    }, 300);
-};
-
-// ============ АДМИН ФУНКЦИИ ============
-window.adminBanUserPrompt = function(username) {
-    if (!isAdmin) return;
-    const minutes = prompt(`🔨 Забанить @${username}\nВведите количество минут:`);
-    if (minutes === null) return;
-    const num = parseInt(minutes);
-    if (isNaN(num) || num < 1) {
-        alert('Введите корректное число (от 1 минуты)');
-        return;
-    }
-    adminBanUser(username, num);
-    closeUserProfile();
-};
-
-window.adminBanUser = function(username, minutes) {
-    if (!isAdmin) return;
-    if (username === 'BarsikNet') {
-        alert('Нельзя забанить админа!');
-        return;
-    }
-    if (username === currentUser.username) {
-        alert('Нельзя забанить самого себя!');
-        return;
-    }
-    if (!minutes || minutes < 1) {
-        alert('Введите корректное количество минут (от 1)');
-        return;
-    }
-    const banExpiry = Date.now() + (minutes * 60000);
-    db.ref('users/' + username + '/banned').set(true);
-    db.ref('users/' + username + '/banExpiry').set(banExpiry);
-    db.ref('users/' + username + '/online').set(false);
-    alert(`🔨 Пользователь @${username} забанен на ${minutes} минут!`);
-    renderAdminPanel();
-};
-
-window.adminUnbanUser = function(username) {
-    if (!isAdmin) return;
-    if (confirm(`Разбанить пользователя @${username}?`)) {
-        db.ref('users/' + username + '/banned').remove();
-        db.ref('users/' + username + '/banExpiry').remove();
-        alert(`✅ Пользователь @${username} разбанен!`);
-        renderAdminPanel();
-    }
-};
-
-window.adminVerify = function(username) {
-    if (!isAdmin) return;
-    const ref = db.ref('users/' + username + '/verified');
-    ref.once('value', snap => {
-        ref.set(!snap.val()).then(() => {
-            renderAdminPanel();
-            renderFeed();
-            renderChatList();
-            renderFriends();
-            renderSearch();
-            renderReelsStrip();
-            renderProfile();
-        });
-    });
-};
-
-window.adminDeleteUser = function(username) {
-    if (!isAdmin) return;
-    if (username === 'BarsikNet') {
-        alert('Нельзя удалить главного админа!');
-        return;
-    }
-    if (confirm(`🗑️ Удалить пользователя @${username} и все его данные?`)) {
-        db.ref('users/' + username).remove().then(() => {
-            renderAdminPanel();
-            renderFeed();
-            renderChatList();
-            renderFriends();
-            renderSearch();
-            renderReelsStrip();
-            alert(`✅ Пользователь @${username} удален!`);
-        });
-    }
-};
-
-// ============ АДМИН ПАНЕЛЬ ============
-function renderAdminPanel() {
-    if (!isAdmin) return;
-    
-    const users = Object.keys(allUsersCache);
-    let online = 0;
-    let totalPosts = 0;
-    let totalReels = 0;
-    let totalMessages = 0;
-    let totalBanned = 0;
-    
-    for (const u of users) {
-        const data = allUsersCache[u];
-        if (data && data.online) online++;
-        if (data && data.posts) totalPosts += Object.keys(data.posts).length;
-        if (data && data.reels) totalReels += Object.keys(data.reels).length;
-        if (data && data.banned) totalBanned++;
-    }
-    
-    db.ref('messages').once('value', snap => {
-        const msgs = snap.val() || {};
-        for (const chatId in msgs) {
-            totalMessages += Object.keys(msgs[chatId]).length;
-        }
-        $('statMessages').textContent = totalMessages;
-    });
-    
-    $('statUsers').textContent = users.length;
-    $('statOnline').textContent = online;
-    $('statPosts').textContent = totalPosts;
-    $('statReels').textContent = totalReels;
-    $('statBanned').textContent = totalBanned;
-    
-    const list = $('adminUserList');
-    list.innerHTML = '';
-    for (const u of users) {
-        const data = allUsersCache[u];
-        if (!data) continue;
-        const div = document.createElement('div');
-        div.className = 'admin-user-item';
-        if (data.banned) div.classList.add('banned-user');
-        
-        const postsCount = data.posts ? Object.keys(data.posts).length : 0;
-        const reelsCount = data.reels ? Object.keys(data.reels).length : 0;
-        const friendsCount = data.friends ? Object.keys(data.friends).length : 0;
-        const isBanned = isUserBanned(u);
-        const banTimeLeft = getBanTimeLeft(u);
-        
-        div.innerHTML = `
-            <div class="info">
-                <div class="name">
-                    ${data.name || u} 
-                    ${data.online ? '🟢' : '⚫'} 
-                    ${data.verified ? '✅' : ''}
-                    ${isBanned ? '🔨' : ''}
-                </div>
-                <div class="username">
-                    @${u} • 📝${postsCount} 📹${reelsCount} 🤝${friendsCount}
-                    ${isBanned ? ` • ⏱️${banTimeLeft}мин` : ''}
-                </div>
-            </div>
-            <div class="admin-buttons">
-                <button class="btn-sm success" onclick="adminVerify('${u}')" title="Верификация">✅</button>
-                ${isBanned ? 
-                    `<button class="btn-sm success" onclick="adminUnbanUser('${u}')" title="Разбанить">🔓</button>` :
-                    `<button class="btn-sm danger" onclick="adminBanUserPrompt('${u}')" title="Забанить">🔨</button>`
-                }
-                <button class="btn-sm danger" onclick="adminDeleteUser('${u}')" title="Удалить пользователя">🗑️</button>
-            </div>
-        `;
-        list.appendChild(div);
-    }
-}
-
-// ============ РЕЖИМ ЧТЕНИЯ - ИСПРАВЛЕННЫЙ ============
-if (readonlyToggle) {
-    readonlyToggle.addEventListener('click', function(e) {
-        e.stopPropagation();
-        e.preventDefault();
-        
-        readonlyMode = !readonlyMode;
-        
-        if (readonlyMode) {
-            this.classList.add('active');
-            document.body.classList.add('readonly');
-            if (readonlyStatus) readonlyStatus.textContent = 'Включен 🔒';
-            alert('📖 Режим чтения ВКЛЮЧЕН!\n\nВсе пользователи не могут:\n- Публиковать посты\n- Публиковать рилсы\n- Писать сообщения\n- Ставить лайки\n- Комментировать');
-        } else {
-            this.classList.remove('active');
-            document.body.classList.remove('readonly');
-            if (readonlyStatus) readonlyStatus.textContent = 'Выключен';
-            alert('📖 Режим чтения ВЫКЛЮЧЕН!');
-        }
-        
-        saveReadonlyMode();
-    });
-}
-
-// ============ ТЕМА - ИСПРАВЛЕННАЯ ============
-if (themeToggle) {
-    themeToggle.addEventListener('click', function(e) {
-        e.stopPropagation();
-        e.preventDefault();
-        
-        isDark = !isDark;
-        
-        if (isDark) {
-            this.classList.add('active');
-            document.body.classList.add('dark');
-        } else {
-            this.classList.remove('active');
-            document.body.classList.remove('dark');
-        }
-        
-        saveTheme();
-    });
-}
-
-// ============ ЗАКРЫТИЕ РИЛСА - ИСПРАВЛЕННОЕ ============
-function closeReelView() {
-    reelView.classList.remove('active');
-    reelImage.src = '';
-    reelUserLabel.textContent = '';
-}
-
-if (reelCloseBtn) {
-    reelCloseBtn.addEventListener('click', function(e) {
-        e.stopPropagation();
-        e.preventDefault();
-        closeReelView();
-    });
-}
-
-if (reelView) {
-    reelView.addEventListener('click', function(e) {
-        if (e.target === this) {
-            closeReelView();
-        }
-    });
-}
-
-// Также добавим закрытие по ESC
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape' && reelView.classList.contains('active')) {
-        closeReelView();
-    }
-});
-
-// ============ ЧАТ ============
-
-function getChatId(user1, user2) {
-    const users = [user1, user2].sort();
-    return users[0] + '_' + users[1];
-}
-
+// ============================================================
+// ЧАТЫ - РАСШИРЕННАЯ ЛОГИКА
+// ============================================================
 function renderChatList() {
     if (!currentUser) return;
     chatList.innerHTML = '';
+    
+    // Собираем все чаты: друзья + те, с кем есть сообщения
+    const allChatPartners = new Set();
+    
+    // 1. Друзья
     const friends = Object.keys(currentUser.friends || {});
-    if (friends.length === 0) {
-        chatList.innerHTML = '<div style="text-align:center; opacity:0.5; padding:30px 0;">Нет друзей</div>';
-        return;
-    }
-    for (const u of friends) {
-        const user = allUsersCache[u];
-        if (!user) continue;
-        const isBanned = isUserBanned(u);
-        const item = document.createElement('div');
-        item.className = 'chat-item';
-        if (isBanned) item.style.opacity = '0.5';
-        
-        const av = document.createElement('div');
-        av.className = 'avatar';
-        if (user.avatar && user.avatar.startsWith('http')) {
-            const img = document.createElement('img');
-            img.src = user.avatar;
-            img.alt = 'avatar';
-            img.loading = 'lazy';
-            img.crossOrigin = 'anonymous';
-            img.referrerPolicy = 'no-referrer';
-            img.onerror = function() { this.style.display = 'none'; av.textContent = '🐱'; };
-            av.appendChild(img);
-        } else {
-            av.textContent = user.avatar || '🐱';
-        }
-        if (user.online && !isBanned) av.classList.add('online');
-        item.appendChild(av);
-        const info = document.createElement('div');
-        info.className = 'info';
-        const nameWrapper = document.createElement('div');
-        nameWrapper.className = 'name-wrapper';
-        const nameSpan = document.createElement('span');
-        nameSpan.textContent = user.name || u;
-        nameWrapper.appendChild(nameSpan);
-        const badge = getVerifiedBadge(u);
-        if (badge) nameWrapper.innerHTML += badge;
-        if (isBanned) nameWrapper.innerHTML += ' <span style="color:#ff3b30;font-size:10px;">🔨</span>';
-        info.appendChild(nameWrapper);
-        const statusDiv = document.createElement('div');
-        statusDiv.className = 'status';
-        if (isBanned) {
-            statusDiv.textContent = '🔨 Забанен';
-            statusDiv.style.color = '#ff3b30';
-        } else if (user.online) {
-            statusDiv.textContent = '🟢 в сети';
-        } else {
-            statusDiv.textContent = 'был(а) ' + (user.lastSeen ? new Date(user.lastSeen).toLocaleString() : 'недавно');
-        }
-        info.appendChild(statusDiv);
-        item.appendChild(info);
-        item.onclick = () => {
-            if (isBanned) {
-                alert('🔨 Этот пользователь забанен');
-                return;
+    friends.forEach(u => allChatPartners.add(u));
+    
+    // 2. Те, с кем есть переписка (даже если не друзья)
+    db.ref('messages').once('value', snap => {
+        const msgs = snap.val() || {};
+        for (const chatId in msgs) {
+            const [u1, u2] = chatId.split('_');
+            if (u1 === currentUser.username && allUsersCache[u2]) {
+                allChatPartners.add(u2);
+            } else if (u2 === currentUser.username && allUsersCache[u1]) {
+                allChatPartners.add(u1);
             }
-            openChat(u);
-        };
-        chatList.appendChild(item);
-    }
+        }
+        
+        // Сортируем: сначала друзья, потом остальные
+        const sortedPartners = Array.from(allChatPartners).sort((a, b) => {
+            const aIsFriend = currentUser.friends && currentUser.friends[a];
+            const bIsFriend = currentUser.friends && currentUser.friends[b];
+            if (aIsFriend && !bIsFriend) return -1;
+            if (!aIsFriend && bIsFriend) return 1;
+            return 0;
+        });
+        
+        if (sortedPartners.length === 0) {
+            chatList.innerHTML = '<div style="text-align:center; opacity:0.5; padding:30px 0;">💬 Нет чатов</div>';
+            return;
+        }
+        
+        for (const u of sortedPartners) {
+            const user = allUsersCache[u];
+            if (!user) continue;
+            const isBanned = isUserBanned(u);
+            const isFriend = currentUser.friends && currentUser.friends[u];
+            const item = document.createElement('div');
+            item.className = 'chat-item';
+            if (isBanned) item.style.opacity = '0.5';
+            
+            const av = document.createElement('div');
+            av.className = 'avatar';
+            if (user.avatar && user.avatar.startsWith('http')) {
+                const img = document.createElement('img');
+                img.src = user.avatar;
+                img.alt = 'avatar';
+                img.loading = 'lazy';
+                img.crossOrigin = 'anonymous';
+                img.referrerPolicy = 'no-referrer';
+                img.onerror = function() { this.style.display = 'none'; av.textContent = '🐱'; };
+                av.appendChild(img);
+            } else {
+                av.textContent = user.avatar || '🐱';
+            }
+            if (user.online && !isBanned) av.classList.add('online');
+            item.appendChild(av);
+            
+            const info = document.createElement('div');
+            info.className = 'info';
+            const nameWrapper = document.createElement('div');
+            nameWrapper.className = 'name-wrapper';
+            const nameSpan = document.createElement('span');
+            nameSpan.textContent = user.name || u;
+            nameWrapper.appendChild(nameSpan);
+            const badge = getVerifiedBadge(u);
+            if (badge) nameWrapper.innerHTML += badge;
+            if (isBanned) nameWrapper.innerHTML += ' <span style="color:#ff3b30;font-size:10px;">🔨</span>';
+            if (!isFriend && !isBanned) nameWrapper.innerHTML += ' <span style="font-size:10px; opacity:0.5;">✉️</span>';
+            info.appendChild(nameWrapper);
+            
+            const statusDiv = document.createElement('div');
+            statusDiv.className = 'status';
+            if (isBanned) {
+                statusDiv.textContent = '🔨 Забанен';
+                statusDiv.style.color = '#ff3b30';
+            } else if (user.online) {
+                statusDiv.textContent = '🟢 в сети';
+            } else {
+                statusDiv.textContent = 'был(а) ' + (user.lastSeen ? new Date(user.lastSeen).toLocaleString() : 'недавно');
+            }
+            info.appendChild(statusDiv);
+            item.appendChild(info);
+            item.onclick = () => {
+                if (isBanned) { alert('🔨 Этот пользователь забанен'); return; }
+                openChat(u);
+            };
+            chatList.appendChild(item);
+        }
+    });
 }
 
 function openChat(username) {
-    if (isUserBanned(username)) {
-        alert('🔨 Этот пользователь забанен');
-        return;
-    }
+    if (isUserBanned(username)) { alert('🔨 Этот пользователь забанен'); return; }
     if (currentChat && chatListeners[currentChat]) {
         chatListeners[currentChat]();
         delete chatListeners[currentChat];
@@ -2479,18 +1945,13 @@ function openChat(username) {
 function setupChatListener(username) {
     const chatId = getChatId(currentUser.username, username);
     const ref = db.ref('messages/' + chatId);
-    
     if (chatListeners[username]) {
         chatListeners[username]();
         delete chatListeners[username];
     }
-    
     const listener = ref.on('value', snap => {
-        if (currentChat === username) {
-            renderChatMessages(username);
-        }
+        if (currentChat === username) renderChatMessages(username);
     });
-    
     chatListeners[username] = () => ref.off('value', listener);
 }
 
@@ -2516,25 +1977,16 @@ function renderChatMessages(username) {
     ref.once('value', snap => {
         const data = snap.val() || {};
         const allMsgs = [];
-        
         for (const key in data) {
             const msg = data[key];
-            allMsgs.push({
-                text: msg.text,
-                time: msg.time || 0,
-                from: msg.from || ''
-            });
+            allMsgs.push({ text: msg.text, time: msg.time || 0, from: msg.from || '' });
         }
-        
         allMsgs.sort((a, b) => a.time - b.time);
-        
         chatMessages.innerHTML = '';
         for (const msg of allMsgs) {
             const div = document.createElement('div');
             div.className = 'chat-message';
-            if (msg.from === currentUser.username) {
-                div.classList.add('mine');
-            }
+            if (msg.from === currentUser.username) div.classList.add('mine');
             div.textContent = msg.text;
             chatMessages.appendChild(div);
         }
@@ -2563,7 +2015,7 @@ function checkChatLimit(username) {
                 chatWarning.textContent = '⚠️ Вы можете отправить только одно сообщение, пока не станете друзьями';
                 chatWarning.style.color = '#ff9500';
             } else {
-                chatWarning.textContent = '📝 Вы можете отправить одно сообщение, затем подпишитесь друг на друга для продолжения';
+                chatWarning.textContent = '📝 Отправьте сообщение, затем подпишитесь друг на друга для продолжения';
                 chatWarning.style.color = '#34c759';
             }
         });
@@ -2574,39 +2026,24 @@ function checkChatLimit(username) {
 }
 
 function sendMessage(text, username) {
-    if (readonlyMode) {
-        alert('📖 Режим чтения! Отправка сообщений запрещена.');
-        return;
-    }
-    if (isUserBanned(username)) {
-        alert('🔨 Этот пользователь забанен');
-        return;
-    }
+    if (readonlyMode) { alert('📖 Режим чтения! Отправка сообщений запрещена.'); return; }
+    if (isUserBanned(username)) { alert('🔨 Этот пользователь забанен'); return; }
     const chatId = getChatId(currentUser.username, username);
     const ref = db.ref('messages/' + chatId);
-    ref.push().set({
-        text: text,
-        time: Date.now(),
-        from: currentUser.username
-    });
+    ref.push().set({ text, time: Date.now(), from: currentUser.username });
     chatInput.value = '';
     renderChatMessages(username);
+    // Обновляем список чатов, чтобы появился у собеседника
+    renderChatList();
 }
 
 chatSend.onclick = () => {
     const text = chatInput.value.trim();
     if (!text || !currentChat) return;
     const username = currentChat;
-    if (isUserBanned(username)) {
-        alert('🔨 Этот пользователь забанен');
-        return;
-    }
-    if (readonlyMode) {
-        alert('📖 Режим чтения! Отправка сообщений запрещена.');
-        return;
-    }
+    if (isUserBanned(username)) { alert('🔨 Этот пользователь забанен'); return; }
+    if (readonlyMode) { alert('📖 Режим чтения! Отправка сообщений запрещена.'); return; }
     const isFriend = currentUser.friends && currentUser.friends[username];
-    
     if (!isFriend) {
         const chatId = getChatId(currentUser.username, username);
         const ref = db.ref('messages/' + chatId);
@@ -2640,8 +2077,104 @@ chatBack.onclick = () => {
     showBottomNav();
 };
 
-// ============ ПОИСК ============
+chatInput.addEventListener('keydown', e => { if (e.key === 'Enter') chatSend.click(); });
 
+// ============================================================
+// ДРУЗЬЯ - С ВОЗМОЖНОСТЬЮ ОТПИСАТЬСЯ
+// ============================================================
+function renderFriends() {
+    if (!currentUser) return;
+    friendsList.innerHTML = '';
+    const friends = Object.keys(currentUser.friends || {});
+    if (friends.length === 0) {
+        friendsList.innerHTML = '<div style="opacity:0.5; padding:20px 0;">🤝 Нет друзей</div>';
+        return;
+    }
+    for (const u of friends) {
+        const user = allUsersCache[u];
+        if (!user) continue;
+        const isBanned = isUserBanned(u);
+        const card = document.createElement('div');
+        card.className = 'user-card';
+        if (isBanned) card.style.opacity = '0.5';
+        
+        const info = document.createElement('div');
+        info.className = 'info';
+        const nameWrapper = document.createElement('div');
+        nameWrapper.className = 'name-wrapper';
+        nameWrapper.style.cursor = 'pointer';
+        nameWrapper.onclick = () => openUserProfile(u);
+        const nameSpan = document.createElement('span');
+        nameSpan.textContent = user.name || u;
+        nameWrapper.appendChild(nameSpan);
+        const badge = getVerifiedBadge(u);
+        if (badge) nameWrapper.innerHTML += badge;
+        if (isBanned) nameWrapper.innerHTML += ' <span style="color:#ff3b30;font-size:10px;">🔨</span>';
+        info.appendChild(nameWrapper);
+        const uname = document.createElement('div');
+        uname.className = 'username';
+        uname.textContent = '@' + u;
+        info.appendChild(uname);
+        card.appendChild(info);
+        
+        const btnGroup = document.createElement('div');
+        btnGroup.style.display = 'flex';
+        btnGroup.style.gap = '6px';
+        
+        if (!isBanned) {
+            const chatBtn = document.createElement('button');
+            chatBtn.className = 'btn-sm';
+            chatBtn.textContent = '💬 Написать';
+            chatBtn.onclick = () => { openChat(u); };
+            btnGroup.appendChild(chatBtn);
+            
+            // Кнопка отписаться (удалить из друзей)
+            const unfriendBtn = document.createElement('button');
+            unfriendBtn.className = 'btn-sm danger';
+            unfriendBtn.textContent = '🚫 Отписаться';
+            unfriendBtn.onclick = () => {
+                if (confirm(`Отписаться от @${u}? Вы перестанете быть друзьями.`)) {
+                    unfriendUser(u);
+                }
+            };
+            btnGroup.appendChild(unfriendBtn);
+        } else {
+            const bannedBtn = document.createElement('button');
+            bannedBtn.className = 'btn-sm banned';
+            bannedBtn.textContent = '🔨 Забанен';
+            bannedBtn.style.cursor = 'default';
+            btnGroup.appendChild(bannedBtn);
+        }
+        card.appendChild(btnGroup);
+        friendsList.appendChild(card);
+    }
+}
+
+function unfriendUser(username) {
+    if (readonlyMode) { alert('📖 Режим чтения!'); return; }
+    // Удаляем из друзей у обоих
+    db.ref('users/' + currentUser.username + '/friends/' + username).remove();
+    db.ref('users/' + username + '/friends/' + currentUser.username).remove();
+    // Также удаляем из подписок
+    db.ref('users/' + currentUser.username + '/following/' + username).remove();
+    db.ref('users/' + username + '/followers/' + currentUser.username).remove();
+    
+    setTimeout(() => {
+        db.ref('users/' + currentUser.username).once('value', snap => {
+            currentUser = { ...snap.val(), username: currentUser.username };
+            renderFriends();
+            renderChatList();
+            renderSearch();
+            renderFeed();
+            renderProfile();
+            renderReelsStrip();
+        });
+    }, 300);
+}
+
+// ============================================================
+// ПОИСК
+// ============================================================
 searchInput.oninput = renderSearch;
 
 function renderSearch() {
@@ -2684,27 +2217,34 @@ function renderSearch() {
         const isFriend = currentUser.friends && currentUser.friends[u];
         const isFollowing = currentUser.following && currentUser.following[u];
         
-        const btn = document.createElement('button');
-        btn.className = 'btn-sm';
+        const btnGroup = document.createElement('div');
+        btnGroup.style.display = 'flex';
+        btnGroup.style.gap = '6px';
         
         if (isBanned) {
-            btn.textContent = '🔨 Забанен';
+            const btn = document.createElement('button');
             btn.className = 'btn-sm banned';
+            btn.textContent = '🔨 Забанен';
             btn.style.cursor = 'default';
+            btnGroup.appendChild(btn);
         } else if (isFriend) {
-            btn.textContent = 'Друзья ✅';
-            btn.style.background = '#34c759';
+            const btn = document.createElement('button');
+            btn.className = 'btn-sm success';
+            btn.textContent = '✅ Друзья';
             btn.style.cursor = 'default';
+            btnGroup.appendChild(btn);
+            const chatBtn = document.createElement('button');
+            chatBtn.className = 'btn-sm outline';
+            chatBtn.textContent = '💬';
+            chatBtn.onclick = () => openChat(u);
+            btnGroup.appendChild(chatBtn);
         } else if (isFollowing) {
+            const btn = document.createElement('button');
+            btn.className = 'btn-sm danger';
             btn.textContent = 'Отписаться';
-            btn.classList.add('danger');
             btn.onclick = () => {
                 db.ref('users/' + currentUser.username + '/following/' + u).remove();
                 db.ref('users/' + u + '/followers/' + currentUser.username).remove();
-                if (isFriend) {
-                    db.ref('users/' + currentUser.username + '/friends/' + u).remove();
-                    db.ref('users/' + u + '/friends/' + currentUser.username).remove();
-                }
                 setTimeout(() => {
                     db.ref('users/' + currentUser.username).once('value', snap => {
                         currentUser = { ...snap.val(), username: currentUser.username };
@@ -2715,18 +2255,24 @@ function renderSearch() {
                     });
                 }, 300);
             };
+            btnGroup.appendChild(btn);
+            const chatBtn = document.createElement('button');
+            chatBtn.className = 'btn-sm outline';
+            chatBtn.textContent = '💬';
+            chatBtn.onclick = () => openChat(u);
+            btnGroup.appendChild(chatBtn);
         } else {
+            const btn = document.createElement('button');
+            btn.className = 'btn-sm';
             btn.textContent = 'Подписаться';
             btn.onclick = () => {
                 db.ref('users/' + currentUser.username + '/following/' + u).set(true);
                 db.ref('users/' + u + '/followers/' + currentUser.username).set(true);
-                
                 const other = allUsersCache[u];
                 if (other && other.following && other.following[currentUser.username]) {
                     db.ref('users/' + currentUser.username + '/friends/' + u).set(true);
                     db.ref('users/' + u + '/friends/' + currentUser.username).set(true);
                 }
-                
                 setTimeout(() => {
                     db.ref('users/' + currentUser.username).once('value', snap => {
                         currentUser = { ...snap.val(), username: currentUser.username };
@@ -2737,82 +2283,295 @@ function renderSearch() {
                     });
                 }, 300);
             };
+            btnGroup.appendChild(btn);
+            const chatBtn = document.createElement('button');
+            chatBtn.className = 'btn-sm outline';
+            chatBtn.textContent = '💬';
+            chatBtn.onclick = () => openChat(u);
+            btnGroup.appendChild(chatBtn);
         }
-        card.appendChild(btn);
-        
-        if (!isBanned) {
-            const writeBtn = document.createElement('button');
-            writeBtn.className = 'btn-sm outline';
-            writeBtn.textContent = 'Написать';
-            writeBtn.onclick = () => {
-                openChat(u);
-            };
-            card.appendChild(writeBtn);
-        }
+        card.appendChild(btnGroup);
         searchResults.appendChild(card);
     }
 }
 
-// ============ ДРУЗЬЯ ============
-
-function renderFriends() {
-    if (!currentUser) return;
-    friendsList.innerHTML = '';
-    const friends = Object.keys(currentUser.friends || {});
-    if (friends.length === 0) {
-        friendsList.innerHTML = '<div style="opacity:0.5; padding:20px 0;">Нет друзей</div>';
+// ============================================================
+// ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ
+// ============================================================
+function openUserProfile(username) {
+    if (username === currentUser.username) {
+        document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+        document.querySelector('[data-page="pageProfile"]').classList.add('active');
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        $('pageProfile').classList.add('active');
+        pageTitle.textContent = '👤 Профиль';
+        renderProfile();
         return;
     }
-    for (const u of friends) {
-        const user = allUsersCache[u];
-        if (!user) continue;
+    viewedUser = username;
+    const user = allUsersCache[username];
+    if (!user) return;
+    const isFriend = currentUser.friends && currentUser.friends[username];
+    const isFollowing = currentUser.following && currentUser.following[username];
+    const followersCount = user.followers ? Object.keys(user.followers).length : 0;
+    const friendsCount = user.friends ? Object.keys(user.friends).length : 0;
+    const isBanned = isUserBanned(username);
+    const banTimeLeft = getBanTimeLeft(username);
+    
+    let avatarHtml = '';
+    if (user.avatar && user.avatar.startsWith('http')) {
+        avatarHtml = `<img src="${user.avatar}" alt="avatar" style="width:100%;height:100%;object-fit:cover;" />`;
+    } else {
+        avatarHtml = user.avatar || '🐱';
+    }
+    const badge = getVerifiedBadge(username, 'big');
+    const banBadge = isBanned ? `<span class="ban-badge">🔨 БАН</span>` : '';
+    
+    let actionsHtml = '';
+    if (isBanned) {
+        actionsHtml = `<span style="color:#ff3b30;font-weight:600;">🔨 Забанен (осталось ${banTimeLeft} мин.)</span>`;
+        if (isAdmin) actionsHtml += `<button class="btn-sm success" onclick="adminUnbanUser('${username}')">Разбанить</button>`;
+    } else if (isFriend) {
+        actionsHtml = `
+            <button class="btn-sm success" style="cursor:default;">✅ Друзья</button>
+            <button class="btn-sm outline" onclick="openChatFromProfile('${username}')">💬 Написать</button>
+            <button class="btn-sm danger" onclick="unfriendUserFromProfile('${username}')">🚫 Отписаться</button>
+            ${isAdmin ? `<button class="btn-sm danger" onclick="adminBanUserPrompt('${username}')">🔨 Забанить</button>` : ''}
+        `;
+    } else if (isFollowing) {
+        actionsHtml = `
+            <button class="btn-sm danger" onclick="unfollowUser('${username}')">Отписаться</button>
+            <button class="btn-sm outline" onclick="openChatFromProfile('${username}')">💬 Написать</button>
+            ${isAdmin ? `<button class="btn-sm danger" onclick="adminBanUserPrompt('${username}')">🔨 Забанить</button>` : ''}
+        `;
+    } else {
+        actionsHtml = `
+            <button class="btn-sm" onclick="followUser('${username}')">➕ Подписаться</button>
+            <button class="btn-sm outline" onclick="openChatFromProfile('${username}')">💬 Написать</button>
+            ${isAdmin ? `<button class="btn-sm danger" onclick="adminBanUserPrompt('${username}')">🔨 Забанить</button>` : ''}
+        `;
+    }
+    
+    userProfileContent.innerHTML = `
+        <div class="user-profile-view">
+            <div class="profile-header">
+                <div class="avatar big">${avatarHtml}</div>
+                <div class="name-wrapper" style="font-size:22px;font-weight:700;">
+                    ${user.name || username} ${badge} ${banBadge}
+                </div>
+                <div class="username">@${username}</div>
+                <div class="profile-stats">
+                    <div class="stat"><div class="num">${friendsCount}</div><div class="label">Друзья</div></div>
+                    <div class="stat"><div class="num">${followersCount}</div><div class="label">Подписчики</div></div>
+                </div>
+                <div class="profile-actions" style="display:flex; gap:8px; justify-content:center; margin-top:12px; flex-wrap:wrap;">
+                    ${actionsHtml}
+                </div>
+            </div>
+        </div>
+    `;
+    userProfileModal.style.display = 'flex';
+}
+
+function closeUserProfile() {
+    userProfileModal.style.display = 'none';
+    viewedUser = null;
+}
+
+window.followUser = function(username) {
+    if (readonlyMode) { alert('📖 Режим чтения!'); return; }
+    db.ref('users/' + currentUser.username + '/following/' + username).set(true);
+    db.ref('users/' + username + '/followers/' + currentUser.username).set(true);
+    const other = allUsersCache[username];
+    if (other && other.following && other.following[currentUser.username]) {
+        db.ref('users/' + currentUser.username + '/friends/' + username).set(true);
+        db.ref('users/' + username + '/friends/' + currentUser.username).set(true);
+    }
+    setTimeout(() => {
+        db.ref('users/' + currentUser.username).once('value', snap => {
+            currentUser = { ...snap.val(), username: currentUser.username };
+            closeUserProfile();
+            if (viewedUser) openUserProfile(viewedUser);
+            renderSearch();
+            renderChatList();
+            renderFriends();
+            renderReelsStrip();
+            renderProfile();
+        });
+    }, 300);
+};
+
+window.unfollowUser = function(username) {
+    if (readonlyMode) { alert('📖 Режим чтения!'); return; }
+    db.ref('users/' + currentUser.username + '/following/' + username).remove();
+    db.ref('users/' + username + '/followers/' + currentUser.username).remove();
+    const isFriend = currentUser.friends && currentUser.friends[username];
+    if (isFriend) {
+        db.ref('users/' + currentUser.username + '/friends/' + username).remove();
+        db.ref('users/' + username + '/friends/' + currentUser.username).remove();
+    }
+    setTimeout(() => {
+        db.ref('users/' + currentUser.username).once('value', snap => {
+            currentUser = { ...snap.val(), username: currentUser.username };
+            closeUserProfile();
+            if (viewedUser) openUserProfile(viewedUser);
+            renderSearch();
+            renderChatList();
+            renderFriends();
+            renderReelsStrip();
+            renderProfile();
+        });
+    }, 300);
+};
+
+window.unfriendUserFromProfile = function(username) {
+    if (readonlyMode) { alert('📖 Режим чтения!'); return; }
+    if (confirm(`Отписаться от @${username}?`)) {
+        unfriendUser(username);
+        closeUserProfile();
+    }
+};
+
+window.openChatFromProfile = function(username) {
+    closeUserProfile();
+    setTimeout(() => openChat(username), 300);
+};
+
+// ============================================================
+// АДМИН ФУНКЦИИ
+// ============================================================
+window.adminBanUserPrompt = function(username) {
+    if (!isAdmin) return;
+    const minutes = prompt(`🔨 Забанить @${username}\nВведите количество минут:`);
+    if (minutes === null) return;
+    const num = parseInt(minutes);
+    if (isNaN(num) || num < 1) { alert('Введите корректное число (от 1 минуты)'); return; }
+    adminBanUser(username, num);
+    closeUserProfile();
+};
+
+window.adminBanUser = function(username, minutes) {
+    if (!isAdmin) return;
+    if (username === 'BarsikNet') { alert('Нельзя забанить админа!'); return; }
+    if (username === currentUser.username) { alert('Нельзя забанить самого себя!'); return; }
+    if (!minutes || minutes < 1) { alert('Введите корректное количество минут (от 1)'); return; }
+    const banExpiry = Date.now() + (minutes * 60000);
+    db.ref('users/' + username + '/banned').set(true);
+    db.ref('users/' + username + '/banExpiry').set(banExpiry);
+    db.ref('users/' + username + '/online').set(false);
+    alert(`🔨 Пользователь @${username} забанен на ${minutes} минут!`);
+    renderAdminPanel();
+};
+
+window.adminUnbanUser = function(username) {
+    if (!isAdmin) return;
+    if (confirm(`Разбанить пользователя @${username}?`)) {
+        db.ref('users/' + username + '/banned').remove();
+        db.ref('users/' + username + '/banExpiry').remove();
+        alert(`✅ Пользователь @${username} разбанен!`);
+        renderAdminPanel();
+        closeUserProfile();
+    }
+};
+
+window.adminVerify = function(username) {
+    if (!isAdmin) return;
+    const ref = db.ref('users/' + username + '/verified');
+    ref.once('value', snap => {
+        ref.set(!snap.val()).then(() => {
+            renderAdminPanel();
+            renderFeed();
+            renderChatList();
+            renderFriends();
+            renderSearch();
+            renderReelsStrip();
+            renderProfile();
+        });
+    });
+};
+
+window.adminDeleteUser = function(username) {
+    if (!isAdmin) return;
+    if (username === 'BarsikNet') { alert('Нельзя удалить главного админа!'); return; }
+    if (confirm(`🗑️ Удалить пользователя @${username} и все его данные?`)) {
+        db.ref('users/' + username).remove().then(() => {
+            renderAdminPanel();
+            renderFeed();
+            renderChatList();
+            renderFriends();
+            renderSearch();
+            renderReelsStrip();
+            alert(`✅ Пользователь @${username} удален!`);
+        });
+    }
+};
+
+// ============================================================
+// АДМИН ПАНЕЛЬ
+// ============================================================
+function renderAdminPanel() {
+    if (!isAdmin) return;
+    const users = Object.keys(allUsersCache);
+    let online = 0, totalPosts = 0, totalReels = 0, totalMessages = 0, totalBanned = 0;
+    for (const u of users) {
+        const data = allUsersCache[u];
+        if (data && data.online) online++;
+        if (data && data.posts) totalPosts += Object.keys(data.posts).length;
+        if (data && data.reels) totalReels += Object.keys(data.reels).length;
+        if (data && data.banned) totalBanned++;
+    }
+    db.ref('messages').once('value', snap => {
+        const msgs = snap.val() || {};
+        for (const chatId in msgs) totalMessages += Object.keys(msgs[chatId]).length;
+        $('statMessages').textContent = totalMessages;
+    });
+    $('statUsers').textContent = users.length;
+    $('statOnline').textContent = online;
+    $('statPosts').textContent = totalPosts;
+    $('statReels').textContent = totalReels;
+    $('statBanned').textContent = totalBanned;
+    
+    const list = $('adminUserList');
+    list.innerHTML = '';
+    for (const u of users) {
+        const data = allUsersCache[u];
+        if (!data) continue;
+        const div = document.createElement('div');
+        div.className = 'admin-user-item';
+        if (data.banned) div.classList.add('banned-user');
+        const postsCount = data.posts ? Object.keys(data.posts).length : 0;
+        const reelsCount = data.reels ? Object.keys(data.reels).length : 0;
+        const friendsCount = data.friends ? Object.keys(data.friends).length : 0;
         const isBanned = isUserBanned(u);
-        const card = document.createElement('div');
-        card.className = 'user-card';
-        if (isBanned) card.style.opacity = '0.5';
-        
-        const info = document.createElement('div');
-        info.className = 'info';
-        const nameWrapper = document.createElement('div');
-        nameWrapper.className = 'name-wrapper';
-        nameWrapper.style.cursor = 'pointer';
-        nameWrapper.onclick = () => openUserProfile(u);
-        const nameSpan = document.createElement('span');
-        nameSpan.textContent = user.name || u;
-        nameWrapper.appendChild(nameSpan);
-        const badge = getVerifiedBadge(u);
-        if (badge) nameWrapper.innerHTML += badge;
-        if (isBanned) nameWrapper.innerHTML += ' <span style="color:#ff3b30;font-size:10px;">🔨</span>';
-        info.appendChild(nameWrapper);
-        const uname = document.createElement('div');
-        uname.className = 'username';
-        uname.textContent = '@' + u;
-        info.appendChild(uname);
-        card.appendChild(info);
-        
-        if (!isBanned) {
-            const btn = document.createElement('button');
-            btn.className = 'btn-sm';
-            btn.textContent = 'Написать';
-            btn.onclick = () => { openChat(u); };
-            card.appendChild(btn);
-        } else {
-            const btn = document.createElement('button');
-            btn.className = 'btn-sm banned';
-            btn.textContent = '🔨 Забанен';
-            btn.style.cursor = 'default';
-            card.appendChild(btn);
-        }
-        friendsList.appendChild(card);
+        const banTimeLeft = getBanTimeLeft(u);
+        div.innerHTML = `
+            <div class="info">
+                <div class="name">
+                    ${data.name || u} ${data.online ? '🟢' : '⚫'} ${data.verified ? '✅' : ''} ${isBanned ? '🔨' : ''}
+                </div>
+                <div class="username">
+                    @${u} • 📝${postsCount} 📹${reelsCount} 🤝${friendsCount} ${isBanned ? `• ⏱️${banTimeLeft}мин` : ''}
+                </div>
+            </div>
+            <div class="admin-buttons">
+                <button class="btn-sm success" onclick="adminVerify('${u}')" title="Верификация">✅</button>
+                ${isBanned ? 
+                    `<button class="btn-sm success" onclick="adminUnbanUser('${u}')" title="Разбанить">🔓</button>` :
+                    `<button class="btn-sm danger" onclick="adminBanUserPrompt('${u}')" title="Забанить">🔨</button>`
+                }
+                <button class="btn-sm danger" onclick="adminDeleteUser('${u}')" title="Удалить">🗑️</button>
+            </div>
+        `;
+        list.appendChild(div);
     }
 }
 
-// ============ ПРОФИЛЬ ============
-
+// ============================================================
+// ПРОФИЛЬ
+// ============================================================
 function renderProfile() {
     if (!currentUser) return;
     const user = currentUser;
-    
     if (user.avatar && user.avatar.startsWith('http')) {
         const img = document.createElement('img');
         img.src = user.avatar;
@@ -2826,27 +2585,19 @@ function renderProfile() {
     } else {
         profileAvatar.textContent = user.avatar || '🐱';
     }
-    
     profileName.textContent = user.name || user.username;
     const badge = getVerifiedBadge(user.username, 'big');
     profileBadge.innerHTML = badge;
     profileUsername.textContent = '@' + user.username;
-    
     const friendsCount = user.friends ? Object.keys(user.friends).length : 0;
     const followersCount = user.followers ? Object.keys(user.followers).length : 0;
     profileFriendsCount.textContent = friendsCount;
     profileFollowersCount.textContent = followersCount;
-    
-    if (user.avatar && user.avatar.startsWith('http')) {
-        settingsAvatarUrl.value = user.avatar;
-    } else {
-        settingsAvatarUrl.value = '';
-    }
+    if (user.avatar && user.avatar.startsWith('http')) settingsAvatarUrl.value = user.avatar;
+    else settingsAvatarUrl.value = '';
     if (isDark) themeToggle.classList.add('active');
     else themeToggle.classList.remove('active');
 }
-
-// ============ НАСТРОЙКИ ============
 
 function renderSettings() {
     if (!currentUser) return;
@@ -2857,14 +2608,8 @@ function renderSettings() {
 
 settingsSaveAvatar.onclick = () => {
     const url = settingsAvatarUrl.value.trim();
-    if (!url) {
-        alert('Введите ссылку на фото');
-        return;
-    }
-    if (!isValidImageUrl(url)) {
-        alert('Введите корректную ссылку на изображение');
-        return;
-    }
+    if (!url) { alert('Введите ссылку на фото'); return; }
+    if (!isValidImageUrl(url)) { alert('Введите корректную ссылку на изображение'); return; }
     db.ref('users/' + currentUser.username + '/avatar').set(url).then(() => {
         currentUser.avatar = url;
         renderProfile();
@@ -2917,13 +2662,85 @@ userProfileModal.onclick = (e) => {
     if (e.target === userProfileModal) closeUserProfile();
 };
 
-// Enter key
+// ============================================================
+// ТЕМА И РЕЖИМ ЧТЕНИЯ - ОБРАБОТЧИКИ
+// ============================================================
+if (themeToggle) {
+    themeToggle.addEventListener('click', function(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        isDark = !isDark;
+        if (isDark) {
+            this.classList.add('active');
+            document.body.classList.add('dark');
+        } else {
+            this.classList.remove('active');
+            document.body.classList.remove('dark');
+        }
+        saveTheme();
+    });
+}
+
+if (readonlyToggle) {
+    readonlyToggle.addEventListener('click', function(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        readonlyMode = !readonlyMode;
+        if (readonlyMode) {
+            this.classList.add('active');
+            document.body.classList.add('readonly');
+            if (readonlyStatus) readonlyStatus.textContent = 'Включен 🔒';
+            alert('📖 Режим чтения ВКЛЮЧЕН!');
+        } else {
+            this.classList.remove('active');
+            document.body.classList.remove('readonly');
+            if (readonlyStatus) readonlyStatus.textContent = 'Выключен';
+            alert('📖 Режим чтения ВЫКЛЮЧЕН!');
+        }
+        saveReadonlyMode();
+    });
+}
+
+// ============================================================
+// ЗАКРЫТИЕ РИЛСА
+// ============================================================
+function closeReelView() {
+    reelView.classList.remove('active');
+    reelImage.src = '';
+    reelUserLabel.textContent = '';
+}
+
+if (reelClose) {
+    reelClose.addEventListener('click', function(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        closeReelView();
+    });
+}
+
+if (reelView) {
+    reelView.addEventListener('click', function(e) {
+        if (e.target === this) closeReelView();
+    });
+}
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && reelView.classList.contains('active')) closeReelView();
+});
+
+// ============================================================
+// ЗАПУСК
+// ============================================================
 authPassword.addEventListener('keydown', e => { if (e.key === 'Enter') authBtn.click(); });
-chatInput.addEventListener('keydown', e => { if (e.key === 'Enter') chatSend.click(); });
 postText.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); publishPostBtn.click(); } });
 
-console.log('🐱 BarsikNet готов!');
-console.log('📱 Переключатели ТЕМА и РЕЖИМ ЧТЕНИЯ работают!');
+console.log('🐱 BarsikNet обновлен!');
+console.log('✨ Что нового:');
+console.log('1. Анимации при появлении');
+console.log('2. Чаты появляются у обоих после 1 сообщения');
+console.log('3. Кнопка "Отписаться" в друзьях');
+console.log('4. Рилсы теперь сверху ленты');
+console.log('5. Лента рекомендаций в разработке');
 </script>
 </body>
 </html>
