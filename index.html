@@ -646,13 +646,204 @@
             display: block;
             margin-top: 4px;
         }
+        
+        /* ============ АДАПТИВ ДЛЯ ТЕЛЕФОНОВ ============ */
         @media (max-width: 480px) {
-            .post-media-container img {
-                max-height: 300px;
+            .page {
+                padding: 8px 10px 70px;
             }
-            .post-media-container .fallback {
-                padding: 20px;
+            
+            .header {
+                padding: 8px 12px;
+                min-height: 48px;
+            }
+            .header h2 {
+                font-size: 17px;
+            }
+            
+            .post-card {
+                padding: 10px 12px;
+                margin-bottom: 8px;
+            }
+            .post-header .avatar {
+                width: 32px;
+                height: 32px;
+                font-size: 16px;
+            }
+            .post-content {
+                font-size: 14px;
+            }
+            .post-media-container img {
+                max-height: 250px;
+            }
+            .post-time {
+                font-size: 10px;
+            }
+            
+            .reel-circle .avatar {
+                width: 48px;
+                height: 48px;
+            }
+            .reel-circle span {
+                font-size: 10px;
+                max-width: 50px;
+            }
+            
+            .bottom-nav {
+                padding: 4px 0;
+            }
+            .nav-item {
+                font-size: 10px;
+                min-width: 40px;
+                padding: 2px 4px;
+            }
+            .nav-item span {
+                font-size: 16px;
+            }
+            
+            .chat-item {
+                padding: 8px 0;
+            }
+            .chat-item .avatar {
+                width: 36px;
+                height: 36px;
+                font-size: 16px;
+            }
+            .chat-message {
+                font-size: 14px;
+                padding: 8px 12px;
+            }
+            .chat-input input {
+                font-size: 14px;
+                padding: 8px 12px;
+            }
+            .chat-input button {
+                padding: 8px 14px;
+                font-size: 14px;
+            }
+            
+            .search-input {
+                font-size: 14px;
+                padding: 10px 14px;
+            }
+            .user-card {
+                padding: 10px 12px;
+            }
+            .user-card .info .name-wrapper {
+                font-size: 14px;
+            }
+            .user-card .info .username {
                 font-size: 12px;
+            }
+            .btn-sm {
+                font-size: 11px;
+                padding: 4px 12px;
+            }
+            
+            .profile-header .avatar {
+                width: 64px;
+                height: 64px;
+                font-size: 28px;
+            }
+            .profile-header .name-wrapper {
+                font-size: 18px;
+            }
+            .profile-header .username {
+                font-size: 14px;
+            }
+            
+            .create-post-area {
+                padding: 8px;
+            }
+            .create-post-area textarea {
+                font-size: 14px;
+                min-height: 40px;
+                padding: 8px;
+            }
+            .create-post-area .actions input {
+                font-size: 13px;
+                padding: 6px 10px;
+            }
+            .create-post-area .actions .btn-sm {
+                font-size: 11px;
+                padding: 4px 10px;
+            }
+            
+            .verified-badge {
+                width: 14px;
+                height: 14px;
+                font-size: 8px;
+            }
+            .verified-badge-sm {
+                width: 12px;
+                height: 12px;
+                font-size: 6px;
+            }
+            
+            #reelInput {
+                font-size: 13px;
+                padding: 6px 10px;
+            }
+            
+            input, textarea {
+                font-size: 14px !important;
+            }
+            
+            .settings-row {
+                padding: 8px 0;
+                flex-wrap: wrap;
+                gap: 6px;
+            }
+            .settings-row label {
+                font-size: 14px;
+            }
+            .settings-row input {
+                font-size: 13px !important;
+                padding: 4px 8px;
+                max-width: 120px !important;
+            }
+            
+            .emoji-grid button {
+                font-size: 22px;
+                padding: 2px 6px;
+            }
+            
+            .reel-view .close {
+                top: 16px;
+                right: 16px;
+                font-size: 24px;
+            }
+            .reel-view img {
+                max-height: 60vh;
+            }
+            .reel-view .user-label {
+                font-size: 16px;
+            }
+        }
+        
+        @media (max-width: 380px) {
+            .nav-item {
+                font-size: 9px;
+                min-width: 32px;
+                padding: 2px 2px;
+            }
+            .nav-item span {
+                font-size: 14px;
+            }
+            .bottom-nav {
+                padding: 2px 0;
+            }
+            .post-card {
+                padding: 8px 10px;
+            }
+            .chat-message {
+                font-size: 13px;
+                padding: 6px 10px;
+            }
+            .verified-badge {
+                width: 12px;
+                height: 12px;
+                font-size: 6px;
             }
         }
     </style>
@@ -685,7 +876,7 @@
         <div class="create-post-area">
             <textarea id="postText" placeholder="Что нового?"></textarea>
             <div class="actions">
-                <input id="postImage" placeholder="Ссылка на фото (опционально)" />
+                <input id="postImage" placeholder="Ссылка на фото" />
                 <button class="btn-sm" id="publishPostBtn">Опубликовать</button>
             </div>
         </div>
@@ -693,9 +884,9 @@
         <div id="feedPosts"></div>
         <div style="display:flex; gap:8px; margin-top:12px; background:var(--card); padding:12px; border-radius:var(--radius); border:1px solid var(--border);">
             <input id="reelInput" placeholder="Ссылка на фото (рилс)" style="flex:1; padding:8px 12px; border-radius:20px; border:1px solid var(--border); background:var(--bg); color:var(--text); outline:none;" />
-            <button id="publishReelBtn" class="btn-sm">Опубликовать рилс</button>
+            <button id="publishReelBtn" class="btn-sm">Рилс</button>
         </div>
-        <div style="margin-top:8px; font-size:12px; opacity:0.5; text-align:center;">Рилсы удаляются через 1 час</div>
+        <div style="margin-top:8px; font-size:11px; opacity:0.5; text-align:center;">Рилсы удаляются через 1 час</div>
     </div>
 
     <div id="pageChats" class="page">
@@ -703,7 +894,7 @@
         <div id="chatWindow" class="chat-window">
             <div style="display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid var(--border);">
                 <button class="back-btn" id="chatBack">‹</button>
-                <div style="display:flex; align-items:center; gap:4px;">
+                <div style="display:flex; align-items:center; gap:4px; flex:1;">
                     <span id="chatPartnerName" style="font-weight:600;"></span>
                     <span id="chatPartnerBadge"></span>
                 </div>
@@ -719,7 +910,7 @@
     </div>
 
     <div id="pageSearch" class="page">
-        <input class="search-input" id="searchInput" placeholder="Поиск по юзернейму (можно с @)" />
+        <input class="search-input" id="searchInput" placeholder="Поиск по юзернейму" />
         <div id="searchResults"></div>
     </div>
 
@@ -750,7 +941,7 @@
             </div>
             <div class="settings-row">
                 <label>Имя</label>
-                <input id="settingsName" placeholder="Новое имя" style="flex:1; max-width:160px;" />
+                <input id="settingsName" placeholder="Новое имя" />
                 <button class="btn-sm" id="settingsSaveName">Сохранить</button>
             </div>
             <div class="settings-row" style="flex-direction:column; align-items:stretch; gap:8px;">
@@ -824,7 +1015,6 @@ const settingsAvatarUrl = $('settingsAvatarUrl'), settingsSaveAvatar = $('settin
 const emojiGrid = $('emojiGrid');
 const reelView = $('reelView'), reelImage = $('reelImage'), reelUserLabel = $('reelUserLabel'), reelClose = $('reelClose');
 const onlineStatus = $('onlineStatus');
-const profileNameWrapper = $('profileNameWrapper');
 
 // ============ ФУНКЦИЯ ДЛЯ ГАЛОЧКИ ============
 function getVerifiedBadge(username, size = 'normal') {
@@ -834,34 +1024,6 @@ function getVerifiedBadge(username, size = 'normal') {
         return `<span class="verified-badge${sizeClass}">✓</span>`;
     }
     return '';
-}
-
-// ============ ФУНКЦИЯ ДЛЯ АВАТАРКИ С ОБРЕЗКОЙ ============
-function createAvatarElement(username, size = 'normal') {
-    const user = allUsersCache[username];
-    if (!user) return '🐱';
-    
-    const sizeClass = size === 'small' ? ' avatar-sm' : '';
-    const wrapper = document.createElement('div');
-    wrapper.className = 'avatar' + sizeClass;
-    
-    if (user.avatar && user.avatar.startsWith('http')) {
-        const img = document.createElement('img');
-        img.src = user.avatar;
-        img.alt = 'avatar';
-        img.loading = 'lazy';
-        img.onerror = function() {
-            this.style.display = 'none';
-            wrapper.textContent = '🐱';
-        };
-        wrapper.appendChild(img);
-    } else {
-        wrapper.textContent = user.avatar || '🐱';
-    }
-    
-    if (user.online) wrapper.classList.add('online');
-    
-    return wrapper;
 }
 
 // Auth switch
@@ -1041,7 +1203,7 @@ document.querySelectorAll('.nav-item').forEach(btn => {
     };
 });
 
-// ============ ПОСТЫ (ВИДНЫ ВСЕМ) ============
+// ============ ПОСТЫ ============
 publishPostBtn.onclick = () => {
     const text = postText.value.trim();
     const imageUrl = postImage.value.trim();
@@ -1180,7 +1342,7 @@ publishReelBtn.onclick = () => {
     const url = reelInput.value.trim();
     if (!url) return;
     if (!url.match(/\.(jpeg|jpg|gif|png|webp|svg|bmp|ico)/i)) {
-        alert('Пожалуйста, введите ссылку на фото (jpeg, png, gif, webp, svg, bmp)');
+        alert('Пожалуйста, введите ссылку на фото');
         return;
     }
     const ref = db.ref('users/' + currentUser.username + '/reels');
@@ -1705,12 +1867,7 @@ chatInput.addEventListener('keydown', e => { if (e.key === 'Enter') chatSend.cli
 postText.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); publishPostBtn.click(); } });
 
 console.log('🐱 BarsikNet готов!');
-console.log('📝 Посты видят все пользователи');
-console.log('📹 Рилсы BarsikNet видят все, остальные - только друзья');
-console.log('✅ Синяя галочка верификации как в Instagram');
-console.log('📱 Фикс для фото на телефонах');
-console.log('🖼️ Аватарки обрезаются под круг (object-fit: cover)');
-console.log('💡 Чтобы добавить галочку: в Firebase у пользователя поставь verified: true');
+console.log('📱 Адаптировано для телефонов');
 </script>
 </body>
 </html>
