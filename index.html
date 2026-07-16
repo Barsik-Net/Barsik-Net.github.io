@@ -1061,9 +1061,21 @@ function hideBottomNav() {
     });
 }
 
-// ============ ЗАГРУЗКА ФОТО С ПРОВЕРКОЙ ============
-function loadImageWithFallback(imgElement, src, fallbackText = '🖼️') {
+// ============ ЗАГРУЗКА ФОТО ============
+function loadImageWithFallback(imgElement, src, fallbackText = '🖼️ Фото не загрузилось') {
     if (!imgElement) return;
+    
+    const container = imgElement.parentElement;
+    
+    // Показываем загрузку
+    let loading = container.querySelector('.loading');
+    if (!loading) {
+        loading = document.createElement('div');
+        loading.className = 'loading';
+        loading.textContent = '⏳ Загрузка...';
+        container.appendChild(loading);
+    }
+    
     imgElement.src = src;
     imgElement.crossOrigin = 'anonymous';
     imgElement.referrerPolicy = 'no-referrer';
@@ -1071,20 +1083,17 @@ function loadImageWithFallback(imgElement, src, fallbackText = '🖼️') {
     
     imgElement.onload = function() {
         this.style.display = 'block';
-        const container = this.parentElement;
+        const load = container.querySelector('.loading');
+        if (load) load.remove();
         const fallback = container.querySelector('.fallback');
         if (fallback) fallback.remove();
-        const loading = container.querySelector('.loading');
-        if (loading) loading.remove();
     };
     
     imgElement.onerror = function() {
         this.style.display = 'none';
-        const container = this.parentElement;
-        // Удаляем loading если есть
-        const loading = container.querySelector('.loading');
-        if (loading) loading.remove();
-        // Проверяем есть ли уже fallback
+        const load = container.querySelector('.loading');
+        if (load) load.remove();
+        
         if (!container.querySelector('.fallback')) {
             const fallback = document.createElement('div');
             fallback.className = 'fallback';
@@ -1092,15 +1101,6 @@ function loadImageWithFallback(imgElement, src, fallbackText = '🖼️') {
             container.appendChild(fallback);
         }
     };
-    
-    // Показываем загрузку
-    const container = imgElement.parentElement;
-    if (!container.querySelector('.loading') && !container.querySelector('.fallback')) {
-        const loading = document.createElement('div');
-        loading.className = 'loading';
-        loading.textContent = '⏳ Загрузка...';
-        container.appendChild(loading);
-    }
 }
 
 // Auth switch
@@ -1421,7 +1421,7 @@ function renderFeed() {
         }
         
         // ============ ФИКС ФОТО ============
-        if (p.url && p.url.match(/\.(jpeg|jpg|gif|png|webp|svg|bmp|ico)/i)) {
+        if (p.url) {
             const container = document.createElement('div');
             container.className = 'post-media-container';
             
@@ -2152,7 +2152,7 @@ console.log('🐱 BarsikNet готов!');
 console.log('📱 Адаптировано для iPhone');
 console.log('❤️ Лайки и 💬 комментарии добавлены!');
 console.log('👑 Админ-панель доступна для BarsikNet');
-console.log('🖼️ Фикс загрузки фото');
+console.log('🖼️ Фикс загрузки фото по ссылке');
 </script>
 </body>
 </html>
