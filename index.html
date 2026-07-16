@@ -49,24 +49,16 @@
             padding-top: var(--safe-top);
             padding-bottom: var(--safe-bottom);
         }
-        body.readonly * {
-            pointer-events: none !important;
-            opacity: 0.7 !important;
-        }
-        body.readonly .header, 
-        body.readonly .bottom-nav,
-        body.readonly .post-card .post-actions button,
-        body.readonly .chat-input button,
-        body.readonly .create-post-area button {
+        body.readonly .create-post-area,
+        body.readonly .chat-input,
+        body.readonly .post-actions button,
+        body.readonly .comment-input,
+        body.readonly #reelPublishArea {
             pointer-events: none !important;
             opacity: 0.5 !important;
         }
-        body.readonly .admin-actions button,
-        body.readonly .admin-user-item button {
-            pointer-events: auto !important;
-            opacity: 1 !important;
-        }
-        body.readonly .bottom-nav .nav-item {
+        body.readonly .header .right,
+        body.readonly .bottom-nav .nav-item:not(.admin-only) {
             pointer-events: none !important;
             opacity: 0.5 !important;
         }
@@ -849,6 +841,7 @@
             border-radius: var(--radius);
             border: 1px solid var(--border);
             margin-bottom: 16px;
+            flex-wrap: wrap;
         }
         .admin-mode-toggle .label {
             font-weight: 600;
@@ -1154,9 +1147,6 @@
         
         <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px;">
             <button class="btn-sm" onclick="adminRefresh.click()" style="background:var(--primary);">🔄 Обновить</button>
-            <button class="btn-sm danger" onclick="adminClearAllMessages()" style="background:#ff3b30;">🗑️ Очистить все чаты</button>
-            <button class="btn-sm warning" onclick="adminClearAllPosts()" style="background:#ff9500;">🗑️ Очистить все посты</button>
-            <button class="btn-sm warning" onclick="adminClearAllReels()" style="background:#ff9500;">🗑️ Очистить все рилсы</button>
         </div>
         
         <h4 style="margin:12px 0 8px;">👥 Все пользователи</h4>
@@ -1341,7 +1331,6 @@ function isUserBanned(username) {
     const user = allUsersCache[username];
     if (!user || !user.banned) return false;
     if (user.banExpiry && Date.now() > user.banExpiry) {
-        // Бан истек
         db.ref('users/' + username + '/banned').remove();
         db.ref('users/' + username + '/banExpiry').remove();
         return false;
@@ -1354,7 +1343,7 @@ function getBanTimeLeft(username) {
     if (!user || !user.banExpiry) return null;
     const left = user.banExpiry - Date.now();
     if (left <= 0) return null;
-    return Math.ceil(left / 60000); // минуты
+    return Math.ceil(left / 60000);
 }
 
 // ============ СОХРАНЕНИЕ ТЕМЫ ============
@@ -1444,14 +1433,12 @@ authBtn.onclick = async () => {
                 authError.textContent = 'Неверный юзернейм или пароль';
                 return;
             }
-            // Проверка бана
             if (data.banned) {
                 if (data.banExpiry && Date.now() < data.banExpiry) {
                     const left = Math.ceil((data.banExpiry - Date.now()) / 60000);
                     authError.textContent = `🔨 Вы забанены! Осталось ${left} мин.`;
                     return;
                 } else {
-                    // Бан истек
                     await ref.update({ banned: false, banExpiry: null });
                 }
             }
@@ -1559,7 +1546,6 @@ function loadAllUsers() {
         renderAdminPanel();
         renderProfile();
         if (currentChat) renderChatMessages(currentChat);
-        // Проверяем, не забанен ли текущий пользователь
         if (currentUser && allUsersCache[currentUser.username]) {
             const userData = allUsersCache[currentUser.username];
             if (userData.banned && userData.banExpiry && Date.now() < userData.banExpiry) {
@@ -1628,38 +1614,176 @@ document.querySelectorAll('.nav-item').forEach(btn => {
     };
 });
 
-// ============ ПОСТЫ ============
-publishPostBtn.onclick = () => {
-    if (readonlyMode) {
-        alert('📖 Режим чтения! Публикация запрещена.');
+// ============ ОТОБРАЖЕНИЕ ПОСТОВ ============
+function renderFeed() {
+    if (!currentUser) return;
+    feedPosts.innerHTML = '';
+    
+    const allUsers = Object.keys(allUsersCache);
+    const posts = [];
+    
+    for (const u of allUsers) {
+        const userData = allUsersCache[u];
+        if (!userData) continue;
+        const userPosts = userData.posts || {};
+        for (const key in userPosts) {
+            posts.push({ 
+                ...userPosts[key], 
+                username: u, 
+                name: userData.name || u,
+                postKey: key
+            });
+        }
+    }
+    
+    posts.sort((a,b) => (b.time||0) - (a.time||0));
+    
+    if (posts.length === 0) {
+        feedPosts.innerHTML = '<div style="text-align:center; opacity:0.5; padding:40px 0;">📝 Нет постов</div>';
         return;
     }
-    const text = postText.value.trim();
-    const imageUrl = postImage.value.trim();
-    if (!text && !imageUrl) {
-        alert('Напишите текст или добавьте фото');
-        return;
+    
+    for (const p of posts) {
+        const card = document.createElement('div');
+        card.className = 'post-card';
+        card.id = 'post_' + p.postKey;
+        
+        const header = document.createElement('div');
+        header.className = 'post-header';
+        const av = document.createElement('div');
+        av.className = 'avatar';
+        const user = allUsersCache[p.username];
+        if (user && user.avatar && user.avatar.startsWith('http')) {
+            const img = document.createElement('img');
+            img.src = user.avatar;
+            img.alt = 'avatar';
+            img.loading = 'lazy';
+            img.crossOrigin = 'anonymous';
+            img.referrerPolicy = 'no-referrer';
+            img.onerror = function() { this.style.display = 'none'; av.textContent = '🐱'; };
+            av.appendChild(img);
+        } else {
+            av.textContent = (user && user.avatar) || '🐱';
+        }
+        if (user && user.online) av.classList.add('online');
+        
+        av.style.cursor = 'pointer';
+        av.onclick = (e) => {
+            e.stopPropagation();
+            openUserProfile(p.username);
+        };
+        header.appendChild(av);
+        
+        const nameWrapper = document.createElement('span');
+        nameWrapper.className = 'name-wrapper';
+        nameWrapper.style.cursor = 'pointer';
+        nameWrapper.onclick = (e) => {
+            e.stopPropagation();
+            openUserProfile(p.username);
+        };
+        const nameSpan = document.createElement('span');
+        nameSpan.textContent = p.name || p.username;
+        nameWrapper.appendChild(nameSpan);
+        const badge = getVerifiedBadge(p.username);
+        if (badge) nameWrapper.innerHTML += badge;
+        header.appendChild(nameWrapper);
+        card.appendChild(header);
+        
+        if (p.text) {
+            const text = document.createElement('div');
+            text.className = 'post-content';
+            text.textContent = p.text;
+            card.appendChild(text);
+        }
+        
+        if (p.url) {
+            const container = document.createElement('div');
+            container.className = 'post-media-container';
+            const img = document.createElement('img');
+            img.alt = 'медиа';
+            container.appendChild(img);
+            loadImageWithFallback(img, p.url, '🖼️ Фото не загрузилось');
+            img.onclick = function(e) {
+                e.stopPropagation();
+                if (window.innerWidth < 768) {
+                    window.open(this.src, '_blank');
+                }
+            };
+            card.appendChild(container);
+        }
+        
+        const timeDiv = document.createElement('div');
+        timeDiv.className = 'post-time';
+        timeDiv.textContent = new Date(p.time).toLocaleString();
+        card.appendChild(timeDiv);
+        
+        const actions = document.createElement('div');
+        actions.className = 'post-actions';
+        
+        const likesCount = p.likes ? Object.keys(p.likes).length : 0;
+        const isLiked = p.likes && p.likes[currentUser.username];
+        
+        const likeBtn = document.createElement('button');
+        likeBtn.className = isLiked ? 'liked' : '';
+        likeBtn.innerHTML = `❤️ ${likesCount}`;
+        likeBtn.onclick = () => toggleLike(p.postKey, p.username);
+        actions.appendChild(likeBtn);
+        
+        const commentsCount = p.comments ? Object.keys(p.comments).length : 0;
+        const commentBtn = document.createElement('button');
+        commentBtn.textContent = `💬 ${commentsCount}`;
+        commentBtn.onclick = () => {
+            const section = document.getElementById('comments_' + p.postKey);
+            if (section) {
+                section.style.display = section.style.display === 'none' ? 'block' : 'none';
+            }
+        };
+        actions.appendChild(commentBtn);
+        card.appendChild(actions);
+        
+        const commentsSection = document.createElement('div');
+        commentsSection.className = 'comments-section';
+        commentsSection.id = 'comments_' + p.postKey;
+        commentsSection.style.display = 'none';
+        
+        if (p.comments) {
+            const commentsArr = Object.values(p.comments);
+            commentsArr.sort((a,b) => (a.time||0) - (b.time||0));
+            for (const c of commentsArr) {
+                const div = document.createElement('div');
+                div.className = 'comment';
+                const name = document.createElement('span');
+                name.className = 'name';
+                name.textContent = c.from + ':';
+                div.appendChild(name);
+                const text = document.createElement('span');
+                text.textContent = c.text;
+                div.appendChild(text);
+                commentsSection.appendChild(div);
+            }
+        }
+        
+        const commentInput = document.createElement('div');
+        commentInput.className = 'comment-input';
+        const input = document.createElement('input');
+        input.id = 'commentInput_' + p.postKey;
+        input.placeholder = 'Написать комментарий...';
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') addComment(p.postKey, p.username);
+        });
+        const sendBtn = document.createElement('button');
+        sendBtn.textContent = '➤';
+        sendBtn.onclick = () => addComment(p.postKey, p.username);
+        commentInput.appendChild(input);
+        commentInput.appendChild(sendBtn);
+        commentsSection.appendChild(commentInput);
+        card.appendChild(commentsSection);
+        
+        feedPosts.appendChild(card);
     }
-    if (imageUrl && !isValidImageUrl(imageUrl)) {
-        alert('Пожалуйста, введите корректную ссылку на изображение');
-        return;
-    }
-    const ref = db.ref('users/' + currentUser.username + '/posts');
-    const newRef = ref.push();
-    const post = {
-        text: text,
-        time: Date.now(),
-        likes: {},
-        comments: {}
-    };
-    if (imageUrl) post.url = imageUrl;
-    newRef.set(post).then(() => {
-        postText.value = '';
-        postImage.value = '';
-        renderFeed();
-    }).catch(e => alert('Ошибка: ' + e.message));
-};
+}
 
+// ============ ЛАЙКИ И КОММЕНТЫ ============
 function toggleLike(postKey, username) {
     if (readonlyMode) {
         alert('📖 Режим чтения!');
@@ -1695,107 +1819,36 @@ function addComment(postKey, username) {
     });
 }
 
-// ============ АДМИН ФУНКЦИИ ДЛЯ УДАЛЕНИЯ ПОСТОВ/РИЛСОВ ============
-window.adminDeletePost = function(username, postKey) {
-    if (!isAdmin) return;
-    if (confirm(`Удалить этот пост?`)) {
-        db.ref('users/' + username + '/posts/' + postKey).remove().then(() => {
-            renderFeed();
-            renderAdminPanel();
-            alert('✅ Пост удален!');
-        });
-    }
-};
-
-window.adminDeleteReel = function(username, reelKey) {
-    if (!isAdmin) return;
-    if (confirm(`Удалить этот рилс?`)) {
-        db.ref('users/' + username + '/reels/' + reelKey).remove().then(() => {
-            renderReelsStrip();
-            renderAdminPanel();
-            alert('✅ Рилс удален!');
-        });
-    }
-};
-
-// ============ БАН ПОЛЬЗОВАТЕЛЯ ============
-window.adminBanUser = function(username, minutes) {
-    if (!isAdmin) return;
-    if (username === 'BarsikNet') {
-        alert('Нельзя забанить админа!');
+// ============ ПУБЛИКАЦИЯ ПОСТОВ ============
+publishPostBtn.onclick = () => {
+    if (readonlyMode) {
+        alert('📖 Режим чтения! Публикация запрещена.');
         return;
     }
-    if (username === currentUser.username) {
-        alert('Нельзя забанить самого себя!');
+    const text = postText.value.trim();
+    const imageUrl = postImage.value.trim();
+    if (!text && !imageUrl) {
+        alert('Напишите текст или добавьте фото');
         return;
     }
-    if (!minutes || minutes < 1) {
-        alert('Введите корректное количество минут (от 1)');
+    if (imageUrl && !isValidImageUrl(imageUrl)) {
+        alert('Пожалуйста, введите корректную ссылку на изображение');
         return;
     }
-    const banExpiry = Date.now() + (minutes * 60000);
-    db.ref('users/' + username + '/banned').set(true);
-    db.ref('users/' + username + '/banExpiry').set(banExpiry);
-    db.ref('users/' + username + '/online').set(false);
-    alert(`🔨 Пользователь @${username} забанен на ${minutes} минут!`);
-    renderAdminPanel();
-};
-
-window.adminUnbanUser = function(username) {
-    if (!isAdmin) return;
-    if (confirm(`Разбанить пользователя @${username}?`)) {
-        db.ref('users/' + username + '/banned').remove();
-        db.ref('users/' + username + '/banExpiry').remove();
-        alert(`✅ Пользователь @${username} разбанен!`);
-        renderAdminPanel();
-    }
-};
-
-// ============ ОЧИСТКА ВСЕХ ДАННЫХ ============
-window.adminClearAllMessages = function() {
-    if (!isAdmin) return;
-    if (confirm('🗑️ Удалить ВСЕ сообщения во всех чатах?')) {
-        db.ref('messages').remove().then(() => {
-            renderAdminPanel();
-            alert('✅ Все сообщения удалены!');
-        });
-    }
-};
-
-window.adminClearAllPosts = function() {
-    if (!isAdmin) return;
-    if (confirm('🗑️ Удалить ВСЕ посты всех пользователей?')) {
-        const users = Object.keys(allUsersCache);
-        let count = 0;
-        for (const u of users) {
-            db.ref('users/' + u + '/posts').remove().then(() => {
-                count++;
-                if (count === users.length) {
-                    renderFeed();
-                    renderAdminPanel();
-                    alert('✅ Все посты удалены!');
-                }
-            });
-        }
-    }
-};
-
-window.adminClearAllReels = function() {
-    if (!isAdmin) return;
-    if (confirm('🗑️ Удалить ВСЕ рилсы всех пользователей?')) {
-        const users = Object.keys(allUsersCache);
-        let count = 0;
-        for (const u of users) {
-            db.ref('users/' + u + '/reels').remove().then(() => {
-                count++;
-                if (count === users.length) {
-                    renderReelsStrip();
-                    renderAdminPanel();
-                    alert('✅ Все рилсы удалены!');
-                }
-            });
-        }
-    }
+    const ref = db.ref('users/' + currentUser.username + '/posts');
+    const newRef = ref.push();
+    const post = {
+        text: text,
+        time: Date.now(),
+        likes: {},
+        comments: {}
+    };
+    if (imageUrl) post.url = imageUrl;
+    newRef.set(post).then(() => {
+        postText.value = '';
+        postImage.value = '';
+        renderFeed();
+    }).catch(e => alert('Ошибка: ' + e.message));
 };
 
 // ============ РИЛСЫ ============
@@ -1900,23 +1953,6 @@ function renderReelsStrip() {
         if (badge) label.innerHTML += badge;
         div.appendChild(label);
         
-        // Админ: долгое нажатие для удаления
-        let longPressTimer;
-        div.addEventListener('mousedown', () => {
-            if (!isAdmin) return;
-            longPressTimer = setTimeout(() => {
-                if (confirm(`Удалить рилс пользователя @${reel.username}?`)) {
-                    db.ref('users/' + reel.username + '/reels/' + reel.reelKey).remove().then(() => {
-                        renderReelsStrip();
-                        renderAdminPanel();
-                    });
-                }
-            }, 800);
-        });
-        div.addEventListener('mouseup', () => clearTimeout(longPressTimer));
-        div.addEventListener('mouseleave', () => clearTimeout(longPressTimer));
-        
-        // Короткое нажатие - открыть
         div.onclick = () => {
             if (reel.url && isValidImageUrl(reel.url)) {
                 reelImage.src = reel.url;
@@ -2087,6 +2123,7 @@ window.openChatFromProfile = function(username) {
     }, 300);
 };
 
+// ============ АДМИН ФУНКЦИИ ============
 window.adminBanUserPrompt = function(username) {
     if (!isAdmin) return;
     const minutes = prompt(`🔨 Забанить @${username}\nВведите количество минут:`);
@@ -2098,6 +2135,73 @@ window.adminBanUserPrompt = function(username) {
     }
     adminBanUser(username, num);
     closeUserProfile();
+};
+
+window.adminBanUser = function(username, minutes) {
+    if (!isAdmin) return;
+    if (username === 'BarsikNet') {
+        alert('Нельзя забанить админа!');
+        return;
+    }
+    if (username === currentUser.username) {
+        alert('Нельзя забанить самого себя!');
+        return;
+    }
+    if (!minutes || minutes < 1) {
+        alert('Введите корректное количество минут (от 1)');
+        return;
+    }
+    const banExpiry = Date.now() + (minutes * 60000);
+    db.ref('users/' + username + '/banned').set(true);
+    db.ref('users/' + username + '/banExpiry').set(banExpiry);
+    db.ref('users/' + username + '/online').set(false);
+    alert(`🔨 Пользователь @${username} забанен на ${minutes} минут!`);
+    renderAdminPanel();
+};
+
+window.adminUnbanUser = function(username) {
+    if (!isAdmin) return;
+    if (confirm(`Разбанить пользователя @${username}?`)) {
+        db.ref('users/' + username + '/banned').remove();
+        db.ref('users/' + username + '/banExpiry').remove();
+        alert(`✅ Пользователь @${username} разбанен!`);
+        renderAdminPanel();
+    }
+};
+
+window.adminVerify = function(username) {
+    if (!isAdmin) return;
+    const ref = db.ref('users/' + username + '/verified');
+    ref.once('value', snap => {
+        ref.set(!snap.val()).then(() => {
+            renderAdminPanel();
+            renderFeed();
+            renderChatList();
+            renderFriends();
+            renderSearch();
+            renderReelsStrip();
+            renderProfile();
+        });
+    });
+};
+
+window.adminDeleteUser = function(username) {
+    if (!isAdmin) return;
+    if (username === 'BarsikNet') {
+        alert('Нельзя удалить главного админа!');
+        return;
+    }
+    if (confirm(`🗑️ Удалить пользователя @${username} и все его данные?`)) {
+        db.ref('users/' + username).remove().then(() => {
+            renderAdminPanel();
+            renderFeed();
+            renderChatList();
+            renderFriends();
+            renderSearch();
+            renderReelsStrip();
+            alert(`✅ Пользователь @${username} удален!`);
+        });
+    }
 };
 
 // ============ АДМИН ПАНЕЛЬ ============
@@ -2119,7 +2223,6 @@ function renderAdminPanel() {
         if (data && data.banned) totalBanned++;
     }
     
-    // Считаем сообщения
     db.ref('messages').once('value', snap => {
         const msgs = snap.val() || {};
         for (const chatId in msgs) {
@@ -2134,7 +2237,6 @@ function renderAdminPanel() {
     $('statReels').textContent = totalReels;
     $('statBanned').textContent = totalBanned;
     
-    // Список пользователей
     const list = $('adminUserList');
     list.innerHTML = '';
     for (const u of users) {
@@ -2165,8 +2267,6 @@ function renderAdminPanel() {
             </div>
             <div class="admin-buttons">
                 <button class="btn-sm success" onclick="adminVerify('${u}')" title="Верификация">✅</button>
-                <button class="btn-sm warning" onclick="adminDeletePostPrompt('${u}')" title="Удалить пост">📝</button>
-                <button class="btn-sm warning" onclick="adminDeleteReelPrompt('${u}')" title="Удалить рилс">📹</button>
                 ${isBanned ? 
                     `<button class="btn-sm success" onclick="adminUnbanUser('${u}')" title="Разбанить">🔓</button>` :
                     `<button class="btn-sm danger" onclick="adminBanUserPrompt('${u}')" title="Забанить">🔨</button>`
@@ -2177,112 +2277,6 @@ function renderAdminPanel() {
         list.appendChild(div);
     }
 }
-
-// Админ функции для удаления постов/рилсов через промпт
-window.adminDeletePostPrompt = function(username) {
-    if (!isAdmin) return;
-    const userData = allUsersCache[username];
-    if (!userData || !userData.posts) {
-        alert('У пользователя нет постов');
-        return;
-    }
-    const posts = userData.posts;
-    let postList = '📝 Посты пользователя:\n\n';
-    let index = 1;
-    const keys = Object.keys(posts);
-    for (const key of keys) {
-        const p = posts[key];
-        postList += `${index}. ${p.text || 'Без текста'} (${new Date(p.time).toLocaleString()})\n`;
-        index++;
-    }
-    postList += `\nВведите номер поста для удаления (1-${keys.length}):`;
-    const choice = prompt(postList);
-    if (choice === null) return;
-    const num = parseInt(choice);
-    if (isNaN(num) || num < 1 || num > keys.length) {
-        alert('Неверный номер');
-        return;
-    }
-    const key = keys[num - 1];
-    if (confirm(`Удалить этот пост?`)) {
-        db.ref('users/' + username + '/posts/' + key).remove().then(() => {
-            renderFeed();
-            renderAdminPanel();
-            alert('✅ Пост удален!');
-        });
-    }
-};
-
-window.adminDeleteReelPrompt = function(username) {
-    if (!isAdmin) return;
-    const userData = allUsersCache[username];
-    if (!userData || !userData.reels) {
-        alert('У пользователя нет рилсов');
-        return;
-    }
-    const reels = userData.reels;
-    let reelList = '📹 Рилсы пользователя:\n\n';
-    let index = 1;
-    const keys = Object.keys(reels);
-    for (const key of keys) {
-        const r = reels[key];
-        reelList += `${index}. ${r.url || 'Без ссылки'} (${new Date(r.time).toLocaleString()})\n`;
-        index++;
-    }
-    reelList += `\nВведите номер рилса для удаления (1-${keys.length}):`;
-    const choice = prompt(reelList);
-    if (choice === null) return;
-    const num = parseInt(choice);
-    if (isNaN(num) || num < 1 || num > keys.length) {
-        alert('Неверный номер');
-        return;
-    }
-    const key = keys[num - 1];
-    if (confirm(`Удалить этот рилс?`)) {
-        db.ref('users/' + username + '/reels/' + key).remove().then(() => {
-            renderReelsStrip();
-            renderAdminPanel();
-            alert('✅ Рилс удален!');
-        });
-    }
-};
-
-// Верификация
-window.adminVerify = function(username) {
-    if (!isAdmin) return;
-    const ref = db.ref('users/' + username + '/verified');
-    ref.once('value', snap => {
-        ref.set(!snap.val()).then(() => {
-            renderAdminPanel();
-            renderFeed();
-            renderChatList();
-            renderFriends();
-            renderSearch();
-            renderReelsStrip();
-            renderProfile();
-        });
-    });
-};
-
-// Удаление пользователя
-window.adminDeleteUser = function(username) {
-    if (!isAdmin) return;
-    if (username === 'BarsikNet') {
-        alert('Нельзя удалить главного админа!');
-        return;
-    }
-    if (confirm(`🗑️ Удалить пользователя @${username} и все его данные?`)) {
-        db.ref('users/' + username).remove().then(() => {
-            renderAdminPanel();
-            renderFeed();
-            renderChatList();
-            renderFriends();
-            renderSearch();
-            renderReelsStrip();
-            alert(`✅ Пользователь @${username} удален!`);
-        });
-    }
-};
 
 $('adminRefresh').onclick = () => {
     renderAdminPanel();
@@ -2854,7 +2848,6 @@ emojiGrid.querySelectorAll('button').forEach(btn => {
 reelClose.onclick = () => reelView.classList.remove('active');
 reelView.onclick = (e) => { if (e.target === reelView) reelView.classList.remove('active'); };
 
-// Закрытие модалки по клику вне
 userProfileModal.onclick = (e) => {
     if (e.target === userProfileModal) closeUserProfile();
 };
@@ -2866,10 +2859,6 @@ postText.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey
 
 console.log('🐱 BarsikNet готов!');
 console.log('📱 Адаптировано для iPhone');
-console.log('👑 Расширенная админ-панель:');
-console.log('  • Удаление постов/рилсов (выбор)');
-console.log('  • Режим чтения (все не могут писать/публиковать)');
-console.log('  • Бан пользователей (на выбор минут)');
 </script>
 </body>
 </html>
