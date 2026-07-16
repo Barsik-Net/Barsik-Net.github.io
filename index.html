@@ -392,16 +392,25 @@
             border-radius: 16px;
             box-shadow: 0 8px 40px rgba(0,0,0,0.6);
             object-fit: contain;
+            user-select: none;
+            -webkit-user-drag: none;
         }
         .reel-view .close {
             position: absolute;
             top: 30px;
             right: 24px;
             color: white;
-            font-size: 28px;
+            font-size: 32px;
             cursor: pointer;
-            opacity: 0.7;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+            z-index: 201;
+            background: none;
+            border: none;
+            padding: 8px 12px;
+            font-weight: 300;
         }
+        .reel-view .close:hover { opacity: 1; }
         .reel-view .user-label {
             color: white;
             margin-top: 16px;
@@ -1147,7 +1156,7 @@
         </div>
         
         <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px;">
-            <button class="btn-sm" onclick="adminRefresh.click()" style="background:var(--primary);">🔄 Обновить</button>
+            <button class="btn-sm" onclick="renderAdminPanel()" style="background:var(--primary);">🔄 Обновить</button>
         </div>
         
         <h4 style="margin:12px 0 8px;">👥 Все пользователи</h4>
@@ -1168,7 +1177,7 @@
 
 <!-- Reel View -->
 <div class="reel-view" id="reelView">
-    <span class="close" id="reelClose">✕</span>
+    <button class="close" id="reelCloseBtn">✕</button>
     <img id="reelImage" src="" alt="рилс" />
     <div class="user-label" id="reelUserLabel">@user</div>
 </div>
@@ -1215,7 +1224,8 @@ const profileFriendsCount = $('profileFriendsCount'), profileFollowersCount = $(
 const themeToggle = $('themeToggle'), settingsName = $('settingsName'), settingsSaveName = $('settingsSaveName');
 const settingsAvatarUrl = $('settingsAvatarUrl'), settingsSaveAvatar = $('settingsSaveAvatar');
 const emojiGrid = $('emojiGrid');
-const reelView = $('reelView'), reelImage = $('reelImage'), reelUserLabel = $('reelUserLabel'), reelClose = $('reelClose');
+const reelView = $('reelView'), reelImage = $('reelImage'), reelUserLabel = $('reelUserLabel');
+const reelCloseBtn = $('reelCloseBtn');
 const onlineStatus = $('onlineStatus');
 const bottomNav = $('bottomNav');
 const supportBtn = $('supportBtn');
@@ -1361,6 +1371,10 @@ function loadTheme() {
             isDark = true;
             document.body.classList.add('dark');
             if (themeToggle) themeToggle.classList.add('active');
+        } else {
+            isDark = false;
+            document.body.classList.remove('dark');
+            if (themeToggle) themeToggle.classList.remove('active');
         }
     } catch (e) {}
 }
@@ -1374,6 +1388,11 @@ function loadReadonlyMode() {
             document.body.classList.add('readonly');
             if (readonlyToggle) readonlyToggle.classList.add('active');
             if (readonlyStatus) readonlyStatus.textContent = 'Включен 🔒';
+        } else {
+            readonlyMode = false;
+            document.body.classList.remove('readonly');
+            if (readonlyToggle) readonlyToggle.classList.remove('active');
+            if (readonlyStatus) readonlyStatus.textContent = 'Выключен';
         }
     } catch (e) {}
 }
@@ -2279,41 +2298,79 @@ function renderAdminPanel() {
     }
 }
 
-$('adminRefresh').onclick = () => {
-    renderAdminPanel();
-    alert('✅ Обновлено!');
-};
-
 // ============ РЕЖИМ ЧТЕНИЯ - ИСПРАВЛЕННЫЙ ============
 if (readonlyToggle) {
-    readonlyToggle.onclick = function(e) {
+    readonlyToggle.addEventListener('click', function(e) {
         e.stopPropagation();
+        e.preventDefault();
+        
         readonlyMode = !readonlyMode;
-        this.classList.toggle('active', readonlyMode);
-        document.body.classList.toggle('readonly', readonlyMode);
-        if (readonlyStatus) {
-            readonlyStatus.textContent = readonlyMode ? 'Включен 🔒' : 'Выключен';
-        }
-        saveReadonlyMode();
         
         if (readonlyMode) {
+            this.classList.add('active');
+            document.body.classList.add('readonly');
+            if (readonlyStatus) readonlyStatus.textContent = 'Включен 🔒';
             alert('📖 Режим чтения ВКЛЮЧЕН!\n\nВсе пользователи не могут:\n- Публиковать посты\n- Публиковать рилсы\n- Писать сообщения\n- Ставить лайки\n- Комментировать');
         } else {
+            this.classList.remove('active');
+            document.body.classList.remove('readonly');
+            if (readonlyStatus) readonlyStatus.textContent = 'Выключен';
             alert('📖 Режим чтения ВЫКЛЮЧЕН!');
         }
-    };
+        
+        saveReadonlyMode();
+    });
 }
 
 // ============ ТЕМА - ИСПРАВЛЕННАЯ ============
 if (themeToggle) {
-    themeToggle.onclick = function(e) {
+    themeToggle.addEventListener('click', function(e) {
         e.stopPropagation();
+        e.preventDefault();
+        
         isDark = !isDark;
-        this.classList.toggle('active', isDark);
-        document.body.classList.toggle('dark', isDark);
+        
+        if (isDark) {
+            this.classList.add('active');
+            document.body.classList.add('dark');
+        } else {
+            this.classList.remove('active');
+            document.body.classList.remove('dark');
+        }
+        
         saveTheme();
-    };
+    });
 }
+
+// ============ ЗАКРЫТИЕ РИЛСА - ИСПРАВЛЕННОЕ ============
+function closeReelView() {
+    reelView.classList.remove('active');
+    reelImage.src = '';
+    reelUserLabel.textContent = '';
+}
+
+if (reelCloseBtn) {
+    reelCloseBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        closeReelView();
+    });
+}
+
+if (reelView) {
+    reelView.addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeReelView();
+        }
+    });
+}
+
+// Также добавим закрытие по ESC
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && reelView.classList.contains('active')) {
+        closeReelView();
+    }
+});
 
 // ============ ЧАТ ============
 
@@ -2855,9 +2912,6 @@ emojiGrid.querySelectorAll('button').forEach(btn => {
         settingsAvatarUrl.value = '';
     };
 });
-
-reelClose.onclick = () => reelView.classList.remove('active');
-reelView.onclick = (e) => { if (e.target === reelView) reelView.classList.remove('active'); };
 
 userProfileModal.onclick = (e) => {
     if (e.target === userProfileModal) closeUserProfile();
