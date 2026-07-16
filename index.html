@@ -693,10 +693,11 @@
             overflow: hidden;
             background: var(--bg);
             margin: 8px 0;
-            min-height: 80px;
+            min-height: 120px;
             display: flex;
             align-items: center;
             justify-content: center;
+            border: 1px solid var(--border);
         }
         .post-media-container img {
             width: 100%;
@@ -705,26 +706,30 @@
             max-height: 400px;
             object-fit: contain;
             background: var(--bg);
+            min-height: 100px;
         }
         .post-media-container .fallback {
-            padding: 30px;
+            padding: 20px;
             text-align: center;
             background: var(--bg);
             border-radius: 12px;
             color: var(--text);
-            opacity: 0.5;
-            font-size: 14px;
+            opacity: 0.6;
+            font-size: 13px;
+            width: 100%;
         }
         .post-media-container .fallback span {
             font-size: 11px;
             display: block;
             margin-top: 4px;
+            opacity: 0.5;
         }
         .post-media-container .loading {
             padding: 30px;
             text-align: center;
             color: var(--text);
             opacity: 0.5;
+            font-size: 13px;
         }
         
         /* ============ АДМИНКА ============ */
@@ -771,6 +776,14 @@
         .admin-user-item .info .name { font-weight: 600; }
         .admin-user-item .info .username { font-size: 12px; opacity: 0.6; }
         
+        /* Стиль для невалидных URL */
+        .invalid-url {
+            color: #ff3b30;
+            font-size: 12px;
+            opacity: 0.8;
+            padding: 4px 0;
+        }
+        
         @media (max-width: 480px) {
             .page { padding: 8px 10px 70px; }
             .header { 
@@ -782,6 +795,9 @@
             .post-card { padding: 10px 12px; margin-bottom: 8px; }
             .post-header .avatar { width: 32px; height: 32px; font-size: 16px; }
             .post-content { font-size: 14px; }
+            .post-media-container { 
+                min-height: 80px;
+            }
             .post-media-container img { 
                 max-height: 250px;
                 min-height: 60px;
@@ -1032,6 +1048,109 @@ const reelView = $('reelView'), reelImage = $('reelImage'), reelUserLabel = $('r
 const onlineStatus = $('onlineStatus');
 const bottomNav = $('bottomNav');
 
+// ============ ПРОВЕРКА URL ============
+function isValidImageUrl(url) {
+    if (!url || typeof url !== 'string') return false;
+    // Проверяем расширение
+    const extMatch = url.match(/\.(jpeg|jpg|gif|png|webp|svg|bmp|ico)(\?.*)?$/i);
+    if (extMatch) return true;
+    // Проверяем, что это похоже на URL с картинкой
+    try {
+        const parsed = new URL(url);
+        // Если нет расширения, но это картинка с CDN или облака
+        const path = parsed.pathname.toLowerCase();
+        if (path.includes('image') || path.includes('photo') || path.includes('picture') || 
+            path.includes('img') || path.includes('media') || path.includes('upload')) {
+            return true;
+        }
+        // Проверяем наличие популярных хостингов картинок
+        const host = parsed.hostname.toLowerCase();
+        const imageHosts = ['imgur.com', 'i.imgur.com', 'ibb.co', 'imagebam.com', 'postimg.cc', 
+            'imageshack.com', 'flickr.com', 'staticflickr.com', 'cloudinary.com', 
+            'googleusercontent.com', 'githubusercontent.com', 'cdn.discordapp.com',
+            'cdn.jsdelivr.net', 'unsplash.com', 'images.unsplash.com', 'picsum.photos',
+            'placehold.co', 'loremflickr.com', 'via.placeholder.com', 'tinypic.com'];
+        if (imageHosts.some(hostname => host.includes(hostname))) {
+            return true;
+        }
+        return false;
+    } catch {
+        return false;
+    }
+}
+
+// ============ ЗАГРУЗКА ФОТО С УЛУЧШЕННЫМ FALLBACK ============
+function loadImageWithFallback(imgElement, src, fallbackText = '🖼️ Не удалось загрузить') {
+    if (!imgElement) return;
+    
+    const container = imgElement.parentElement;
+    if (!container) return;
+    
+    // Проверка валидности URL
+    if (!isValidImageUrl(src)) {
+        imgElement.style.display = 'none';
+        const load = container.querySelector('.loading');
+        if (load) load.remove();
+        
+        let fallback = container.querySelector('.fallback');
+        if (!fallback) {
+            fallback = document.createElement('div');
+            fallback.className = 'fallback';
+            fallback.innerHTML = `📷 ${fallbackText}<br><span>Некорректная ссылка</span>`;
+            container.appendChild(fallback);
+        }
+        return;
+    }
+    
+    // Показываем загрузку
+    let loading = container.querySelector('.loading');
+    if (!loading) {
+        loading = document.createElement('div');
+        loading.className = 'loading';
+        loading.textContent = '⏳ Загрузка...';
+        container.appendChild(loading);
+    }
+    
+    // Убираем старые fallback
+    const oldFallback = container.querySelector('.fallback');
+    if (oldFallback) oldFallback.remove();
+    
+    // Показываем img
+    imgElement.style.display = 'block';
+    imgElement.src = src;
+    
+    // Добавляем обработчики
+    imgElement.onload = function() {
+        this.style.display = 'block';
+        const load = container.querySelector('.loading');
+        if (load) load.remove();
+        const fallback = container.querySelector('.fallback');
+        if (fallback) fallback.remove();
+    };
+    
+    imgElement.onerror = function() {
+        this.style.display = 'none';
+        const load = container.querySelector('.loading');
+        if (load) load.remove();
+        
+        let fallback = container.querySelector('.fallback');
+        if (!fallback) {
+            fallback = document.createElement('div');
+            fallback.className = 'fallback';
+            fallback.innerHTML = `📷 ${fallbackText}<br><span>Попробуйте другую ссылку</span>`;
+            container.appendChild(fallback);
+        }
+    };
+    
+    // Таймаут на случай долгой загрузки
+    setTimeout(() => {
+        const load = container.querySelector('.loading');
+        if (load && !imgElement.complete) {
+            load.textContent = '⏳ Всё ещё загружается...';
+        }
+    }, 5000);
+}
+
 // ============ ГАЛОЧКА ============
 function getVerifiedBadge(username, size = 'normal') {
     const user = allUsersCache[username];
@@ -1059,48 +1178,6 @@ function hideBottomNav() {
             p.style.paddingBottom = '12px';
         }
     });
-}
-
-// ============ ЗАГРУЗКА ФОТО ============
-function loadImageWithFallback(imgElement, src, fallbackText = '🖼️ Фото не загрузилось') {
-    if (!imgElement) return;
-    
-    const container = imgElement.parentElement;
-    
-    // Показываем загрузку
-    let loading = container.querySelector('.loading');
-    if (!loading) {
-        loading = document.createElement('div');
-        loading.className = 'loading';
-        loading.textContent = '⏳ Загрузка...';
-        container.appendChild(loading);
-    }
-    
-    imgElement.src = src;
-    imgElement.crossOrigin = 'anonymous';
-    imgElement.referrerPolicy = 'no-referrer';
-    imgElement.loading = 'lazy';
-    
-    imgElement.onload = function() {
-        this.style.display = 'block';
-        const load = container.querySelector('.loading');
-        if (load) load.remove();
-        const fallback = container.querySelector('.fallback');
-        if (fallback) fallback.remove();
-    };
-    
-    imgElement.onerror = function() {
-        this.style.display = 'none';
-        const load = container.querySelector('.loading');
-        if (load) load.remove();
-        
-        if (!container.querySelector('.fallback')) {
-            const fallback = document.createElement('div');
-            fallback.className = 'fallback';
-            fallback.innerHTML = `${fallbackText}<br><span>Попробуйте обновить</span>`;
-            container.appendChild(fallback);
-        }
-    };
 }
 
 // Auth switch
@@ -1301,8 +1378,8 @@ publishPostBtn.onclick = () => {
         alert('Напишите текст или добавьте фото');
         return;
     }
-    if (imageUrl && !imageUrl.match(/\.(jpeg|jpg|gif|png|webp|svg|bmp|ico)/i)) {
-        alert('Ссылка на фото должна быть на изображение');
+    if (imageUrl && !isValidImageUrl(imageUrl)) {
+        alert('Пожалуйста, введите корректную ссылку на изображение');
         return;
     }
     const ref = db.ref('users/' + currentUser.username + '/posts');
@@ -1420,7 +1497,7 @@ function renderFeed() {
             card.appendChild(text);
         }
         
-        // ============ ФИКС ФОТО ============
+        // ============ ФИКС ФОТО С УЛУЧШЕННОЙ ЗАГРУЗКОЙ ============
         if (p.url) {
             const container = document.createElement('div');
             container.className = 'post-media-container';
@@ -1429,7 +1506,7 @@ function renderFeed() {
             img.alt = 'медиа';
             container.appendChild(img);
             
-            // Используем функцию загрузки с проверкой
+            // Используем улучшенную функцию загрузки
             loadImageWithFallback(img, p.url, '🖼️ Фото не загрузилось');
             
             img.onclick = function(e) {
@@ -1519,9 +1596,12 @@ function renderFeed() {
 // ============ РИЛСЫ ============
 publishReelBtn.onclick = () => {
     const url = reelInput.value.trim();
-    if (!url) return;
-    if (!url.match(/\.(jpeg|jpg|gif|png|webp|svg|bmp|ico)/i)) {
-        alert('Пожалуйста, введите ссылку на фото');
+    if (!url) {
+        alert('Введите ссылку на фото');
+        return;
+    }
+    if (!isValidImageUrl(url)) {
+        alert('Пожалуйста, введите корректную ссылку на изображение');
         return;
     }
     const ref = db.ref('users/' + currentUser.username + '/reels');
@@ -1580,7 +1660,22 @@ function renderReelsStrip() {
         const avatarDiv = document.createElement('div');
         avatarDiv.className = 'avatar';
         const user = allUsersCache[reel.username];
-        if (user && user.avatar && user.avatar.startsWith('http')) {
+        
+        // Проверяем, есть ли URL в рилсе и он валидный
+        if (reel.url && isValidImageUrl(reel.url)) {
+            // Показываем миниатюру рилса как аватар
+            const img = document.createElement('img');
+            img.src = reel.url;
+            img.alt = 'reel';
+            img.loading = 'lazy';
+            img.crossOrigin = 'anonymous';
+            img.referrerPolicy = 'no-referrer';
+            img.onerror = function() {
+                this.style.display = 'none';
+                avatarDiv.textContent = '📹';
+            };
+            avatarDiv.appendChild(img);
+        } else if (user && user.avatar && user.avatar.startsWith('http')) {
             const img = document.createElement('img');
             img.src = user.avatar;
             img.alt = 'avatar';
@@ -1601,9 +1696,13 @@ function renderReelsStrip() {
         div.appendChild(label);
         
         div.onclick = () => {
-            reelImage.src = reel.url;
-            reelUserLabel.textContent = '@' + reel.username;
-            reelView.classList.add('active');
+            if (reel.url && isValidImageUrl(reel.url)) {
+                reelImage.src = reel.url;
+                reelUserLabel.textContent = '@' + reel.username;
+                reelView.classList.add('active');
+            } else {
+                alert('❌ Некорректная ссылка на рилс');
+            }
         };
         reelsStrip.appendChild(div);
     }
@@ -2087,9 +2186,12 @@ function renderProfile() {
 
 settingsSaveAvatar.onclick = () => {
     const url = settingsAvatarUrl.value.trim();
-    if (!url) return;
-    if (!url.startsWith('http')) {
-        alert('Введите корректную ссылку');
+    if (!url) {
+        alert('Введите ссылку на фото');
+        return;
+    }
+    if (!isValidImageUrl(url)) {
+        alert('Введите корректную ссылку на изображение');
         return;
     }
     db.ref('users/' + currentUser.username + '/avatar').set(url).then(() => {
@@ -2150,8 +2252,6 @@ postText.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey
 
 console.log('🐱 BarsikNet готов!');
 console.log('📱 Адаптировано для iPhone');
-console.log('❤️ Лайки и 💬 комментарии добавлены!');
-console.log('👑 Админ-панель доступна для BarsikNet');
 console.log('🖼️ Фикс загрузки фото по ссылке');
 </script>
 </body>
