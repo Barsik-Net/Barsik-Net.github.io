@@ -1,0 +1,1601 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BarsikNet</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+        }
+        :root {
+            --bg: #f5f7fa;
+            --card: #ffffff;
+            --text: #1a1a2e;
+            --border: #e0e0e0;
+            --primary: #4a6cf7;
+            --primary-light: #e8edff;
+            --shadow: 0 2px 12px rgba(0,0,0,0.08);
+            --radius: 16px;
+            --online: #34c759;
+        }
+        .dark {
+            --bg: #0f0f1a;
+            --card: #1a1a2e;
+            --text: #e8e8f0;
+            --border: #2a2a3e;
+            --primary: #6a8cff;
+            --primary-light: #2a2a4e;
+            --shadow: 0 2px 12px rgba(0,0,0,0.4);
+        }
+        body {
+            background: var(--bg);
+            color: var(--text);
+            transition: background 0.3s, color 0.3s;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        #auth {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: var(--bg);
+            padding: 20px;
+        }
+        .auth-box {
+            background: var(--card);
+            padding: 32px 28px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            width: 100%;
+            max-width: 360px;
+            transition: background 0.3s;
+        }
+        .auth-box h1 {
+            text-align: center;
+            margin-bottom: 24px;
+            font-weight: 700;
+            font-size: 28px;
+            color: var(--primary);
+        }
+        .auth-box input {
+            width: 100%;
+            padding: 12px 16px;
+            margin-bottom: 14px;
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            background: var(--bg);
+            color: var(--text);
+            font-size: 15px;
+            outline: none;
+        }
+        .auth-box input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(74,108,247,0.15);
+        }
+        .auth-box button {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-top: 4px;
+        }
+        .auth-box button:hover { opacity: 0.9; transform: scale(0.98); }
+        .auth-box .switch {
+            text-align: center;
+            margin-top: 16px;
+            font-size: 14px;
+            color: var(--text);
+            opacity: 0.7;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .auth-box .switch:hover { opacity: 1; color: var(--primary); }
+        .auth-box .error {
+            color: #ff3b30;
+            font-size: 13px;
+            text-align: center;
+            margin-bottom: 10px;
+            min-height: 20px;
+        }
+        #app {
+            display: none;
+            flex-direction: column;
+            height: 100vh;
+            max-width: 480px;
+            margin: 0 auto;
+            width: 100%;
+            background: var(--bg);
+            position: relative;
+        }
+        .header {
+            padding: 12px 16px;
+            background: var(--card);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+            transition: background 0.3s;
+            min-height: 56px;
+        }
+        .header h2 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        .header .right {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        .header .right span {
+            font-size: 13px;
+            opacity: 0.6;
+        }
+        .page {
+            display: none;
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px 16px 80px;
+            background: var(--bg);
+            transition: background 0.3s;
+            -webkit-overflow-scrolling: touch;
+        }
+        .page.active { display: block; }
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            max-width: 480px;
+            margin: 0 auto;
+            background: var(--card);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-around;
+            padding: 6px 0 env(safe-area-inset-bottom);
+            flex-shrink: 0;
+            z-index: 100;
+            transition: background 0.3s;
+            backdrop-filter: blur(8px);
+            background: rgba(var(--card-rgb, 255,255,255), 0.92);
+        }
+        .dark .bottom-nav { --card-rgb: 26,26,46; }
+        .nav-item {
+            background: none;
+            border: none;
+            color: var(--text);
+            opacity: 0.5;
+            font-size: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 4px 8px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-weight: 500;
+            min-width: 52px;
+        }
+        .nav-item.active { opacity: 1; color: var(--primary); }
+        .nav-item span { font-size: 20px; line-height: 1.2; }
+        .post-card, .user-card {
+            background: var(--card);
+            border-radius: var(--radius);
+            padding: 14px 16px;
+            margin-bottom: 12px;
+            box-shadow: var(--shadow);
+            transition: background 0.3s, box-shadow 0.3s;
+            border: 1px solid var(--border);
+        }
+        .post-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--primary);
+            flex-shrink: 0;
+            overflow: hidden;
+            border: 2px solid transparent;
+        }
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .avatar.online { border-color: var(--online); }
+        .post-content { margin: 6px 0 10px; word-wrap: break-word; }
+        .post-media {
+            width: 100%;
+            border-radius: 12px;
+            margin: 8px 0;
+            max-height: 300px;
+            object-fit: cover;
+            background: var(--border);
+        }
+        .post-time {
+            font-size: 11px;
+            opacity: 0.5;
+            margin-top: 4px;
+        }
+        .reels-strip {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            padding: 8px 0 12px;
+            scrollbar-width: none;
+        }
+        .reels-strip::-webkit-scrollbar { display: none; }
+        .reel-circle {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: 0.2s;
+        }
+        .reel-circle .avatar {
+            width: 56px;
+            height: 56px;
+            border: 3px solid var(--primary);
+            transition: 0.2s;
+        }
+        .reel-circle .avatar:active { transform: scale(0.92); }
+        .reel-circle span {
+            font-size: 11px;
+            opacity: 0.7;
+            max-width: 64px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .reel-view {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.92);
+            z-index: 200;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .reel-view.active { display: flex; }
+        .reel-view img {
+            max-width: 100%;
+            max-height: 70vh;
+            border-radius: 16px;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+        }
+        .reel-view .close {
+            position: absolute;
+            top: 30px;
+            right: 24px;
+            color: white;
+            font-size: 28px;
+            cursor: pointer;
+            opacity: 0.7;
+        }
+        .reel-view .user-label {
+            color: white;
+            margin-top: 16px;
+            font-size: 18px;
+            font-weight: 500;
+        }
+        .chat-list { margin-bottom: 12px; }
+        .chat-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .chat-item:active { opacity: 0.6; }
+        .chat-item .info { flex: 1; }
+        .chat-item .info .name-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-weight: 600;
+        }
+        .chat-item .info .status { font-size: 12px; opacity: 0.6; }
+        .chat-window {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+            padding: 0;
+        }
+        .chat-window.active { display: flex; }
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .chat-message {
+            max-width: 80%;
+            padding: 10px 14px;
+            border-radius: 18px;
+            background: #e8e8f0;
+            color: #1a1a2e;
+            align-self: flex-start;
+            word-wrap: break-word;
+        }
+        .dark .chat-message {
+            background: #2a2a3e;
+            color: #e8e8f0;
+        }
+        .chat-message.mine {
+            align-self: flex-end;
+            background: #4a6cf7;
+            color: white;
+        }
+        .chat-input {
+            display: flex;
+            gap: 8px;
+            padding: 8px 0;
+            border-top: 1px solid var(--border);
+        }
+        .chat-input input {
+            flex: 1;
+            padding: 10px 14px;
+            border-radius: 24px;
+            border: 1px solid var(--border);
+            background: var(--bg);
+            color: var(--text);
+            outline: none;
+        }
+        .chat-input button {
+            padding: 10px 18px;
+            border-radius: 24px;
+            border: none;
+            background: var(--primary);
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .back-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: var(--text);
+            cursor: pointer;
+            padding: 4px 8px;
+        }
+        .search-input {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 24px;
+            border: 1.5px solid var(--border);
+            background: var(--bg);
+            color: var(--text);
+            font-size: 15px;
+            margin-bottom: 14px;
+            outline: none;
+        }
+        .search-input:focus { border-color: var(--primary); }
+        .user-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+        .user-card .info { flex: 1; }
+        .user-card .info .name-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-weight: 600;
+        }
+        .user-card .info .username { font-size: 13px; opacity: 0.6; }
+        .btn-sm {
+            padding: 6px 16px;
+            border-radius: 20px;
+            border: none;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            background: var(--primary);
+            color: white;
+            transition: 0.2s;
+            white-space: nowrap;
+        }
+        .btn-sm:active { transform: scale(0.94); }
+        .btn-sm.outline {
+            background: transparent;
+            border: 1.5px solid var(--primary);
+            color: var(--primary);
+        }
+        .btn-sm.danger { background: #ff3b30; }
+        .profile-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 0;
+        }
+        .profile-header .avatar {
+            width: 80px;
+            height: 80px;
+            font-size: 36px;
+            margin-bottom: 8px;
+        }
+        .profile-header .name-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 22px;
+            font-weight: 700;
+        }
+        .profile-header .username { opacity: 0.6; }
+        .settings-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 16px;
+        }
+        .settings-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .settings-row label { font-weight: 500; }
+        .settings-row input {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 6px 12px;
+            color: var(--text);
+            outline: none;
+        }
+        .toggle-btn {
+            width: 44px;
+            height: 24px;
+            border-radius: 12px;
+            background: var(--border);
+            border: none;
+            cursor: pointer;
+            position: relative;
+            transition: 0.3s;
+        }
+        .toggle-btn.active { background: var(--primary); }
+        .toggle-btn::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: white;
+            transition: 0.3s;
+        }
+        .toggle-btn.active::after { left: 22px; }
+        .emoji-grid {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin: 8px 0;
+        }
+        .emoji-grid button {
+            font-size: 28px;
+            background: var(--bg);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            padding: 4px 8px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .emoji-grid button:active { transform: scale(0.9); }
+        .text-center { text-align: center; }
+        .msg-limit-warning {
+            font-size: 12px;
+            text-align: center;
+            padding: 4px;
+            color: #ff9500;
+        }
+        .create-post-area {
+            background: var(--card);
+            border-radius: var(--radius);
+            padding: 12px;
+            margin-bottom: 16px;
+            border: 1px solid var(--border);
+        }
+        .create-post-area textarea {
+            width: 100%;
+            padding: 10px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: var(--bg);
+            color: var(--text);
+            resize: vertical;
+            min-height: 60px;
+            font-family: inherit;
+            outline: none;
+        }
+        .create-post-area textarea:focus {
+            border-color: var(--primary);
+        }
+        .create-post-area .actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+            align-items: center;
+        }
+        .create-post-area .actions input {
+            flex: 1;
+            padding: 8px 12px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            background: var(--bg);
+            color: var(--text);
+            outline: none;
+        }
+        .create-post-area .actions input:focus {
+            border-color: var(--primary);
+        }
+        
+        /* ============ ГАЛОЧКА ВЕРИФИКАЦИИ (INSTAGRAM СТИЛЬ) ============ */
+        .verified-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #1da1f2;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+            border: 1.5px solid white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            font-size: 10px;
+            color: white;
+            font-weight: 700;
+            line-height: 1;
+            padding: 1px;
+        }
+        .dark .verified-badge {
+            border-color: #1a1a2e;
+        }
+        
+        /* Для маленьких размеров */
+        .verified-badge-sm {
+            width: 14px;
+            height: 14px;
+            font-size: 7px;
+        }
+        
+        .verified-badge img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 50%;
+        }
+        
+        .name-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .post-header .name-wrapper {
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+<!-- AUTH -->
+<div id="auth">
+    <div class="auth-box">
+        <h1>🐱 BarsikNet</h1>
+        <div class="error" id="authError"></div>
+        <input id="authUsername" placeholder="Юзернейм (без @)" />
+        <input id="authName" placeholder="Имя" style="display:block;" />
+        <input id="authPassword" type="password" placeholder="Пароль" />
+        <button id="authBtn">Зарегистрироваться</button>
+        <div class="switch" id="authSwitch">Уже есть аккаунт? Войти</div>
+    </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+    <div class="header">
+        <h2 id="pageTitle">🐱 Лента</h2>
+        <div class="right">
+            <span id="onlineStatus">●</span>
+        </div>
+    </div>
+
+    <div id="pageFeed" class="page active">
+        <div class="create-post-area">
+            <textarea id="postText" placeholder="Что нового?"></textarea>
+            <div class="actions">
+                <input id="postImage" placeholder="Ссылка на фото (опционально)" />
+                <button class="btn-sm" id="publishPostBtn">Опубликовать</button>
+            </div>
+        </div>
+        <div class="reels-strip" id="reelsStrip"></div>
+        <div id="feedPosts"></div>
+        <div style="display:flex; gap:8px; margin-top:12px; background:var(--card); padding:12px; border-radius:var(--radius); border:1px solid var(--border);">
+            <input id="reelInput" placeholder="Ссылка на фото (рилс)" style="flex:1; padding:8px 12px; border-radius:20px; border:1px solid var(--border); background:var(--bg); color:var(--text); outline:none;" />
+            <button id="publishReelBtn" class="btn-sm">Опубликовать рилс</button>
+        </div>
+        <div style="margin-top:8px; font-size:12px; opacity:0.5; text-align:center;">Рилсы удаляются через 1 час</div>
+    </div>
+
+    <div id="pageChats" class="page">
+        <div id="chatList" class="chat-list"></div>
+        <div id="chatWindow" class="chat-window">
+            <div style="display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid var(--border);">
+                <button class="back-btn" id="chatBack">‹</button>
+                <div style="display:flex; align-items:center; gap:4px;">
+                    <span id="chatPartnerName" style="font-weight:600;"></span>
+                    <span id="chatPartnerBadge"></span>
+                </div>
+                <span id="chatPartnerStatus" style="font-size:12px; opacity:0.6; margin-left:auto;"></span>
+            </div>
+            <div class="chat-messages" id="chatMessages"></div>
+            <div id="chatWarning" class="msg-limit-warning"></div>
+            <div class="chat-input">
+                <input id="chatInput" placeholder="Сообщение..." />
+                <button id="chatSend">➤</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="pageSearch" class="page">
+        <input class="search-input" id="searchInput" placeholder="Поиск по юзернейму (можно с @)" />
+        <div id="searchResults"></div>
+    </div>
+
+    <div id="pageGroups" class="page text-center" style="padding-top:40px;">
+        <span style="font-size:48px;">🏗️</span>
+        <h3 style="margin-top:12px;">Группы скоро</h3>
+        <p style="opacity:0.5;">Мы работаем над этим!</p>
+    </div>
+
+    <div id="pageFriends" class="page">
+        <h3 style="margin-bottom:12px;">🤝 Друзья</h3>
+        <div id="friendsList"></div>
+    </div>
+
+    <div id="pageProfile" class="page">
+        <div class="profile-header">
+            <div class="avatar" id="profileAvatar">🐱</div>
+            <div class="name-wrapper" id="profileNameWrapper">
+                <span id="profileName">Имя</span>
+                <span id="profileBadge"></span>
+            </div>
+            <div class="username" id="profileUsername">@username</div>
+        </div>
+        <div class="settings-group">
+            <div class="settings-row">
+                <label>Тема</label>
+                <button class="toggle-btn" id="themeToggle"></button>
+            </div>
+            <div class="settings-row">
+                <label>Имя</label>
+                <input id="settingsName" placeholder="Новое имя" style="flex:1; max-width:160px;" />
+                <button class="btn-sm" id="settingsSaveName">Сохранить</button>
+            </div>
+            <div class="settings-row" style="flex-direction:column; align-items:stretch; gap:8px;">
+                <label>Аватар (ссылка на фото)</label>
+                <input id="settingsAvatarUrl" placeholder="URL фото" style="width:100%;" />
+                <button class="btn-sm" id="settingsSaveAvatar">Установить</button>
+                <div style="margin-top:4px;">
+                    <label style="font-size:13px;">Или смайлик:</label>
+                    <div class="emoji-grid" id="emojiGrid">
+                        <button>🐱</button><button>😺</button><button>🦊</button><button>🐶</button><button>🐼</button><button>🐨</button><button>🦁</button><button>🐧</button><button>🐸</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <button class="nav-item active" data-page="pageFeed"><span>🏠</span>Лента</button>
+        <button class="nav-item" data-page="pageChats"><span>💬</span>ЛС</button>
+        <button class="nav-item" data-page="pageSearch"><span>🔍</span>Поиск</button>
+        <button class="nav-item" data-page="pageGroups"><span>👥</span>Группы</button>
+        <button class="nav-item" data-page="pageFriends"><span>🤝</span>Друзья</button>
+        <button class="nav-item" data-page="pageProfile"><span>👤</span>Профиль</button>
+    </div>
+</div>
+
+<!-- Reel View -->
+<div class="reel-view" id="reelView">
+    <span class="close" id="reelClose">✕</span>
+    <img id="reelImage" src="" alt="рилс" />
+    <div class="user-label" id="reelUserLabel">@user</div>
+</div>
+
+<script>
+const firebaseConfig = {
+    databaseURL: "https://gggggg-4dc22-default-rtdb.firebaseio.com/"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+let currentUser = null;
+let currentChat = null;
+let allUsersCache = {};
+let isLogin = false;
+let isDark = false;
+let isAppActive = true;
+let reelCleanupInterval = null;
+let chatListeners = {};
+
+const $ = id => document.getElementById(id);
+
+// DOM refs
+const auth = $('auth'), app = $('app');
+const authUsername = $('authUsername'), authName = $('authName'), authPassword = $('authPassword');
+const authBtn = $('authBtn'), authSwitch = $('authSwitch'), authError = $('authError');
+const pageTitle = $('pageTitle');
+const reelsStrip = $('reelsStrip'), feedPosts = $('feedPosts');
+const reelInput = $('reelInput'), publishReelBtn = $('publishReelBtn');
+const postText = $('postText'), postImage = $('postImage'), publishPostBtn = $('publishPostBtn');
+const chatList = $('chatList'), chatWindow = $('chatWindow'), chatMessages = $('chatMessages');
+const chatInput = $('chatInput'), chatSend = $('chatSend'), chatBack = $('chatBack');
+const chatPartnerName = $('chatPartnerName'), chatPartnerBadge = $('chatPartnerBadge');
+const chatPartnerStatus = $('chatPartnerStatus');
+const chatWarning = $('chatWarning');
+const searchInput = $('searchInput'), searchResults = $('searchResults');
+const friendsList = $('friendsList');
+const profileAvatar = $('profileAvatar'), profileName = $('profileName'), profileBadge = $('profileBadge');
+const profileUsername = $('profileUsername');
+const themeToggle = $('themeToggle'), settingsName = $('settingsName'), settingsSaveName = $('settingsSaveName');
+const settingsAvatarUrl = $('settingsAvatarUrl'), settingsSaveAvatar = $('settingsSaveAvatar');
+const emojiGrid = $('emojiGrid');
+const reelView = $('reelView'), reelImage = $('reelImage'), reelUserLabel = $('reelUserLabel'), reelClose = $('reelClose');
+const onlineStatus = $('onlineStatus');
+const profileNameWrapper = $('profileNameWrapper');
+
+// ============ ФУНКЦИЯ ДЛЯ ГАЛОЧКИ ============
+function getVerifiedBadge(username, size = 'normal') {
+    const user = allUsersCache[username];
+    if (user && user.verified === true) {
+        const sizeClass = size === 'small' ? ' verified-badge-sm' : '';
+        return `<span class="verified-badge${sizeClass}">✓</span>`;
+    }
+    return '';
+}
+
+// Для вставки в элементы
+function addBadgeToElement(element, username, size = 'normal') {
+    if (!element) return;
+    const badge = getVerifiedBadge(username, size);
+    if (badge) {
+        element.innerHTML = element.textContent + badge;
+    }
+}
+
+// Auth switch
+authName.style.display = 'block';
+authBtn.textContent = 'Зарегистрироваться';
+authSwitch.textContent = 'Уже есть аккаунт? Войти';
+
+authSwitch.onclick = () => {
+    isLogin = !isLogin;
+    authBtn.textContent = isLogin ? 'Войти' : 'Зарегистрироваться';
+    authSwitch.textContent = isLogin ? 'Нет аккаунта? Зарегистрироваться' : 'Уже есть аккаунт? Войти';
+    authName.style.display = isLogin ? 'none' : 'block';
+    authError.textContent = '';
+};
+
+// Auth
+authBtn.onclick = async () => {
+    const username = authUsername.value.trim().replace(/^@/, '');
+    const name = authName.value.trim();
+    const password = authPassword.value.trim();
+    if (!username || !password || (!isLogin && !name)) {
+        authError.textContent = 'Заполните все поля';
+        return;
+    }
+    const ref = db.ref('users/' + username);
+    try {
+        const snap = await ref.once('value');
+        const data = snap.val();
+        if (isLogin) {
+            if (!data || data.password !== password) {
+                authError.textContent = 'Неверный юзернейм или пароль';
+                return;
+            }
+            currentUser = { ...data, username };
+            await ref.update({ online: true, lastSeen: Date.now() });
+            enterApp();
+        } else {
+            if (data) {
+                authError.textContent = 'Юзернейм уже занят';
+                return;
+            }
+            const newUser = {
+                name,
+                password,
+                avatar: '🐱',
+                online: true,
+                lastSeen: Date.now(),
+                followers: {},
+                following: {},
+                friends: {},
+                posts: {},
+                reels: {},
+                verified: false
+            };
+            await ref.set(newUser);
+            currentUser = { ...newUser, username };
+            enterApp();
+        }
+    } catch (e) {
+        authError.textContent = 'Ошибка: ' + e.message;
+    }
+};
+
+function enterApp() {
+    isAppActive = true;
+    auth.style.display = 'none';
+    app.style.display = 'flex';
+    loadAllUsers();
+    renderFeed();
+    renderChatList();
+    renderFriends();
+    renderProfile();
+    updateOnlineStatus();
+    if (isDark) document.body.classList.add('dark');
+    else document.body.classList.remove('dark');
+    
+    if (reelCleanupInterval) clearInterval(reelCleanupInterval);
+    reelCleanupInterval = setInterval(cleanupOldReels, 300000);
+    setTimeout(cleanupOldReels, 5000);
+}
+
+function updateOnlineStatus() {
+    if (currentUser && currentUser.online) {
+        onlineStatus.textContent = '🟢';
+    } else {
+        onlineStatus.textContent = '⚫';
+    }
+}
+
+async function cleanupOldReels() {
+    if (!currentUser) return;
+    const oneHourAgo = Date.now() - 3600000;
+    const users = Object.keys(allUsersCache);
+    
+    for (const username of users) {
+        const userData = allUsersCache[username];
+        if (!userData || !userData.reels) continue;
+        const reelsRef = db.ref('users/' + username + '/reels');
+        const reels = userData.reels || {};
+        let hasOldReels = false;
+        
+        for (const key in reels) {
+            if (reels[key].time && reels[key].time < oneHourAgo) {
+                hasOldReels = true;
+                await reelsRef.child(key).remove();
+            }
+        }
+        if (hasOldReels) {
+            console.log(`🧹 Удалены старые рилсы для ${username}`);
+        }
+    }
+    renderReelsStrip();
+}
+
+function loadAllUsers() {
+    db.ref('users').on('value', snap => {
+        allUsersCache = snap.val() || {};
+        renderSearch();
+        renderChatList();
+        renderFriends();
+        renderReelsStrip();
+        renderFeed();
+        if (currentChat) renderChatMessages(currentChat);
+    });
+}
+
+document.addEventListener('visibilitychange', () => {
+    if (document.hidden && currentUser) {
+        db.ref('users/' + currentUser.username).update({
+            online: false,
+            lastSeen: Date.now()
+        });
+    } else if (!document.hidden && currentUser && isAppActive) {
+        db.ref('users/' + currentUser.username).update({
+            online: true,
+            lastSeen: Date.now()
+        });
+    }
+});
+
+window.addEventListener('beforeunload', () => {
+    if (currentUser) {
+        db.ref('users/' + currentUser.username).update({
+            online: false,
+            lastSeen: Date.now()
+        });
+    }
+});
+
+// Navigation
+document.querySelectorAll('.nav-item').forEach(btn => {
+    btn.onclick = () => {
+        document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const pageId = btn.dataset.page;
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        const page = $(pageId);
+        if (page) page.classList.add('active');
+        const titles = {
+            pageFeed: '🐱 Лента',
+            pageChats: '💬 ЛС',
+            pageSearch: '🔍 Поиск',
+            pageGroups: '👥 Группы',
+            pageFriends: '🤝 Друзья',
+            pageProfile: '👤 Профиль'
+        };
+        pageTitle.textContent = titles[pageId] || 'BarsikNet';
+        if (pageId === 'pageChats') {
+            chatWindow.classList.remove('active');
+            chatList.style.display = 'block';
+            renderChatList();
+        }
+        if (pageId === 'pageSearch') renderSearch();
+        if (pageId === 'pageFriends') renderFriends();
+        if (pageId === 'pageFeed') { renderFeed(); renderReelsStrip(); }
+        if (pageId === 'pageProfile') renderProfile();
+    };
+});
+
+// ============ ПОСТЫ (ВИДНЫ ВСЕМ) ============
+publishPostBtn.onclick = () => {
+    const text = postText.value.trim();
+    const imageUrl = postImage.value.trim();
+    if (!text && !imageUrl) {
+        alert('Напишите текст или добавьте фото');
+        return;
+    }
+    if (imageUrl && !imageUrl.match(/\.(jpeg|jpg|gif|png|webp|svg|bmp)/i)) {
+        alert('Ссылка на фото должна быть на изображение');
+        return;
+    }
+    const ref = db.ref('users/' + currentUser.username + '/posts');
+    const newRef = ref.push();
+    const post = {
+        text: text,
+        time: Date.now()
+    };
+    if (imageUrl) post.url = imageUrl;
+    newRef.set(post).then(() => {
+        postText.value = '';
+        postImage.value = '';
+        renderFeed();
+    }).catch(e => alert('Ошибка: ' + e.message));
+};
+
+function renderFeed() {
+    if (!currentUser) return;
+    feedPosts.innerHTML = '';
+    
+    const allUsers = Object.keys(allUsersCache);
+    const posts = [];
+    
+    for (const u of allUsers) {
+        const userData = allUsersCache[u];
+        if (!userData) continue;
+        const userPosts = userData.posts || {};
+        for (const key in userPosts) {
+            posts.push({ 
+                ...userPosts[key], 
+                username: u, 
+                name: userData.name || u, 
+                key 
+            });
+        }
+    }
+    
+    posts.sort((a,b) => (b.time||0) - (a.time||0));
+    
+    if (posts.length === 0) {
+        feedPosts.innerHTML = '<div style="text-align:center; opacity:0.5; padding:40px 0;">📝 Нет постов</div>';
+        return;
+    }
+    
+    for (const p of posts) {
+        const card = document.createElement('div');
+        card.className = 'post-card';
+        const header = document.createElement('div');
+        header.className = 'post-header';
+        const av = document.createElement('div');
+        av.className = 'avatar';
+        const user = allUsersCache[p.username];
+        if (user && user.avatar && user.avatar.startsWith('http')) {
+            av.innerHTML = `<img src="${user.avatar}" />`;
+        } else {
+            av.textContent = (user && user.avatar) || '🐱';
+        }
+        header.appendChild(av);
+        
+        const nameWrapper = document.createElement('span');
+        nameWrapper.className = 'name-wrapper';
+        const nameSpan = document.createElement('span');
+        nameSpan.textContent = p.name || p.username;
+        nameWrapper.appendChild(nameSpan);
+        // Добавляем галочку
+        const badge = getVerifiedBadge(p.username);
+        if (badge) {
+            nameWrapper.innerHTML += badge;
+        }
+        header.appendChild(nameWrapper);
+        card.appendChild(header);
+        
+        if (p.text) {
+            const text = document.createElement('div');
+            text.className = 'post-content';
+            text.textContent = p.text;
+            card.appendChild(text);
+        }
+        if (p.url && p.url.match(/\.(jpeg|jpg|gif|png|webp|svg)/i)) {
+            const img = document.createElement('img');
+            img.className = 'post-media';
+            img.src = p.url;
+            img.alt = 'медиа';
+            card.appendChild(img);
+        }
+        const timeDiv = document.createElement('div');
+        timeDiv.className = 'post-time';
+        timeDiv.textContent = new Date(p.time).toLocaleString();
+        card.appendChild(timeDiv);
+        feedPosts.appendChild(card);
+    }
+}
+
+// ============ РИЛСЫ (BARSIKNET ВИДЯТ ВСЕ) ============
+publishReelBtn.onclick = () => {
+    const url = reelInput.value.trim();
+    if (!url) return;
+    if (!url.match(/\.(jpeg|jpg|gif|png|webp|svg|bmp)/i)) {
+        alert('Пожалуйста, введите ссылку на фото (jpeg, png, gif, webp, svg, bmp)');
+        return;
+    }
+    const ref = db.ref('users/' + currentUser.username + '/reels');
+    const newRef = ref.push();
+    newRef.set({
+        url: url,
+        time: Date.now()
+    }).then(() => {
+        reelInput.value = '';
+        renderReelsStrip();
+    }).catch(e => alert('Ошибка: ' + e.message));
+};
+
+function renderReelsStrip() {
+    if (!currentUser) return;
+    reelsStrip.innerHTML = '';
+    
+    const allReels = {};
+    const friends = Object.keys(currentUser.friends || {});
+    
+    for (const u in allUsersCache) {
+        const userData = allUsersCache[u];
+        if (!userData) continue;
+        
+        if (u === 'BarsikNet') {
+            const reels = userData.reels || {};
+            for (const key in reels) {
+                const reel = reels[key];
+                allReels[key] = { ...reel, username: u, name: userData.name || u };
+            }
+            continue;
+        }
+        
+        if (friends.includes(u) || u === currentUser.username) {
+            const reels = userData.reels || {};
+            for (const key in reels) {
+                const reel = reels[key];
+                allReels[key] = { ...reel, username: u, name: userData.name || u };
+            }
+        }
+    }
+    
+    const oneHourAgo = Date.now() - 3600000;
+    const sorted = Object.values(allReels)
+        .filter(reel => !reel.time || reel.time > oneHourAgo)
+        .sort((a,b) => (b.time||0) - (a.time||0));
+    
+    if (sorted.length === 0) {
+        reelsStrip.innerHTML = '<span style="opacity:0.5; font-size:13px; padding:8px 0;">📹 Нет рилсов</span>';
+        return;
+    }
+    
+    for (const reel of sorted) {
+        const div = document.createElement('div');
+        div.className = 'reel-circle';
+        const avatarDiv = document.createElement('div');
+        avatarDiv.className = 'avatar';
+        const user = allUsersCache[reel.username];
+        if (user && user.avatar && user.avatar.startsWith('http')) {
+            avatarDiv.innerHTML = `<img src="${user.avatar}" />`;
+        } else {
+            avatarDiv.textContent = (user && user.avatar) || '🐱';
+        }
+        div.appendChild(avatarDiv);
+        
+        const label = document.createElement('span');
+        label.textContent = reel.username;
+        // Добавляем галочку маленькую
+        const badge = getVerifiedBadge(reel.username, 'small');
+        if (badge) {
+            label.innerHTML += badge;
+        }
+        div.appendChild(label);
+        
+        div.onclick = () => {
+            reelImage.src = reel.url;
+            reelUserLabel.textContent = '@' + reel.username;
+            reelView.classList.add('active');
+        };
+        reelsStrip.appendChild(div);
+    }
+}
+
+// ============ ЧАТ ============
+
+function getChatId(user1, user2) {
+    const users = [user1, user2].sort();
+    return users[0] + '_' + users[1];
+}
+
+function renderChatList() {
+    if (!currentUser) return;
+    chatList.innerHTML = '';
+    const friends = Object.keys(currentUser.friends || {});
+    if (friends.length === 0) {
+        chatList.innerHTML = '<div style="text-align:center; opacity:0.5; padding:30px 0;">Нет друзей</div>';
+        return;
+    }
+    for (const u of friends) {
+        const user = allUsersCache[u];
+        if (!user) continue;
+        const item = document.createElement('div');
+        item.className = 'chat-item';
+        const av = document.createElement('div');
+        av.className = 'avatar';
+        if (user.avatar && user.avatar.startsWith('http')) {
+            av.innerHTML = `<img src="${user.avatar}" />`;
+        } else {
+            av.textContent = user.avatar || '🐱';
+        }
+        if (user.online) av.classList.add('online');
+        item.appendChild(av);
+        const info = document.createElement('div');
+        info.className = 'info';
+        const nameWrapper = document.createElement('div');
+        nameWrapper.className = 'name-wrapper';
+        const nameSpan = document.createElement('span');
+        nameSpan.textContent = user.name || u;
+        nameWrapper.appendChild(nameSpan);
+        const badge = getVerifiedBadge(u);
+        if (badge) {
+            nameWrapper.innerHTML += badge;
+        }
+        info.appendChild(nameWrapper);
+        const statusDiv = document.createElement('div');
+        statusDiv.className = 'status';
+        if (user.online) statusDiv.textContent = '🟢 в сети';
+        else statusDiv.textContent = 'был(а) ' + (user.lastSeen ? new Date(user.lastSeen).toLocaleString() : 'недавно');
+        info.appendChild(statusDiv);
+        item.appendChild(info);
+        item.onclick = () => openChat(u);
+        chatList.appendChild(item);
+    }
+}
+
+function openChat(username) {
+    if (currentChat && chatListeners[currentChat]) {
+        chatListeners[currentChat]();
+        delete chatListeners[currentChat];
+    }
+    
+    currentChat = username;
+    chatList.style.display = 'none';
+    chatWindow.classList.add('active');
+    
+    document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+    document.querySelector('[data-page="pageChats"]').classList.add('active');
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    $('pageChats').classList.add('active');
+    pageTitle.textContent = '💬 ЛС';
+    
+    const user = allUsersCache[username];
+    chatPartnerName.textContent = user ? (user.name || username) : username;
+    const badge = getVerifiedBadge(username);
+    chatPartnerBadge.innerHTML = badge;
+    
+    setupChatListener(username);
+    renderChatMessages(username);
+}
+
+function setupChatListener(username) {
+    const chatId = getChatId(currentUser.username, username);
+    const ref = db.ref('messages/' + chatId);
+    
+    if (chatListeners[username]) {
+        chatListeners[username]();
+        delete chatListeners[username];
+    }
+    
+    const listener = ref.on('value', snap => {
+        if (currentChat === username) {
+            renderChatMessages(username);
+        }
+    });
+    
+    chatListeners[username] = () => ref.off('value', listener);
+}
+
+function renderChatMessages(username) {
+    if (!currentUser) return;
+    const user = allUsersCache[username];
+    if (!user) return;
+    
+    if (user.online) {
+        chatPartnerStatus.textContent = '🟢 в сети';
+    } else {
+        chatPartnerStatus.textContent = 'был(а) ' + (user.lastSeen ? new Date(user.lastSeen).toLocaleString() : 'недавно');
+    }
+    
+    const chatId = getChatId(currentUser.username, username);
+    const ref = db.ref('messages/' + chatId);
+    
+    ref.once('value', snap => {
+        const data = snap.val() || {};
+        const allMsgs = [];
+        
+        for (const key in data) {
+            const msg = data[key];
+            allMsgs.push({
+                text: msg.text,
+                time: msg.time || 0,
+                from: msg.from || ''
+            });
+        }
+        
+        allMsgs.sort((a, b) => a.time - b.time);
+        
+        chatMessages.innerHTML = '';
+        for (const msg of allMsgs) {
+            const div = document.createElement('div');
+            div.className = 'chat-message';
+            if (msg.from === currentUser.username) {
+                div.classList.add('mine');
+            }
+            div.textContent = msg.text;
+            chatMessages.appendChild(div);
+        }
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+        checkChatLimit(username);
+    });
+}
+
+function checkChatLimit(username) {
+    const isFriend = currentUser.friends && currentUser.friends[username];
+    if (!isFriend) {
+        const chatId = getChatId(currentUser.username, username);
+        const ref = db.ref('messages/' + chatId);
+        ref.once('value', snap => {
+            const msgs = snap.val() || {};
+            let myMsgs = 0;
+            for (const key in msgs) {
+                if (msgs[key].from === currentUser.username) myMsgs++;
+            }
+            if (myMsgs >= 1) {
+                chatWarning.textContent = '⚠️ Вы можете отправить только одно сообщение, пока не станете друзьями';
+                chatWarning.style.color = '#ff9500';
+            } else {
+                chatWarning.textContent = '📝 Вы можете отправить одно сообщение, затем подпишитесь друг на друга для продолжения';
+                chatWarning.style.color = '#34c759';
+            }
+        });
+    } else {
+        chatWarning.textContent = '💬 Вы друзья! Можете писать сколько угодно';
+        chatWarning.style.color = '#34c759';
+    }
+}
+
+function sendMessage(text, username) {
+    const chatId = getChatId(currentUser.username, username);
+    const ref = db.ref('messages/' + chatId);
+    ref.push().set({
+        text: text,
+        time: Date.now(),
+        from: currentUser.username
+    });
+    chatInput.value = '';
+    renderChatMessages(username);
+}
+
+chatSend.onclick = () => {
+    const text = chatInput.value.trim();
+    if (!text || !currentChat) return;
+    const username = currentChat;
+    const isFriend = currentUser.friends && currentUser.friends[username];
+    
+    if (!isFriend) {
+        const chatId = getChatId(currentUser.username, username);
+        const ref = db.ref('messages/' + chatId);
+        ref.once('value', snap => {
+            const msgs = snap.val() || {};
+            let myMsgs = 0;
+            for (const key in msgs) {
+                if (msgs[key].from === currentUser.username) myMsgs++;
+            }
+            if (myMsgs >= 1) {
+                chatWarning.textContent = '❌ Вы уже отправили одно сообщение. Станьте друзьями, чтобы продолжить';
+                chatWarning.style.color = '#ff3b30';
+                return;
+            }
+            sendMessage(text, username);
+        });
+    } else {
+        sendMessage(text, username);
+    }
+};
+
+chatBack.onclick = () => {
+    if (currentChat && chatListeners[currentChat]) {
+        chatListeners[currentChat]();
+        delete chatListeners[currentChat];
+    }
+    chatWindow.classList.remove('active');
+    chatList.style.display = 'block';
+    currentChat = null;
+    renderChatList();
+};
+
+// ============ ПОИСК ============
+
+searchInput.oninput = renderSearch;
+
+function renderSearch() {
+    if (!currentUser) return;
+    const query = searchInput.value.trim().toLowerCase().replace(/^@/, '');
+    searchResults.innerHTML = '';
+    if (!query) return;
+    const results = Object.keys(allUsersCache).filter(u => u.toLowerCase().includes(query) && u !== currentUser.username);
+    if (results.length === 0) {
+        searchResults.innerHTML = '<div style="opacity:0.5; padding:20px 0;">Ничего не найдено</div>';
+        return;
+    }
+    for (const u of results) {
+        const user = allUsersCache[u];
+        if (!user) continue;
+        const card = document.createElement('div');
+        card.className = 'user-card';
+        const info = document.createElement('div');
+        info.className = 'info';
+        const nameWrapper = document.createElement('div');
+        nameWrapper.className = 'name-wrapper';
+        const nameSpan = document.createElement('span');
+        nameSpan.textContent = user.name || u;
+        nameWrapper.appendChild(nameSpan);
+        const badge = getVerifiedBadge(u);
+        if (badge) {
+            nameWrapper.innerHTML += badge;
+        }
+        info.appendChild(nameWrapper);
+        const uname = document.createElement('div');
+        uname.className = 'username';
+        uname.textContent = '@' + u;
+        info.appendChild(uname);
+        card.appendChild(info);
+        
+        const isFriend = currentUser.friends && currentUser.friends[u];
+        const isFollowing = currentUser.following && currentUser.following[u];
+        
+        const btn = document.createElement('button');
+        btn.className = 'btn-sm';
+        
+        if (isFriend) {
+            btn.textContent = 'Друзья ✅';
+            btn.style.background = '#34c759';
+            btn.style.cursor = 'default';
+        } else if (isFollowing) {
+            btn.textContent = 'Отписаться';
+            btn.classList.add('danger');
+            btn.onclick = () => {
+                db.ref('users/' + currentUser.username + '/following/' + u).remove();
+                db.ref('users/' + u + '/followers/' + currentUser.username).remove();
+                if (isFriend) {
+                    db.ref('users/' + currentUser.username + '/friends/' + u).remove();
+                    db.ref('users/' + u + '/friends/' + currentUser.username).remove();
+                }
+                setTimeout(() => {
+                    db.ref('users/' + currentUser.username).once('value', snap => {
+                        currentUser = { ...snap.val(), username: currentUser.username };
+                        renderSearch();
+                        renderChatList();
+                        renderFriends();
+                        renderReelsStrip();
+                    });
+                }, 300);
+            };
+        } else {
+            btn.textContent = 'Подписаться';
+            btn.onclick = () => {
+                db.ref('users/' + currentUser.username + '/following/' + u).set(true);
+                db.ref('users/' + u + '/followers/' + currentUser.username).set(true);
+                
+                const other = allUsersCache[u];
+                if (other && other.following && other.following[currentUser.username]) {
+                    db.ref('users/' + currentUser.username + '/friends/' + u).set(true);
+                    db.ref('users/' + u + '/friends/' + currentUser.username).set(true);
+                }
+                
+                setTimeout(() => {
+                    db.ref('users/' + currentUser.username).once('value', snap => {
+                        currentUser = { ...snap.val(), username: currentUser.username };
+                        renderSearch();
+                        renderChatList();
+                        renderFriends();
+                        renderReelsStrip();
+                    });
+                }, 300);
+            };
+        }
+        card.appendChild(btn);
+        
+        const writeBtn = document.createElement('button');
+        writeBtn.className = 'btn-sm outline';
+        writeBtn.textContent = 'Написать';
+        writeBtn.onclick = () => {
+            openChat(u);
+        };
+        card.appendChild(writeBtn);
+        searchResults.appendChild(card);
+    }
+}
+
+// ============ ДРУЗЬЯ ============
+
+function renderFriends() {
+    if (!currentUser) return;
+    friendsList.innerHTML = '';
+    const friends = Object.keys(currentUser.friends || {});
+    if (friends.length === 0) {
+        friendsList.innerHTML = '<div style="opacity:0.5; padding:20px 0;">Нет друзей</div>';
+        return;
+    }
+    for (const u of friends) {
+        const user = allUsersCache[u];
+        if (!user) continue;
+        const card = document.createElement('div');
+        card.className = 'user-card';
+        const info = document.createElement('div');
+        info.className = 'info';
+        const nameWrapper = document.createElement('div');
+        nameWrapper.className = 'name-wrapper';
+        const nameSpan = document.createElement('span');
+        nameSpan.textContent = user.name || u;
+        nameWrapper.appendChild(nameSpan);
+        const badge = getVerifiedBadge(u);
+        if (badge) {
+            nameWrapper.innerHTML += badge;
+        }
+        info.appendChild(nameWrapper);
+        const uname = document.createElement('div');
+        uname.className = 'username';
+        uname.textContent = '@' + u;
+        info.appendChild(uname);
+        card.appendChild(info);
+        const btn = document.createElement('button');
+        btn.className = 'btn-sm';
+        btn.textContent = 'Написать';
+        btn.onclick = () => { openChat(u); };
+        card.appendChild(btn);
+        friendsList.appendChild(card);
+    }
+}
+
+// ============ ПРОФИЛЬ ============
+
+function renderProfile() {
+    if (!currentUser) return;
+    const user = currentUser;
+    if (user.avatar && user.avatar.startsWith('http')) {
+        profileAvatar.innerHTML = `<img src="${user.avatar}" />`;
+    } else {
+        profileAvatar.textContent = user.avatar || '🐱';
+    }
+    profileName.textContent = user.name || user.username;
+    const badge = getVerifiedBadge(user.username);
+    profileBadge.innerHTML = badge;
+    profileUsername.textContent = '@' + user.username;
+    settingsName.value = user.name || '';
+    settingsAvatarUrl.value = user.avatar && user.avatar.startsWith('http') ? user.avatar : '';
+    if (isDark) themeToggle.classList.add('active');
+    else themeToggle.classList.remove('active');
+}
+
+themeToggle.onclick = () => {
+    isDark = !isDark;
+    document.body.classList.toggle('dark', isDark);
+    themeToggle.classList.toggle('active', isDark);
+};
+
+settingsSaveName.onclick = () => {
+    const newName = settingsName.value.trim();
+    if (!newName) return;
+    db.ref('users/' + currentUser.username + '/name').set(newName);
+};
+
+settingsSaveAvatar.onclick = () => {
+    const url = settingsAvatarUrl.value.trim();
+    if (!url) return;
+    if (!url.startsWith('http')) {
+        alert('Введите корректную ссылку');
+        return;
+    }
+    db.ref('users/' + currentUser.username + '/avatar').set(url);
+};
+
+emojiGrid.querySelectorAll('button').forEach(btn => {
+    btn.onclick = () => {
+        const emoji = btn.textContent;
+        db.ref('users/' + currentUser.username + '/avatar').set(emoji);
+        settingsAvatarUrl.value = '';
+    };
+});
+
+reelClose.onclick = () => reelView.classList.remove('active');
+reelView.onclick = (e) => { if (e.target === reelView) reelView.classList.remove('active'); };
+
+// Enter key
+authPassword.addEventListener('keydown', e => { if (e.key === 'Enter') authBtn.click(); });
+chatInput.addEventListener('keydown', e => { if (e.key === 'Enter') chatSend.click(); });
+postText.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); publishPostBtn.click(); } });
+
+console.log('🐱 BarsikNet готов!');
+console.log('📝 Посты видят все пользователи');
+console.log('📹 Рилсы BarsikNet видят все, остальные - только друзья');
+console.log('✅ Синяя галочка верификации как в Instagram');
+console.log('💡 Чтобы добавить галочку: в Firebase у пользователя поставь verified: true');
+</script>
+</body>
+</html>
