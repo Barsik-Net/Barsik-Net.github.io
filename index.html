@@ -248,6 +248,11 @@
             display: block;
         }
         .avatar.online { border-color: var(--online); }
+        .avatar.big {
+            width: 80px;
+            height: 80px;
+            font-size: 36px;
+        }
         .post-content { margin: 6px 0 10px; word-wrap: break-word; }
         .post-time {
             font-size: 11px;
@@ -541,6 +546,23 @@
             font-weight: 700;
         }
         .profile-header .username { opacity: 0.6; }
+        .profile-stats {
+            display: flex;
+            gap: 24px;
+            margin: 12px 0;
+            justify-content: center;
+        }
+        .profile-stats .stat {
+            text-align: center;
+        }
+        .profile-stats .stat .num {
+            font-size: 18px;
+            font-weight: 700;
+        }
+        .profile-stats .stat .label {
+            font-size: 12px;
+            opacity: 0.6;
+        }
         .settings-group {
             display: flex;
             flex-direction: column;
@@ -676,6 +698,11 @@
             height: 14px;
             font-size: 7px;
         }
+        .verified-badge-big {
+            width: 24px;
+            height: 24px;
+            font-size: 14px;
+        }
         .name-wrapper {
             display: flex;
             align-items: center;
@@ -776,6 +803,39 @@
         .admin-user-item .info .name { font-weight: 600; }
         .admin-user-item .info .username { font-size: 12px; opacity: 0.6; }
         
+        /* ============ ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ ============ */
+        .user-profile-view {
+            padding: 16px 0;
+        }
+        .user-profile-view .profile-header {
+            padding: 10px 0;
+        }
+        .user-profile-view .profile-stats {
+            margin: 8px 0;
+        }
+        .user-profile-view .profile-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-top: 12px;
+        }
+        .user-profile-view .profile-actions .btn-sm {
+            min-width: 100px;
+        }
+        
+        /* ============ НАСТРОЙКИ ============ */
+        .settings-support {
+            margin-top: 20px;
+            padding: 16px;
+            background: var(--card);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            text-align: center;
+        }
+        .settings-support .btn-sm {
+            min-width: 150px;
+        }
+        
         @media (max-width: 480px) {
             .page { padding: 8px 10px 70px; }
             .header { 
@@ -822,6 +882,7 @@
             .create-post-area .actions .btn-sm { font-size: 11px; padding: 4px 10px; }
             .verified-badge { width: 14px; height: 14px; font-size: 8px; }
             .verified-badge-sm { width: 12px; height: 12px; font-size: 6px; }
+            .verified-badge-big { width: 20px; height: 20px; font-size: 12px; }
             #reelInput { font-size: 13px; padding: 6px 10px; }
             input, textarea { font-size: 14px !important; }
             .settings-row { padding: 8px 0; flex-wrap: wrap; gap: 6px; }
@@ -836,6 +897,10 @@
             .admin-stat .num { font-size: 22px; }
             .post-actions button { font-size: 12px; }
             .comment { font-size: 13px; }
+            .profile-stats { gap: 16px; }
+            .profile-stats .stat .num { font-size: 16px; }
+            .profile-stats .stat .label { font-size: 11px; }
+            .avatar.big { width: 64px; height: 64px; font-size: 28px; }
         }
     </style>
 </head>
@@ -885,7 +950,7 @@
         <div id="chatWindow" class="chat-window">
             <div style="display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid var(--border);">
                 <button class="back-btn" id="chatBack">‹</button>
-                <div style="display:flex; align-items:center; gap:4px; flex:1;">
+                <div style="display:flex; align-items:center; gap:4px; flex:1; cursor:pointer;" id="chatPartnerClick">
                     <span id="chatPartnerName" style="font-weight:600;"></span>
                     <span id="chatPartnerBadge"></span>
                 </div>
@@ -924,28 +989,59 @@
                 <span id="profileBadge"></span>
             </div>
             <div class="username" id="profileUsername">@username</div>
+            <div class="profile-stats">
+                <div class="stat">
+                    <div class="num" id="profileFriendsCount">0</div>
+                    <div class="label">Друзья</div>
+                </div>
+                <div class="stat">
+                    <div class="num" id="profileFollowersCount">0</div>
+                    <div class="label">Подписчики</div>
+                </div>
+            </div>
         </div>
         <div class="settings-group">
+            <div class="settings-row">
+                <label>Аватар</label>
+                <input id="settingsAvatarUrl" placeholder="Ссылка на фото" style="flex:1; margin:0 8px;" />
+                <button class="btn-sm" id="settingsSaveAvatar">Установить</button>
+            </div>
+            <div style="margin-top:4px;">
+                <label style="font-size:13px;">Или смайлик:</label>
+                <div class="emoji-grid" id="emojiGrid">
+                    <button>🐱</button><button>😺</button><button>🦊</button><button>🐶</button><button>🐼</button><button>🐨</button><button>🦁</button><button>🐧</button><button>🐸</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ НАСТРОЙКИ ============ -->
+    <div id="pageSettings" class="page">
+        <h3 style="margin-bottom:16px;">⚙️ Настройки</h3>
+        
+        <div class="settings-group">
+            <div class="settings-row">
+                <label>Изменить ник</label>
+                <input id="settingsName" placeholder="Новое имя" style="flex:1; margin:0 8px;" />
+                <button class="btn-sm" id="settingsSaveName">Сохранить</button>
+            </div>
             <div class="settings-row">
                 <label>Тема</label>
                 <button class="toggle-btn" id="themeToggle"></button>
             </div>
-            <div class="settings-row">
-                <label>Имя</label>
-                <input id="settingsName" placeholder="Новое имя" />
-                <button class="btn-sm" id="settingsSaveName">Сохранить</button>
-            </div>
-            <div class="settings-row" style="flex-direction:column; align-items:stretch; gap:8px;">
-                <label>Аватар</label>
-                <input id="settingsAvatarUrl" placeholder="Ссылка на фото" style="width:100%;" />
-                <button class="btn-sm" id="settingsSaveAvatar">Установить</button>
-                <div style="margin-top:4px;">
-                    <label style="font-size:13px;">Или смайлик:</label>
-                    <div class="emoji-grid" id="emojiGrid">
-                        <button>🐱</button><button>😺</button><button>🦊</button><button>🐶</button><button>🐼</button><button>🐨</button><button>🦁</button><button>🐧</button><button>🐸</button>
-                    </div>
-                </div>
-            </div>
+        </div>
+        
+        <div class="settings-support">
+            <p style="margin-bottom:12px; opacity:0.7;">📧 Нужна помощь? Напишите в поддержку</p>
+            <button class="btn-sm" id="supportBtn">Написать в поддержку</button>
+        </div>
+    </div>
+
+    <!-- ============ ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ (модальное окно) ============ -->
+    <div id="userProfileModal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.6); z-index:300; align-items:center; justify-content:center; padding:20px;">
+        <div style="background:var(--card); border-radius:var(--radius); max-width:400px; width:100%; max-height:90vh; overflow-y:auto; padding:24px; position:relative;">
+            <button onclick="closeUserProfile()" style="position:absolute; top:12px; right:16px; background:none; border:none; font-size:24px; color:var(--text); cursor:pointer;">✕</button>
+            <div id="userProfileContent"></div>
         </div>
     </div>
 
@@ -986,6 +1082,7 @@
         <button class="nav-item" data-page="pageGroups"><span>👥</span>Группы</button>
         <button class="nav-item" data-page="pageFriends"><span>🤝</span>Друзья</button>
         <button class="nav-item" data-page="pageProfile"><span>👤</span>Профиль</button>
+        <button class="nav-item" data-page="pageSettings"><span>⚙️</span>Настройки</button>
         <button class="nav-item admin-only" data-page="pageAdmin" style="display:none;"><span>👑</span>Админ</button>
     </div>
 </div>
@@ -1013,6 +1110,7 @@ let isAppActive = true;
 let reelCleanupInterval = null;
 let chatListeners = {};
 let isAdmin = false;
+let viewedUser = null;
 
 const $ = id => document.getElementById(id);
 
@@ -1033,29 +1131,30 @@ const searchInput = $('searchInput'), searchResults = $('searchResults');
 const friendsList = $('friendsList');
 const profileAvatar = $('profileAvatar'), profileName = $('profileName'), profileBadge = $('profileBadge');
 const profileUsername = $('profileUsername');
+const profileFriendsCount = $('profileFriendsCount'), profileFollowersCount = $('profileFollowersCount');
 const themeToggle = $('themeToggle'), settingsName = $('settingsName'), settingsSaveName = $('settingsSaveName');
 const settingsAvatarUrl = $('settingsAvatarUrl'), settingsSaveAvatar = $('settingsSaveAvatar');
 const emojiGrid = $('emojiGrid');
 const reelView = $('reelView'), reelImage = $('reelImage'), reelUserLabel = $('reelUserLabel'), reelClose = $('reelClose');
 const onlineStatus = $('onlineStatus');
 const bottomNav = $('bottomNav');
+const supportBtn = $('supportBtn');
+const chatPartnerClick = $('chatPartnerClick');
+const userProfileModal = $('userProfileModal');
+const userProfileContent = $('userProfileContent');
 
 // ============ ПРОВЕРКА URL ============
 function isValidImageUrl(url) {
     if (!url || typeof url !== 'string') return false;
-    // Проверяем расширение
     const extMatch = url.match(/\.(jpeg|jpg|gif|png|webp|svg|bmp|ico)(\?.*)?$/i);
     if (extMatch) return true;
-    // Проверяем, что это похоже на URL с картинкой
     try {
         const parsed = new URL(url);
-        // Если нет расширения, но это картинка с CDN или облака
         const path = parsed.pathname.toLowerCase();
         if (path.includes('image') || path.includes('photo') || path.includes('picture') || 
             path.includes('img') || path.includes('media') || path.includes('upload')) {
             return true;
         }
-        // Проверяем наличие популярных хостингов картинок
         const host = parsed.hostname.toLowerCase();
         const imageHosts = ['imgur.com', 'i.imgur.com', 'ibb.co', 'imagebam.com', 'postimg.cc', 
             'imageshack.com', 'flickr.com', 'staticflickr.com', 'cloudinary.com', 
@@ -1071,19 +1170,16 @@ function isValidImageUrl(url) {
     }
 }
 
-// ============ ЗАГРУЗКА ФОТО С УЛУЧШЕННЫМ FALLBACK ============
+// ============ ЗАГРУЗКА ФОТО ============
 function loadImageWithFallback(imgElement, src, fallbackText = '🖼️ Не удалось загрузить') {
     if (!imgElement) return;
-    
     const container = imgElement.parentElement;
     if (!container) return;
     
-    // Проверка валидности URL
     if (!isValidImageUrl(src)) {
         imgElement.style.display = 'none';
         const load = container.querySelector('.loading');
         if (load) load.remove();
-        
         let fallback = container.querySelector('.fallback');
         if (!fallback) {
             fallback = document.createElement('div');
@@ -1094,7 +1190,6 @@ function loadImageWithFallback(imgElement, src, fallbackText = '🖼️ Не у�
         return;
     }
     
-    // Показываем загрузку
     let loading = container.querySelector('.loading');
     if (!loading) {
         loading = document.createElement('div');
@@ -1103,15 +1198,12 @@ function loadImageWithFallback(imgElement, src, fallbackText = '🖼️ Не у�
         container.appendChild(loading);
     }
     
-    // Убираем старые fallback
     const oldFallback = container.querySelector('.fallback');
     if (oldFallback) oldFallback.remove();
     
-    // Показываем img
     imgElement.style.display = 'block';
     imgElement.src = src;
     
-    // Добавляем обработчики
     imgElement.onload = function() {
         this.style.display = 'block';
         const load = container.querySelector('.loading');
@@ -1124,7 +1216,6 @@ function loadImageWithFallback(imgElement, src, fallbackText = '🖼️ Не у�
         this.style.display = 'none';
         const load = container.querySelector('.loading');
         if (load) load.remove();
-        
         let fallback = container.querySelector('.fallback');
         if (!fallback) {
             fallback = document.createElement('div');
@@ -1134,7 +1225,6 @@ function loadImageWithFallback(imgElement, src, fallbackText = '🖼️ Не у�
         }
     };
     
-    // Таймаут на случай долгой загрузки
     setTimeout(() => {
         const load = container.querySelector('.loading');
         if (load && !imgElement.complete) {
@@ -1147,10 +1237,30 @@ function loadImageWithFallback(imgElement, src, fallbackText = '🖼️ Не у�
 function getVerifiedBadge(username, size = 'normal') {
     const user = allUsersCache[username];
     if (user && user.verified === true) {
-        const sizeClass = size === 'small' ? ' verified-badge-sm' : '';
+        let sizeClass = '';
+        if (size === 'small') sizeClass = ' verified-badge-sm';
+        else if (size === 'big') sizeClass = ' verified-badge-big';
         return `<span class="verified-badge${sizeClass}">✓</span>`;
     }
     return '';
+}
+
+// ============ СОХРАНЕНИЕ ТЕМЫ ============
+function saveTheme() {
+    try {
+        localStorage.setItem('barsiknet_theme', isDark ? 'dark' : 'light');
+    } catch (e) {}
+}
+
+function loadTheme() {
+    try {
+        const theme = localStorage.getItem('barsiknet_theme');
+        if (theme === 'dark') {
+            isDark = true;
+            document.body.classList.add('dark');
+            if (themeToggle) themeToggle.classList.add('active');
+        }
+    } catch (e) {}
 }
 
 // ============ УПРАВЛЕНИЕ ПАНЕЛЬЮ ============
@@ -1238,12 +1348,12 @@ function enterApp() {
     auth.style.display = 'none';
     app.style.display = 'flex';
     
-    // Проверка админа
     isAdmin = currentUser.username === 'BarsikNet';
     if (isAdmin) {
         document.querySelector('.admin-only').style.display = 'flex';
     }
     
+    loadTheme();
     loadAllUsers();
     renderFeed();
     renderChatList();
@@ -1302,6 +1412,7 @@ function loadAllUsers() {
         renderReelsStrip();
         renderFeed();
         renderAdminPanel();
+        renderProfile();
         if (currentChat) renderChatMessages(currentChat);
     });
 }
@@ -1345,6 +1456,7 @@ document.querySelectorAll('.nav-item').forEach(btn => {
             pageGroups: '👥 Группы',
             pageFriends: '🤝 Друзья',
             pageProfile: '👤 Профиль',
+            pageSettings: '⚙️ Настройки',
             pageAdmin: '👑 Админ'
         };
         pageTitle.textContent = titles[pageId] || 'BarsikNet';
@@ -1358,11 +1470,12 @@ document.querySelectorAll('.nav-item').forEach(btn => {
         if (pageId === 'pageFriends') renderFriends();
         if (pageId === 'pageFeed') { renderFeed(); renderReelsStrip(); }
         if (pageId === 'pageProfile') renderProfile();
+        if (pageId === 'pageSettings') renderSettings();
         if (pageId === 'pageAdmin') renderAdminPanel();
     };
 });
 
-// ============ ПОСТЫ С ЛАЙКАМИ И КОММЕНТАМИ ============
+// ============ ПОСТЫ ============
 publishPostBtn.onclick = () => {
     const text = postText.value.trim();
     const imageUrl = postImage.value.trim();
@@ -1450,7 +1563,6 @@ function renderFeed() {
         card.className = 'post-card';
         card.id = 'post_' + p.postKey;
         
-        // Header
         const header = document.createElement('div');
         header.className = 'post-header';
         const av = document.createElement('div');
@@ -1469,10 +1581,21 @@ function renderFeed() {
             av.textContent = (user && user.avatar) || '🐱';
         }
         if (user && user.online) av.classList.add('online');
+        
+        av.style.cursor = 'pointer';
+        av.onclick = (e) => {
+            e.stopPropagation();
+            openUserProfile(p.username);
+        };
         header.appendChild(av);
         
         const nameWrapper = document.createElement('span');
         nameWrapper.className = 'name-wrapper';
+        nameWrapper.style.cursor = 'pointer';
+        nameWrapper.onclick = (e) => {
+            e.stopPropagation();
+            openUserProfile(p.username);
+        };
         const nameSpan = document.createElement('span');
         nameSpan.textContent = p.name || p.username;
         nameWrapper.appendChild(nameSpan);
@@ -1481,7 +1604,6 @@ function renderFeed() {
         header.appendChild(nameWrapper);
         card.appendChild(header);
         
-        // Text
         if (p.text) {
             const text = document.createElement('div');
             text.className = 'post-content';
@@ -1489,35 +1611,27 @@ function renderFeed() {
             card.appendChild(text);
         }
         
-        // ============ ФИКС ФОТО С УЛУЧШЕННОЙ ЗАГРУЗКОЙ ============
         if (p.url) {
             const container = document.createElement('div');
             container.className = 'post-media-container';
-            
             const img = document.createElement('img');
             img.alt = 'медиа';
             container.appendChild(img);
-            
-            // Используем улучшенную функцию загрузки
             loadImageWithFallback(img, p.url, '🖼️ Фото не загрузилось');
-            
             img.onclick = function(e) {
                 e.stopPropagation();
                 if (window.innerWidth < 768) {
                     window.open(this.src, '_blank');
                 }
             };
-            
             card.appendChild(container);
         }
         
-        // Time
         const timeDiv = document.createElement('div');
         timeDiv.className = 'post-time';
         timeDiv.textContent = new Date(p.time).toLocaleString();
         card.appendChild(timeDiv);
         
-        // ============ ЛАЙКИ И КОММЕНТЫ ============
         const actions = document.createElement('div');
         actions.className = 'post-actions';
         
@@ -1542,7 +1656,6 @@ function renderFeed() {
         actions.appendChild(commentBtn);
         card.appendChild(actions);
         
-        // ============ КОММЕНТАРИИ ============
         const commentsSection = document.createElement('div');
         commentsSection.className = 'comments-section';
         commentsSection.id = 'comments_' + p.postKey;
@@ -1618,7 +1731,6 @@ function renderReelsStrip() {
         const userData = allUsersCache[u];
         if (!userData) continue;
         
-        // Админ BarsikNet всегда виден
         if (u === 'BarsikNet') {
             const reels = userData.reels || {};
             for (const key in reels) {
@@ -1628,7 +1740,6 @@ function renderReelsStrip() {
             continue;
         }
         
-        // Показываем рилсы друзей и свои
         if (friends.includes(u) || u === currentUser.username) {
             const reels = userData.reels || {};
             for (const key in reels) {
@@ -1654,7 +1765,6 @@ function renderReelsStrip() {
         const avatarDiv = document.createElement('div');
         avatarDiv.className = 'avatar';
         
-        // ============ ПОКАЗЫВАЕМ АВАТАР ПОЛЬЗОВАТЕЛЯ ============
         const user = allUsersCache[reel.username];
         if (user && user.avatar && user.avatar.startsWith('http')) {
             const img = document.createElement('img');
@@ -1677,9 +1787,7 @@ function renderReelsStrip() {
             avatarDiv.style.fontSize = '28px';
         }
         
-        // Добавляем обводку как у рилсов (как в Instagram)
         avatarDiv.style.border = '3px solid var(--primary)';
-        
         div.appendChild(avatarDiv);
         
         const label = document.createElement('span');
@@ -1688,7 +1796,6 @@ function renderReelsStrip() {
         if (badge) label.innerHTML += badge;
         div.appendChild(label);
         
-        // При клике открываем рилс
         div.onclick = () => {
             if (reel.url && isValidImageUrl(reel.url)) {
                 reelImage.src = reel.url;
@@ -1701,6 +1808,142 @@ function renderReelsStrip() {
         reelsStrip.appendChild(div);
     }
 }
+
+// ============ ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ ============
+function openUserProfile(username) {
+    if (username === currentUser.username) {
+        // Переключаемся на свой профиль
+        document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+        document.querySelector('[data-page="pageProfile"]').classList.add('active');
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        $('pageProfile').classList.add('active');
+        pageTitle.textContent = '👤 Профиль';
+        renderProfile();
+        return;
+    }
+    
+    viewedUser = username;
+    const user = allUsersCache[username];
+    if (!user) return;
+    
+    const isFriend = currentUser.friends && currentUser.friends[username];
+    const isFollowing = currentUser.following && currentUser.following[username];
+    const followersCount = user.followers ? Object.keys(user.followers).length : 0;
+    const friendsCount = user.friends ? Object.keys(user.friends).length : 0;
+    
+    let avatarHtml = '';
+    if (user.avatar && user.avatar.startsWith('http')) {
+        avatarHtml = `<img src="${user.avatar}" alt="avatar" style="width:100%;height:100%;object-fit:cover;" />`;
+    } else {
+        avatarHtml = user.avatar || '🐱';
+    }
+    
+    const badge = getVerifiedBadge(username, 'big');
+    
+    let actionsHtml = '';
+    
+    if (isFriend) {
+        actionsHtml = `<button class="btn-sm success" style="cursor:default;">✅ Друзья</button>`;
+    } else if (isFollowing) {
+        actionsHtml = `
+            <button class="btn-sm danger" onclick="unfollowUser('${username}')">Отписаться</button>
+            <button class="btn-sm outline" onclick="openChatFromProfile('${username}')">Написать</button>
+        `;
+    } else {
+        actionsHtml = `
+            <button class="btn-sm" onclick="followUser('${username}')">Подписаться</button>
+            <button class="btn-sm outline" onclick="openChatFromProfile('${username}')">Написать</button>
+        `;
+    }
+    
+    userProfileContent.innerHTML = `
+        <div class="user-profile-view">
+            <div class="profile-header">
+                <div class="avatar big">${avatarHtml}</div>
+                <div class="name-wrapper" style="font-size:22px;font-weight:700;">
+                    ${user.name || username}
+                    ${badge}
+                </div>
+                <div class="username">@${username}</div>
+                <div class="profile-stats">
+                    <div class="stat">
+                        <div class="num">${friendsCount}</div>
+                        <div class="label">Друзья</div>
+                    </div>
+                    <div class="stat">
+                        <div class="num">${followersCount}</div>
+                        <div class="label">Подписчики</div>
+                    </div>
+                </div>
+                <div class="profile-actions">
+                    ${actionsHtml}
+                </div>
+            </div>
+        </div>
+    `;
+    
+    userProfileModal.style.display = 'flex';
+}
+
+function closeUserProfile() {
+    userProfileModal.style.display = 'none';
+    viewedUser = null;
+}
+
+window.followUser = function(username) {
+    db.ref('users/' + currentUser.username + '/following/' + username).set(true);
+    db.ref('users/' + username + '/followers/' + currentUser.username).set(true);
+    
+    const other = allUsersCache[username];
+    if (other && other.following && other.following[currentUser.username]) {
+        db.ref('users/' + currentUser.username + '/friends/' + username).set(true);
+        db.ref('users/' + username + '/friends/' + currentUser.username).set(true);
+    }
+    
+    setTimeout(() => {
+        db.ref('users/' + currentUser.username).once('value', snap => {
+            currentUser = { ...snap.val(), username: currentUser.username };
+            closeUserProfile();
+            if (viewedUser) openUserProfile(viewedUser);
+            renderSearch();
+            renderChatList();
+            renderFriends();
+            renderReelsStrip();
+            renderProfile();
+        });
+    }, 300);
+};
+
+window.unfollowUser = function(username) {
+    db.ref('users/' + currentUser.username + '/following/' + username).remove();
+    db.ref('users/' + username + '/followers/' + currentUser.username).remove();
+    
+    const isFriend = currentUser.friends && currentUser.friends[username];
+    if (isFriend) {
+        db.ref('users/' + currentUser.username + '/friends/' + username).remove();
+        db.ref('users/' + username + '/friends/' + currentUser.username).remove();
+    }
+    
+    setTimeout(() => {
+        db.ref('users/' + currentUser.username).once('value', snap => {
+            currentUser = { ...snap.val(), username: currentUser.username };
+            closeUserProfile();
+            if (viewedUser) openUserProfile(viewedUser);
+            renderSearch();
+            renderChatList();
+            renderFriends();
+            renderReelsStrip();
+            renderProfile();
+        });
+    }, 300);
+};
+
+window.openChatFromProfile = function(username) {
+    closeUserProfile();
+    setTimeout(() => {
+        openChat(username);
+    }, 300);
+};
 
 // ============ АДМИН ПАНЕЛЬ ============
 function renderAdminPanel() {
@@ -1723,7 +1966,6 @@ function renderAdminPanel() {
     $('statPosts').textContent = totalPosts;
     $('statReels').textContent = totalReels;
     
-    // Список пользователей
     const list = $('adminUserList');
     list.innerHTML = '';
     for (const u of users) {
@@ -1745,7 +1987,6 @@ function renderAdminPanel() {
     }
 }
 
-// Админ функции
 window.adminVerify = function(username) {
     if (!isAdmin) return;
     const ref = db.ref('users/' + username + '/verified');
@@ -1863,6 +2104,7 @@ function openChat(username) {
     chatPartnerName.textContent = user ? (user.name || username) : username;
     const badge = getVerifiedBadge(username);
     chatPartnerBadge.innerHTML = badge;
+    chatPartnerClick.onclick = () => openUserProfile(username);
     
     setupChatListener(username);
     renderChatMessages(username);
@@ -2029,6 +2271,8 @@ function renderSearch() {
         info.className = 'info';
         const nameWrapper = document.createElement('div');
         nameWrapper.className = 'name-wrapper';
+        nameWrapper.style.cursor = 'pointer';
+        nameWrapper.onclick = () => openUserProfile(u);
         const nameSpan = document.createElement('span');
         nameSpan.textContent = user.name || u;
         nameWrapper.appendChild(nameSpan);
@@ -2126,6 +2370,8 @@ function renderFriends() {
         info.className = 'info';
         const nameWrapper = document.createElement('div');
         nameWrapper.className = 'name-wrapper';
+        nameWrapper.style.cursor = 'pointer';
+        nameWrapper.onclick = () => openUserProfile(u);
         const nameSpan = document.createElement('span');
         nameSpan.textContent = user.name || u;
         nameWrapper.appendChild(nameSpan);
@@ -2151,6 +2397,7 @@ function renderFriends() {
 function renderProfile() {
     if (!currentUser) return;
     const user = currentUser;
+    
     if (user.avatar && user.avatar.startsWith('http')) {
         const img = document.createElement('img');
         img.src = user.avatar;
@@ -2164,16 +2411,32 @@ function renderProfile() {
     } else {
         profileAvatar.textContent = user.avatar || '🐱';
     }
+    
     profileName.textContent = user.name || user.username;
-    const badge = getVerifiedBadge(user.username);
+    const badge = getVerifiedBadge(user.username, 'big');
     profileBadge.innerHTML = badge;
     profileUsername.textContent = '@' + user.username;
-    settingsName.value = user.name || '';
+    
+    // Статистика
+    const friendsCount = user.friends ? Object.keys(user.friends).length : 0;
+    const followersCount = user.followers ? Object.keys(user.followers).length : 0;
+    profileFriendsCount.textContent = friendsCount;
+    profileFollowersCount.textContent = followersCount;
+    
     if (user.avatar && user.avatar.startsWith('http')) {
         settingsAvatarUrl.value = user.avatar;
     } else {
         settingsAvatarUrl.value = '';
     }
+    if (isDark) themeToggle.classList.add('active');
+    else themeToggle.classList.remove('active');
+}
+
+// ============ НАСТРОЙКИ ============
+
+function renderSettings() {
+    if (!currentUser) return;
+    settingsName.value = currentUser.name || '';
     if (isDark) themeToggle.classList.add('active');
     else themeToggle.classList.remove('active');
 }
@@ -2211,6 +2474,8 @@ settingsSaveName.onclick = () => {
         renderFriends();
         renderSearch();
         renderReelsStrip();
+        renderSettings();
+        alert('✅ Имя обновлено!');
     });
 };
 
@@ -2218,6 +2483,11 @@ themeToggle.onclick = () => {
     isDark = !isDark;
     document.body.classList.toggle('dark', isDark);
     themeToggle.classList.toggle('active', isDark);
+    saveTheme();
+};
+
+supportBtn.onclick = () => {
+    window.location.href = 'mailto:thebarsiknet@gmail.com?subject=Помощь%20BarsikNet&body=Здравствуйте!%20У%20меня%20вопрос...';
 };
 
 emojiGrid.querySelectorAll('button').forEach(btn => {
@@ -2239,6 +2509,11 @@ emojiGrid.querySelectorAll('button').forEach(btn => {
 reelClose.onclick = () => reelView.classList.remove('active');
 reelView.onclick = (e) => { if (e.target === reelView) reelView.classList.remove('active'); };
 
+// Закрытие модалки по клику вне
+userProfileModal.onclick = (e) => {
+    if (e.target === userProfileModal) closeUserProfile();
+};
+
 // Enter key
 authPassword.addEventListener('keydown', e => { if (e.key === 'Enter') authBtn.click(); });
 chatInput.addEventListener('keydown', e => { if (e.key === 'Enter') chatSend.click(); });
@@ -2246,8 +2521,7 @@ postText.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey
 
 console.log('🐱 BarsikNet готов!');
 console.log('📱 Адаптировано для iPhone');
-console.log('🖼️ Фикс загрузки фото по ссылке');
-console.log('👤 В рилсах теперь показывается аватар пользователя');
+console.log('👤 При клике на имя в чате открывается профиль!');
 </script>
 </body>
 </html>
