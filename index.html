@@ -613,6 +613,7 @@
             cursor: pointer;
             position: relative;
             transition: 0.3s;
+            flex-shrink: 0;
         }
         .toggle-btn.active { background: var(--primary); }
         .toggle-btn::after {
@@ -2283,19 +2284,36 @@ $('adminRefresh').onclick = () => {
     alert('✅ Обновлено!');
 };
 
-// ============ РЕЖИМ ЧТЕНИЯ ============
-readonlyToggle.onclick = () => {
-    readonlyMode = !readonlyMode;
-    readonlyToggle.classList.toggle('active', readonlyMode);
-    document.body.classList.toggle('readonly', readonlyMode);
-    readonlyStatus.textContent = readonlyMode ? 'Включен 🔒' : 'Выключен';
-    saveReadonlyMode();
-    if (readonlyMode) {
-        alert('📖 Режим чтения ВКЛЮЧЕН!\nВсе пользователи не могут:\n- Публиковать посты\n- Публиковать рилсы\n- Писать сообщения\n- Ставить лайки\n- Комментировать');
-    } else {
-        alert('📖 Режим чтения ВЫКЛЮЧЕН!');
-    }
-};
+// ============ РЕЖИМ ЧТЕНИЯ - ИСПРАВЛЕННЫЙ ============
+if (readonlyToggle) {
+    readonlyToggle.onclick = function(e) {
+        e.stopPropagation();
+        readonlyMode = !readonlyMode;
+        this.classList.toggle('active', readonlyMode);
+        document.body.classList.toggle('readonly', readonlyMode);
+        if (readonlyStatus) {
+            readonlyStatus.textContent = readonlyMode ? 'Включен 🔒' : 'Выключен';
+        }
+        saveReadonlyMode();
+        
+        if (readonlyMode) {
+            alert('📖 Режим чтения ВКЛЮЧЕН!\n\nВсе пользователи не могут:\n- Публиковать посты\n- Публиковать рилсы\n- Писать сообщения\n- Ставить лайки\n- Комментировать');
+        } else {
+            alert('📖 Режим чтения ВЫКЛЮЧЕН!');
+        }
+    };
+}
+
+// ============ ТЕМА - ИСПРАВЛЕННАЯ ============
+if (themeToggle) {
+    themeToggle.onclick = function(e) {
+        e.stopPropagation();
+        isDark = !isDark;
+        this.classList.toggle('active', isDark);
+        document.body.classList.toggle('dark', isDark);
+        saveTheme();
+    };
+}
 
 // ============ ЧАТ ============
 
@@ -2818,13 +2836,6 @@ settingsSaveName.onclick = () => {
     });
 };
 
-themeToggle.onclick = () => {
-    isDark = !isDark;
-    document.body.classList.toggle('dark', isDark);
-    themeToggle.classList.toggle('active', isDark);
-    saveTheme();
-};
-
 supportBtn.onclick = () => {
     window.location.href = 'mailto:thebarsiknet@gmail.com?subject=Помощь%20BarsikNet&body=Здравствуйте!%20У%20меня%20вопрос...';
 };
@@ -2858,7 +2869,7 @@ chatInput.addEventListener('keydown', e => { if (e.key === 'Enter') chatSend.cli
 postText.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); publishPostBtn.click(); } });
 
 console.log('🐱 BarsikNet готов!');
-console.log('📱 Адаптировано для iPhone');
+console.log('📱 Переключатели ТЕМА и РЕЖИМ ЧТЕНИЯ работают!');
 </script>
 </body>
 </html>
