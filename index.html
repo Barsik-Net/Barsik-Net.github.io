@@ -49,6 +49,31 @@
             padding-top: var(--safe-top);
             padding-bottom: var(--safe-bottom);
         }
+        body.readonly * {
+            pointer-events: none !important;
+            opacity: 0.7 !important;
+        }
+        body.readonly .header, 
+        body.readonly .bottom-nav,
+        body.readonly .post-card .post-actions button,
+        body.readonly .chat-input button,
+        body.readonly .create-post-area button {
+            pointer-events: none !important;
+            opacity: 0.5 !important;
+        }
+        body.readonly .admin-actions button,
+        body.readonly .admin-user-item button {
+            pointer-events: auto !important;
+            opacity: 1 !important;
+        }
+        body.readonly .bottom-nav .nav-item {
+            pointer-events: none !important;
+            opacity: 0.5 !important;
+        }
+        body.readonly .bottom-nav .nav-item.admin-only {
+            pointer-events: auto !important;
+            opacity: 1 !important;
+        }
         #auth {
             display: flex;
             justify-content: center;
@@ -521,6 +546,8 @@
         }
         .btn-sm.danger { background: #ff3b30; }
         .btn-sm.success { background: #34c759; }
+        .btn-sm.warning { background: #ff9500; }
+        .btn-sm.banned { background: #8e8e93; }
         .profile-header {
             display: flex;
             flex-direction: column;
@@ -762,7 +789,7 @@
         /* ============ АДМИНКА ============ */
         .admin-stats {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr 1fr 1fr;
             gap: 10px;
             margin-bottom: 16px;
         }
@@ -798,10 +825,34 @@
             justify-content: space-between;
             padding: 8px 0;
             border-bottom: 1px solid var(--border);
+            flex-wrap: wrap;
+            gap: 4px;
         }
-        .admin-user-item .info { flex: 1; }
+        .admin-user-item .info { flex: 1; min-width: 120px; }
         .admin-user-item .info .name { font-weight: 600; }
         .admin-user-item .info .username { font-size: 12px; opacity: 0.6; }
+        .admin-user-item .admin-buttons {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+        .admin-user-item .admin-buttons .btn-sm {
+            font-size: 10px;
+            padding: 2px 8px;
+        }
+        .admin-mode-toggle {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: var(--card);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            margin-bottom: 16px;
+        }
+        .admin-mode-toggle .label {
+            font-weight: 600;
+        }
         
         /* ============ ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ ============ */
         .user-profile-view {
@@ -818,6 +869,7 @@
             gap: 8px;
             justify-content: center;
             margin-top: 12px;
+            flex-wrap: wrap;
         }
         .user-profile-view .profile-actions .btn-sm {
             min-width: 100px;
@@ -834,6 +886,20 @@
         }
         .settings-support .btn-sm {
             min-width: 150px;
+        }
+        
+        /* ============ БАН ============ */
+        .ban-badge {
+            background: #ff3b30;
+            color: white;
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-weight: 600;
+            margin-left: 4px;
+        }
+        .banned-user {
+            opacity: 0.6;
         }
         
         @media (max-width: 480px) {
@@ -901,6 +967,9 @@
             .profile-stats .stat .num { font-size: 16px; }
             .profile-stats .stat .label { font-size: 11px; }
             .avatar.big { width: 64px; height: 64px; font-size: 28px; }
+            .admin-user-item { flex-direction: column; align-items: stretch; }
+            .admin-user-item .admin-buttons { justify-content: center; }
+            .admin-mode-toggle { flex-wrap: wrap; justify-content: center; }
         }
     </style>
 </head>
@@ -929,7 +998,7 @@
     </div>
 
     <div id="pageFeed" class="page active">
-        <div class="create-post-area">
+        <div class="create-post-area" id="createPostArea">
             <textarea id="postText" placeholder="Что нового?"></textarea>
             <div class="actions">
                 <input id="postImage" placeholder="Ссылка на фото" />
@@ -938,7 +1007,7 @@
         </div>
         <div class="reels-strip" id="reelsStrip"></div>
         <div id="feedPosts"></div>
-        <div style="display:flex; gap:8px; margin-top:12px; background:var(--card); padding:12px; border-radius:var(--radius); border:1px solid var(--border);">
+        <div style="display:flex; gap:8px; margin-top:12px; background:var(--card); padding:12px; border-radius:var(--radius); border:1px solid var(--border);" id="reelPublishArea">
             <input id="reelInput" placeholder="Ссылка на фото (рилс)" style="flex:1; padding:8px 12px; border-radius:20px; border:1px solid var(--border); background:var(--bg); color:var(--text); outline:none;" />
             <button id="publishReelBtn" class="btn-sm">Рилс</button>
         </div>
@@ -958,7 +1027,7 @@
             </div>
             <div class="chat-messages" id="chatMessages"></div>
             <div id="chatWarning" class="msg-limit-warning"></div>
-            <div class="chat-input">
+            <div class="chat-input" id="chatInputArea">
                 <input id="chatInput" placeholder="Сообщение..." />
                 <button id="chatSend">➤</button>
             </div>
@@ -1048,6 +1117,14 @@
     <!-- ============ АДМИНКА ============ -->
     <div id="pageAdmin" class="page">
         <h3 style="margin-bottom:12px;">👑 Админ-панель</h3>
+        
+        <!-- Режим чтения -->
+        <div class="admin-mode-toggle">
+            <span class="label">📖 Режим чтения:</span>
+            <button class="toggle-btn" id="readonlyToggle"></button>
+            <span style="font-size:12px; opacity:0.6;" id="readonlyStatus">Выключен</span>
+        </div>
+        
         <div class="admin-stats" id="adminStats">
             <div class="admin-stat">
                 <div class="num" id="statUsers">0</div>
@@ -1065,14 +1142,25 @@
                 <div class="num" id="statReels">0</div>
                 <div class="label">📹 Рилсов</div>
             </div>
+            <div class="admin-stat">
+                <div class="num" id="statMessages">0</div>
+                <div class="label">💬 Сообщений</div>
+            </div>
+            <div class="admin-stat">
+                <div class="num" id="statBanned">0</div>
+                <div class="label">🔨 Забанено</div>
+            </div>
+        </div>
+        
+        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px;">
+            <button class="btn-sm" onclick="adminRefresh.click()" style="background:var(--primary);">🔄 Обновить</button>
+            <button class="btn-sm danger" onclick="adminClearAllMessages()" style="background:#ff3b30;">🗑️ Очистить все чаты</button>
+            <button class="btn-sm warning" onclick="adminClearAllPosts()" style="background:#ff9500;">🗑️ Очистить все посты</button>
+            <button class="btn-sm warning" onclick="adminClearAllReels()" style="background:#ff9500;">🗑️ Очистить все рилсы</button>
         </div>
         
         <h4 style="margin:12px 0 8px;">👥 Все пользователи</h4>
         <div id="adminUserList"></div>
-        
-        <div class="admin-actions" style="margin-top:12px;">
-            <button class="btn-sm" id="adminRefresh" style="background:var(--primary);">🔄 Обновить</button>
-        </div>
     </div>
 
     <div class="bottom-nav" id="bottomNav">
@@ -1111,6 +1199,7 @@ let reelCleanupInterval = null;
 let chatListeners = {};
 let isAdmin = false;
 let viewedUser = null;
+let readonlyMode = false;
 
 const $ = id => document.getElementById(id);
 
@@ -1142,6 +1231,8 @@ const supportBtn = $('supportBtn');
 const chatPartnerClick = $('chatPartnerClick');
 const userProfileModal = $('userProfileModal');
 const userProfileContent = $('userProfileContent');
+const readonlyToggle = $('readonlyToggle');
+const readonlyStatus = $('readonlyStatus');
 
 // ============ ПРОВЕРКА URL ============
 function isValidImageUrl(url) {
@@ -1245,6 +1336,27 @@ function getVerifiedBadge(username, size = 'normal') {
     return '';
 }
 
+// ============ БАН ============
+function isUserBanned(username) {
+    const user = allUsersCache[username];
+    if (!user || !user.banned) return false;
+    if (user.banExpiry && Date.now() > user.banExpiry) {
+        // Бан истек
+        db.ref('users/' + username + '/banned').remove();
+        db.ref('users/' + username + '/banExpiry').remove();
+        return false;
+    }
+    return true;
+}
+
+function getBanTimeLeft(username) {
+    const user = allUsersCache[username];
+    if (!user || !user.banExpiry) return null;
+    const left = user.banExpiry - Date.now();
+    if (left <= 0) return null;
+    return Math.ceil(left / 60000); // минуты
+}
+
 // ============ СОХРАНЕНИЕ ТЕМЫ ============
 function saveTheme() {
     try {
@@ -1260,6 +1372,25 @@ function loadTheme() {
             document.body.classList.add('dark');
             if (themeToggle) themeToggle.classList.add('active');
         }
+    } catch (e) {}
+}
+
+// ============ РЕЖИМ ЧТЕНИЯ ============
+function loadReadonlyMode() {
+    try {
+        const mode = localStorage.getItem('barsiknet_readonly');
+        if (mode === 'true') {
+            readonlyMode = true;
+            document.body.classList.add('readonly');
+            if (readonlyToggle) readonlyToggle.classList.add('active');
+            if (readonlyStatus) readonlyStatus.textContent = 'Включен 🔒';
+        }
+    } catch (e) {}
+}
+
+function saveReadonlyMode() {
+    try {
+        localStorage.setItem('barsiknet_readonly', readonlyMode ? 'true' : 'false');
     } catch (e) {}
 }
 
@@ -1313,6 +1444,17 @@ authBtn.onclick = async () => {
                 authError.textContent = 'Неверный юзернейм или пароль';
                 return;
             }
+            // Проверка бана
+            if (data.banned) {
+                if (data.banExpiry && Date.now() < data.banExpiry) {
+                    const left = Math.ceil((data.banExpiry - Date.now()) / 60000);
+                    authError.textContent = `🔨 Вы забанены! Осталось ${left} мин.`;
+                    return;
+                } else {
+                    // Бан истек
+                    await ref.update({ banned: false, banExpiry: null });
+                }
+            }
             currentUser = { ...data, username };
             await ref.update({ online: true, lastSeen: Date.now() });
             enterApp();
@@ -1332,7 +1474,9 @@ authBtn.onclick = async () => {
                 friends: {},
                 posts: {},
                 reels: {},
-                verified: false
+                verified: false,
+                banned: false,
+                banExpiry: null
             };
             await ref.set(newUser);
             currentUser = { ...newUser, username };
@@ -1354,6 +1498,7 @@ function enterApp() {
     }
     
     loadTheme();
+    loadReadonlyMode();
     loadAllUsers();
     renderFeed();
     renderChatList();
@@ -1414,6 +1559,14 @@ function loadAllUsers() {
         renderAdminPanel();
         renderProfile();
         if (currentChat) renderChatMessages(currentChat);
+        // Проверяем, не забанен ли текущий пользователь
+        if (currentUser && allUsersCache[currentUser.username]) {
+            const userData = allUsersCache[currentUser.username];
+            if (userData.banned && userData.banExpiry && Date.now() < userData.banExpiry) {
+                alert('🔨 Вы были забанены!');
+                location.reload();
+            }
+        }
     });
 }
 
@@ -1477,6 +1630,10 @@ document.querySelectorAll('.nav-item').forEach(btn => {
 
 // ============ ПОСТЫ ============
 publishPostBtn.onclick = () => {
+    if (readonlyMode) {
+        alert('📖 Режим чтения! Публикация запрещена.');
+        return;
+    }
     const text = postText.value.trim();
     const imageUrl = postImage.value.trim();
     if (!text && !imageUrl) {
@@ -1504,6 +1661,10 @@ publishPostBtn.onclick = () => {
 };
 
 function toggleLike(postKey, username) {
+    if (readonlyMode) {
+        alert('📖 Режим чтения!');
+        return;
+    }
     const postRef = db.ref('users/' + username + '/posts/' + postKey + '/likes/' + currentUser.username);
     postRef.once('value', snap => {
         if (snap.val()) {
@@ -1515,6 +1676,10 @@ function toggleLike(postKey, username) {
 }
 
 function addComment(postKey, username) {
+    if (readonlyMode) {
+        alert('📖 Режим чтения!');
+        return;
+    }
     const input = document.getElementById('commentInput_' + postKey);
     if (!input) return;
     const text = input.value.trim();
@@ -1530,176 +1695,115 @@ function addComment(postKey, username) {
     });
 }
 
-function renderFeed() {
-    if (!currentUser) return;
-    feedPosts.innerHTML = '';
-    
-    const allUsers = Object.keys(allUsersCache);
-    const posts = [];
-    
-    for (const u of allUsers) {
-        const userData = allUsersCache[u];
-        if (!userData) continue;
-        const userPosts = userData.posts || {};
-        for (const key in userPosts) {
-            posts.push({ 
-                ...userPosts[key], 
-                username: u, 
-                name: userData.name || u,
-                postKey: key
+// ============ АДМИН ФУНКЦИИ ДЛЯ УДАЛЕНИЯ ПОСТОВ/РИЛСОВ ============
+window.adminDeletePost = function(username, postKey) {
+    if (!isAdmin) return;
+    if (confirm(`Удалить этот пост?`)) {
+        db.ref('users/' + username + '/posts/' + postKey).remove().then(() => {
+            renderFeed();
+            renderAdminPanel();
+            alert('✅ Пост удален!');
+        });
+    }
+};
+
+window.adminDeleteReel = function(username, reelKey) {
+    if (!isAdmin) return;
+    if (confirm(`Удалить этот рилс?`)) {
+        db.ref('users/' + username + '/reels/' + reelKey).remove().then(() => {
+            renderReelsStrip();
+            renderAdminPanel();
+            alert('✅ Рилс удален!');
+        });
+    }
+};
+
+// ============ БАН ПОЛЬЗОВАТЕЛЯ ============
+window.adminBanUser = function(username, minutes) {
+    if (!isAdmin) return;
+    if (username === 'BarsikNet') {
+        alert('Нельзя забанить админа!');
+        return;
+    }
+    if (username === currentUser.username) {
+        alert('Нельзя забанить самого себя!');
+        return;
+    }
+    if (!minutes || minutes < 1) {
+        alert('Введите корректное количество минут (от 1)');
+        return;
+    }
+    const banExpiry = Date.now() + (minutes * 60000);
+    db.ref('users/' + username + '/banned').set(true);
+    db.ref('users/' + username + '/banExpiry').set(banExpiry);
+    db.ref('users/' + username + '/online').set(false);
+    alert(`🔨 Пользователь @${username} забанен на ${minutes} минут!`);
+    renderAdminPanel();
+};
+
+window.adminUnbanUser = function(username) {
+    if (!isAdmin) return;
+    if (confirm(`Разбанить пользователя @${username}?`)) {
+        db.ref('users/' + username + '/banned').remove();
+        db.ref('users/' + username + '/banExpiry').remove();
+        alert(`✅ Пользователь @${username} разбанен!`);
+        renderAdminPanel();
+    }
+};
+
+// ============ ОЧИСТКА ВСЕХ ДАННЫХ ============
+window.adminClearAllMessages = function() {
+    if (!isAdmin) return;
+    if (confirm('🗑️ Удалить ВСЕ сообщения во всех чатах?')) {
+        db.ref('messages').remove().then(() => {
+            renderAdminPanel();
+            alert('✅ Все сообщения удалены!');
+        });
+    }
+};
+
+window.adminClearAllPosts = function() {
+    if (!isAdmin) return;
+    if (confirm('🗑️ Удалить ВСЕ посты всех пользователей?')) {
+        const users = Object.keys(allUsersCache);
+        let count = 0;
+        for (const u of users) {
+            db.ref('users/' + u + '/posts').remove().then(() => {
+                count++;
+                if (count === users.length) {
+                    renderFeed();
+                    renderAdminPanel();
+                    alert('✅ Все посты удалены!');
+                }
             });
         }
     }
-    
-    posts.sort((a,b) => (b.time||0) - (a.time||0));
-    
-    if (posts.length === 0) {
-        feedPosts.innerHTML = '<div style="text-align:center; opacity:0.5; padding:40px 0;">📝 Нет постов</div>';
-        return;
-    }
-    
-    for (const p of posts) {
-        const card = document.createElement('div');
-        card.className = 'post-card';
-        card.id = 'post_' + p.postKey;
-        
-        const header = document.createElement('div');
-        header.className = 'post-header';
-        const av = document.createElement('div');
-        av.className = 'avatar';
-        const user = allUsersCache[p.username];
-        if (user && user.avatar && user.avatar.startsWith('http')) {
-            const img = document.createElement('img');
-            img.src = user.avatar;
-            img.alt = 'avatar';
-            img.loading = 'lazy';
-            img.crossOrigin = 'anonymous';
-            img.referrerPolicy = 'no-referrer';
-            img.onerror = function() { this.style.display = 'none'; av.textContent = '🐱'; };
-            av.appendChild(img);
-        } else {
-            av.textContent = (user && user.avatar) || '🐱';
-        }
-        if (user && user.online) av.classList.add('online');
-        
-        av.style.cursor = 'pointer';
-        av.onclick = (e) => {
-            e.stopPropagation();
-            openUserProfile(p.username);
-        };
-        header.appendChild(av);
-        
-        const nameWrapper = document.createElement('span');
-        nameWrapper.className = 'name-wrapper';
-        nameWrapper.style.cursor = 'pointer';
-        nameWrapper.onclick = (e) => {
-            e.stopPropagation();
-            openUserProfile(p.username);
-        };
-        const nameSpan = document.createElement('span');
-        nameSpan.textContent = p.name || p.username;
-        nameWrapper.appendChild(nameSpan);
-        const badge = getVerifiedBadge(p.username);
-        if (badge) nameWrapper.innerHTML += badge;
-        header.appendChild(nameWrapper);
-        card.appendChild(header);
-        
-        if (p.text) {
-            const text = document.createElement('div');
-            text.className = 'post-content';
-            text.textContent = p.text;
-            card.appendChild(text);
-        }
-        
-        if (p.url) {
-            const container = document.createElement('div');
-            container.className = 'post-media-container';
-            const img = document.createElement('img');
-            img.alt = 'медиа';
-            container.appendChild(img);
-            loadImageWithFallback(img, p.url, '🖼️ Фото не загрузилось');
-            img.onclick = function(e) {
-                e.stopPropagation();
-                if (window.innerWidth < 768) {
-                    window.open(this.src, '_blank');
+};
+
+window.adminClearAllReels = function() {
+    if (!isAdmin) return;
+    if (confirm('🗑️ Удалить ВСЕ рилсы всех пользователей?')) {
+        const users = Object.keys(allUsersCache);
+        let count = 0;
+        for (const u of users) {
+            db.ref('users/' + u + '/reels').remove().then(() => {
+                count++;
+                if (count === users.length) {
+                    renderReelsStrip();
+                    renderAdminPanel();
+                    alert('✅ Все рилсы удалены!');
                 }
-            };
-            card.appendChild(container);
+            });
         }
-        
-        const timeDiv = document.createElement('div');
-        timeDiv.className = 'post-time';
-        timeDiv.textContent = new Date(p.time).toLocaleString();
-        card.appendChild(timeDiv);
-        
-        const actions = document.createElement('div');
-        actions.className = 'post-actions';
-        
-        const likesCount = p.likes ? Object.keys(p.likes).length : 0;
-        const isLiked = p.likes && p.likes[currentUser.username];
-        
-        const likeBtn = document.createElement('button');
-        likeBtn.className = isLiked ? 'liked' : '';
-        likeBtn.innerHTML = `❤️ ${likesCount}`;
-        likeBtn.onclick = () => toggleLike(p.postKey, p.username);
-        actions.appendChild(likeBtn);
-        
-        const commentsCount = p.comments ? Object.keys(p.comments).length : 0;
-        const commentBtn = document.createElement('button');
-        commentBtn.textContent = `💬 ${commentsCount}`;
-        commentBtn.onclick = () => {
-            const section = document.getElementById('comments_' + p.postKey);
-            if (section) {
-                section.style.display = section.style.display === 'none' ? 'block' : 'none';
-            }
-        };
-        actions.appendChild(commentBtn);
-        card.appendChild(actions);
-        
-        const commentsSection = document.createElement('div');
-        commentsSection.className = 'comments-section';
-        commentsSection.id = 'comments_' + p.postKey;
-        commentsSection.style.display = 'none';
-        
-        if (p.comments) {
-            const commentsArr = Object.values(p.comments);
-            commentsArr.sort((a,b) => (a.time||0) - (b.time||0));
-            for (const c of commentsArr) {
-                const div = document.createElement('div');
-                div.className = 'comment';
-                const name = document.createElement('span');
-                name.className = 'name';
-                name.textContent = c.from + ':';
-                div.appendChild(name);
-                const text = document.createElement('span');
-                text.textContent = c.text;
-                div.appendChild(text);
-                commentsSection.appendChild(div);
-            }
-        }
-        
-        const commentInput = document.createElement('div');
-        commentInput.className = 'comment-input';
-        const input = document.createElement('input');
-        input.id = 'commentInput_' + p.postKey;
-        input.placeholder = 'Написать комментарий...';
-        input.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') addComment(p.postKey, p.username);
-        });
-        const sendBtn = document.createElement('button');
-        sendBtn.textContent = '➤';
-        sendBtn.onclick = () => addComment(p.postKey, p.username);
-        commentInput.appendChild(input);
-        commentInput.appendChild(sendBtn);
-        commentsSection.appendChild(commentInput);
-        card.appendChild(commentsSection);
-        
-        feedPosts.appendChild(card);
     }
-}
+};
 
 // ============ РИЛСЫ ============
 publishReelBtn.onclick = () => {
+    if (readonlyMode) {
+        alert('📖 Режим чтения! Публикация запрещена.');
+        return;
+    }
     const url = reelInput.value.trim();
     if (!url) {
         alert('Введите ссылку на фото');
@@ -1735,7 +1839,7 @@ function renderReelsStrip() {
             const reels = userData.reels || {};
             for (const key in reels) {
                 const reel = reels[key];
-                allReels[key] = { ...reel, username: u, name: userData.name || u };
+                allReels[key] = { ...reel, username: u, name: userData.name || u, reelKey: key };
             }
             continue;
         }
@@ -1744,7 +1848,7 @@ function renderReelsStrip() {
             const reels = userData.reels || {};
             for (const key in reels) {
                 const reel = reels[key];
-                allReels[key] = { ...reel, username: u, name: userData.name || u };
+                allReels[key] = { ...reel, username: u, name: userData.name || u, reelKey: key };
             }
         }
     }
@@ -1796,6 +1900,23 @@ function renderReelsStrip() {
         if (badge) label.innerHTML += badge;
         div.appendChild(label);
         
+        // Админ: долгое нажатие для удаления
+        let longPressTimer;
+        div.addEventListener('mousedown', () => {
+            if (!isAdmin) return;
+            longPressTimer = setTimeout(() => {
+                if (confirm(`Удалить рилс пользователя @${reel.username}?`)) {
+                    db.ref('users/' + reel.username + '/reels/' + reel.reelKey).remove().then(() => {
+                        renderReelsStrip();
+                        renderAdminPanel();
+                    });
+                }
+            }, 800);
+        });
+        div.addEventListener('mouseup', () => clearTimeout(longPressTimer));
+        div.addEventListener('mouseleave', () => clearTimeout(longPressTimer));
+        
+        // Короткое нажатие - открыть
         div.onclick = () => {
             if (reel.url && isValidImageUrl(reel.url)) {
                 reelImage.src = reel.url;
@@ -1812,7 +1933,6 @@ function renderReelsStrip() {
 // ============ ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ ============
 function openUserProfile(username) {
     if (username === currentUser.username) {
-        // Переключаемся на свой профиль
         document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
         document.querySelector('[data-page="pageProfile"]').classList.add('active');
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -1830,6 +1950,8 @@ function openUserProfile(username) {
     const isFollowing = currentUser.following && currentUser.following[username];
     const followersCount = user.followers ? Object.keys(user.followers).length : 0;
     const friendsCount = user.friends ? Object.keys(user.friends).length : 0;
+    const isBanned = isUserBanned(username);
+    const banTimeLeft = getBanTimeLeft(username);
     
     let avatarHtml = '';
     if (user.avatar && user.avatar.startsWith('http')) {
@@ -1839,20 +1961,31 @@ function openUserProfile(username) {
     }
     
     const badge = getVerifiedBadge(username, 'big');
+    const banBadge = isBanned ? `<span class="ban-badge">🔨 БАН</span>` : '';
     
     let actionsHtml = '';
     
-    if (isFriend) {
+    if (isBanned) {
+        actionsHtml = `<span style="color:#ff3b30;font-weight:600;">🔨 Забанен (осталось ${banTimeLeft} мин.)</span>`;
+        if (isAdmin) {
+            actionsHtml += `<button class="btn-sm success" onclick="adminUnbanUser('${username}')">Разбанить</button>`;
+        }
+    } else if (isFriend) {
         actionsHtml = `<button class="btn-sm success" style="cursor:default;">✅ Друзья</button>`;
+        if (isAdmin) {
+            actionsHtml += `<button class="btn-sm danger" onclick="adminBanUserPrompt('${username}')">🔨 Забанить</button>`;
+        }
     } else if (isFollowing) {
         actionsHtml = `
             <button class="btn-sm danger" onclick="unfollowUser('${username}')">Отписаться</button>
             <button class="btn-sm outline" onclick="openChatFromProfile('${username}')">Написать</button>
+            ${isAdmin ? `<button class="btn-sm danger" onclick="adminBanUserPrompt('${username}')">🔨 Забанить</button>` : ''}
         `;
     } else {
         actionsHtml = `
             <button class="btn-sm" onclick="followUser('${username}')">Подписаться</button>
             <button class="btn-sm outline" onclick="openChatFromProfile('${username}')">Написать</button>
+            ${isAdmin ? `<button class="btn-sm danger" onclick="adminBanUserPrompt('${username}')">🔨 Забанить</button>` : ''}
         `;
     }
     
@@ -1863,6 +1996,7 @@ function openUserProfile(username) {
                 <div class="name-wrapper" style="font-size:22px;font-weight:700;">
                     ${user.name || username}
                     ${badge}
+                    ${banBadge}
                 </div>
                 <div class="username">@${username}</div>
                 <div class="profile-stats">
@@ -1891,6 +2025,10 @@ function closeUserProfile() {
 }
 
 window.followUser = function(username) {
+    if (readonlyMode) {
+        alert('📖 Режим чтения!');
+        return;
+    }
     db.ref('users/' + currentUser.username + '/following/' + username).set(true);
     db.ref('users/' + username + '/followers/' + currentUser.username).set(true);
     
@@ -1915,6 +2053,10 @@ window.followUser = function(username) {
 };
 
 window.unfollowUser = function(username) {
+    if (readonlyMode) {
+        alert('📖 Режим чтения!');
+        return;
+    }
     db.ref('users/' + currentUser.username + '/following/' + username).remove();
     db.ref('users/' + username + '/followers/' + currentUser.username).remove();
     
@@ -1945,6 +2087,19 @@ window.openChatFromProfile = function(username) {
     }, 300);
 };
 
+window.adminBanUserPrompt = function(username) {
+    if (!isAdmin) return;
+    const minutes = prompt(`🔨 Забанить @${username}\nВведите количество минут:`);
+    if (minutes === null) return;
+    const num = parseInt(minutes);
+    if (isNaN(num) || num < 1) {
+        alert('Введите корректное число (от 1 минуты)');
+        return;
+    }
+    adminBanUser(username, num);
+    closeUserProfile();
+};
+
 // ============ АДМИН ПАНЕЛЬ ============
 function renderAdminPanel() {
     if (!isAdmin) return;
@@ -1953,19 +2108,33 @@ function renderAdminPanel() {
     let online = 0;
     let totalPosts = 0;
     let totalReels = 0;
+    let totalMessages = 0;
+    let totalBanned = 0;
     
     for (const u of users) {
         const data = allUsersCache[u];
         if (data && data.online) online++;
         if (data && data.posts) totalPosts += Object.keys(data.posts).length;
         if (data && data.reels) totalReels += Object.keys(data.reels).length;
+        if (data && data.banned) totalBanned++;
     }
+    
+    // Считаем сообщения
+    db.ref('messages').once('value', snap => {
+        const msgs = snap.val() || {};
+        for (const chatId in msgs) {
+            totalMessages += Object.keys(msgs[chatId]).length;
+        }
+        $('statMessages').textContent = totalMessages;
+    });
     
     $('statUsers').textContent = users.length;
     $('statOnline').textContent = online;
     $('statPosts').textContent = totalPosts;
     $('statReels').textContent = totalReels;
+    $('statBanned').textContent = totalBanned;
     
+    // Список пользователей
     const list = $('adminUserList');
     list.innerHTML = '';
     for (const u of users) {
@@ -1973,20 +2142,112 @@ function renderAdminPanel() {
         if (!data) continue;
         const div = document.createElement('div');
         div.className = 'admin-user-item';
+        if (data.banned) div.classList.add('banned-user');
+        
+        const postsCount = data.posts ? Object.keys(data.posts).length : 0;
+        const reelsCount = data.reels ? Object.keys(data.reels).length : 0;
+        const friendsCount = data.friends ? Object.keys(data.friends).length : 0;
+        const isBanned = isUserBanned(u);
+        const banTimeLeft = getBanTimeLeft(u);
+        
         div.innerHTML = `
             <div class="info">
-                <div class="name">${data.name || u} ${data.online ? '🟢' : '⚫'} ${data.verified ? '✅' : ''}</div>
-                <div class="username">@${u}</div>
+                <div class="name">
+                    ${data.name || u} 
+                    ${data.online ? '🟢' : '⚫'} 
+                    ${data.verified ? '✅' : ''}
+                    ${isBanned ? '🔨' : ''}
+                </div>
+                <div class="username">
+                    @${u} • 📝${postsCount} 📹${reelsCount} 🤝${friendsCount}
+                    ${isBanned ? ` • ⏱️${banTimeLeft}мин` : ''}
+                </div>
             </div>
-            <div style="display:flex; gap:4px; flex-wrap:wrap;">
-                <button class="btn-sm success" onclick="adminVerify('${u}')" style="font-size:10px; padding:2px 8px;">✅</button>
-                <button class="btn-sm danger" onclick="adminDeleteUser('${u}')" style="font-size:10px; padding:2px 8px;">🗑️</button>
+            <div class="admin-buttons">
+                <button class="btn-sm success" onclick="adminVerify('${u}')" title="Верификация">✅</button>
+                <button class="btn-sm warning" onclick="adminDeletePostPrompt('${u}')" title="Удалить пост">📝</button>
+                <button class="btn-sm warning" onclick="adminDeleteReelPrompt('${u}')" title="Удалить рилс">📹</button>
+                ${isBanned ? 
+                    `<button class="btn-sm success" onclick="adminUnbanUser('${u}')" title="Разбанить">🔓</button>` :
+                    `<button class="btn-sm danger" onclick="adminBanUserPrompt('${u}')" title="Забанить">🔨</button>`
+                }
+                <button class="btn-sm danger" onclick="adminDeleteUser('${u}')" title="Удалить пользователя">🗑️</button>
             </div>
         `;
         list.appendChild(div);
     }
 }
 
+// Админ функции для удаления постов/рилсов через промпт
+window.adminDeletePostPrompt = function(username) {
+    if (!isAdmin) return;
+    const userData = allUsersCache[username];
+    if (!userData || !userData.posts) {
+        alert('У пользователя нет постов');
+        return;
+    }
+    const posts = userData.posts;
+    let postList = '📝 Посты пользователя:\n\n';
+    let index = 1;
+    const keys = Object.keys(posts);
+    for (const key of keys) {
+        const p = posts[key];
+        postList += `${index}. ${p.text || 'Без текста'} (${new Date(p.time).toLocaleString()})\n`;
+        index++;
+    }
+    postList += `\nВведите номер поста для удаления (1-${keys.length}):`;
+    const choice = prompt(postList);
+    if (choice === null) return;
+    const num = parseInt(choice);
+    if (isNaN(num) || num < 1 || num > keys.length) {
+        alert('Неверный номер');
+        return;
+    }
+    const key = keys[num - 1];
+    if (confirm(`Удалить этот пост?`)) {
+        db.ref('users/' + username + '/posts/' + key).remove().then(() => {
+            renderFeed();
+            renderAdminPanel();
+            alert('✅ Пост удален!');
+        });
+    }
+};
+
+window.adminDeleteReelPrompt = function(username) {
+    if (!isAdmin) return;
+    const userData = allUsersCache[username];
+    if (!userData || !userData.reels) {
+        alert('У пользователя нет рилсов');
+        return;
+    }
+    const reels = userData.reels;
+    let reelList = '📹 Рилсы пользователя:\n\n';
+    let index = 1;
+    const keys = Object.keys(reels);
+    for (const key of keys) {
+        const r = reels[key];
+        reelList += `${index}. ${r.url || 'Без ссылки'} (${new Date(r.time).toLocaleString()})\n`;
+        index++;
+    }
+    reelList += `\nВведите номер рилса для удаления (1-${keys.length}):`;
+    const choice = prompt(reelList);
+    if (choice === null) return;
+    const num = parseInt(choice);
+    if (isNaN(num) || num < 1 || num > keys.length) {
+        alert('Неверный номер');
+        return;
+    }
+    const key = keys[num - 1];
+    if (confirm(`Удалить этот рилс?`)) {
+        db.ref('users/' + username + '/reels/' + key).remove().then(() => {
+            renderReelsStrip();
+            renderAdminPanel();
+            alert('✅ Рилс удален!');
+        });
+    }
+};
+
+// Верификация
 window.adminVerify = function(username) {
     if (!isAdmin) return;
     const ref = db.ref('users/' + username + '/verified');
@@ -2003,13 +2264,14 @@ window.adminVerify = function(username) {
     });
 };
 
+// Удаление пользователя
 window.adminDeleteUser = function(username) {
     if (!isAdmin) return;
     if (username === 'BarsikNet') {
         alert('Нельзя удалить главного админа!');
         return;
     }
-    if (confirm(`Удалить пользователя @${username}?`)) {
+    if (confirm(`🗑️ Удалить пользователя @${username} и все его данные?`)) {
         db.ref('users/' + username).remove().then(() => {
             renderAdminPanel();
             renderFeed();
@@ -2017,6 +2279,7 @@ window.adminDeleteUser = function(username) {
             renderFriends();
             renderSearch();
             renderReelsStrip();
+            alert(`✅ Пользователь @${username} удален!`);
         });
     }
 };
@@ -2024,6 +2287,20 @@ window.adminDeleteUser = function(username) {
 $('adminRefresh').onclick = () => {
     renderAdminPanel();
     alert('✅ Обновлено!');
+};
+
+// ============ РЕЖИМ ЧТЕНИЯ ============
+readonlyToggle.onclick = () => {
+    readonlyMode = !readonlyMode;
+    readonlyToggle.classList.toggle('active', readonlyMode);
+    document.body.classList.toggle('readonly', readonlyMode);
+    readonlyStatus.textContent = readonlyMode ? 'Включен 🔒' : 'Выключен';
+    saveReadonlyMode();
+    if (readonlyMode) {
+        alert('📖 Режим чтения ВКЛЮЧЕН!\nВсе пользователи не могут:\n- Публиковать посты\n- Публиковать рилсы\n- Писать сообщения\n- Ставить лайки\n- Комментировать');
+    } else {
+        alert('📖 Режим чтения ВЫКЛЮЧЕН!');
+    }
 };
 
 // ============ ЧАТ ============
@@ -2044,8 +2321,11 @@ function renderChatList() {
     for (const u of friends) {
         const user = allUsersCache[u];
         if (!user) continue;
+        const isBanned = isUserBanned(u);
         const item = document.createElement('div');
         item.className = 'chat-item';
+        if (isBanned) item.style.opacity = '0.5';
+        
         const av = document.createElement('div');
         av.className = 'avatar';
         if (user.avatar && user.avatar.startsWith('http')) {
@@ -2060,7 +2340,7 @@ function renderChatList() {
         } else {
             av.textContent = user.avatar || '🐱';
         }
-        if (user.online) av.classList.add('online');
+        if (user.online && !isBanned) av.classList.add('online');
         item.appendChild(av);
         const info = document.createElement('div');
         info.className = 'info';
@@ -2071,19 +2351,36 @@ function renderChatList() {
         nameWrapper.appendChild(nameSpan);
         const badge = getVerifiedBadge(u);
         if (badge) nameWrapper.innerHTML += badge;
+        if (isBanned) nameWrapper.innerHTML += ' <span style="color:#ff3b30;font-size:10px;">🔨</span>';
         info.appendChild(nameWrapper);
         const statusDiv = document.createElement('div');
         statusDiv.className = 'status';
-        if (user.online) statusDiv.textContent = '🟢 в сети';
-        else statusDiv.textContent = 'был(а) ' + (user.lastSeen ? new Date(user.lastSeen).toLocaleString() : 'недавно');
+        if (isBanned) {
+            statusDiv.textContent = '🔨 Забанен';
+            statusDiv.style.color = '#ff3b30';
+        } else if (user.online) {
+            statusDiv.textContent = '🟢 в сети';
+        } else {
+            statusDiv.textContent = 'был(а) ' + (user.lastSeen ? new Date(user.lastSeen).toLocaleString() : 'недавно');
+        }
         info.appendChild(statusDiv);
         item.appendChild(info);
-        item.onclick = () => openChat(u);
+        item.onclick = () => {
+            if (isBanned) {
+                alert('🔨 Этот пользователь забанен');
+                return;
+            }
+            openChat(u);
+        };
         chatList.appendChild(item);
     }
 }
 
 function openChat(username) {
+    if (isUserBanned(username)) {
+        alert('🔨 Этот пользователь забанен');
+        return;
+    }
     if (currentChat && chatListeners[currentChat]) {
         chatListeners[currentChat]();
         delete chatListeners[currentChat];
@@ -2133,10 +2430,15 @@ function renderChatMessages(username) {
     const user = allUsersCache[username];
     if (!user) return;
     
-    if (user.online) {
+    if (isUserBanned(username)) {
+        chatPartnerStatus.textContent = '🔨 Забанен';
+        chatPartnerStatus.style.color = '#ff3b30';
+    } else if (user.online) {
         chatPartnerStatus.textContent = '🟢 в сети';
+        chatPartnerStatus.style.color = '';
     } else {
         chatPartnerStatus.textContent = 'был(а) ' + (user.lastSeen ? new Date(user.lastSeen).toLocaleString() : 'недавно');
+        chatPartnerStatus.style.color = '';
     }
     
     const chatId = getChatId(currentUser.username, username);
@@ -2173,6 +2475,11 @@ function renderChatMessages(username) {
 }
 
 function checkChatLimit(username) {
+    if (isUserBanned(username)) {
+        chatWarning.textContent = '🔨 Этот пользователь забанен';
+        chatWarning.style.color = '#ff3b30';
+        return;
+    }
     const isFriend = currentUser.friends && currentUser.friends[username];
     if (!isFriend) {
         const chatId = getChatId(currentUser.username, username);
@@ -2198,6 +2505,14 @@ function checkChatLimit(username) {
 }
 
 function sendMessage(text, username) {
+    if (readonlyMode) {
+        alert('📖 Режим чтения! Отправка сообщений запрещена.');
+        return;
+    }
+    if (isUserBanned(username)) {
+        alert('🔨 Этот пользователь забанен');
+        return;
+    }
     const chatId = getChatId(currentUser.username, username);
     const ref = db.ref('messages/' + chatId);
     ref.push().set({
@@ -2213,6 +2528,14 @@ chatSend.onclick = () => {
     const text = chatInput.value.trim();
     if (!text || !currentChat) return;
     const username = currentChat;
+    if (isUserBanned(username)) {
+        alert('🔨 Этот пользователь забанен');
+        return;
+    }
+    if (readonlyMode) {
+        alert('📖 Режим чтения! Отправка сообщений запрещена.');
+        return;
+    }
     const isFriend = currentUser.friends && currentUser.friends[username];
     
     if (!isFriend) {
@@ -2265,8 +2588,11 @@ function renderSearch() {
     for (const u of results) {
         const user = allUsersCache[u];
         if (!user) continue;
+        const isBanned = isUserBanned(u);
         const card = document.createElement('div');
         card.className = 'user-card';
+        if (isBanned) card.style.opacity = '0.5';
+        
         const info = document.createElement('div');
         info.className = 'info';
         const nameWrapper = document.createElement('div');
@@ -2278,6 +2604,7 @@ function renderSearch() {
         nameWrapper.appendChild(nameSpan);
         const badge = getVerifiedBadge(u);
         if (badge) nameWrapper.innerHTML += badge;
+        if (isBanned) nameWrapper.innerHTML += ' <span style="color:#ff3b30;font-size:10px;">🔨</span>';
         info.appendChild(nameWrapper);
         const uname = document.createElement('div');
         uname.className = 'username';
@@ -2291,7 +2618,11 @@ function renderSearch() {
         const btn = document.createElement('button');
         btn.className = 'btn-sm';
         
-        if (isFriend) {
+        if (isBanned) {
+            btn.textContent = '🔨 Забанен';
+            btn.className = 'btn-sm banned';
+            btn.style.cursor = 'default';
+        } else if (isFriend) {
             btn.textContent = 'Друзья ✅';
             btn.style.background = '#34c759';
             btn.style.cursor = 'default';
@@ -2340,13 +2671,15 @@ function renderSearch() {
         }
         card.appendChild(btn);
         
-        const writeBtn = document.createElement('button');
-        writeBtn.className = 'btn-sm outline';
-        writeBtn.textContent = 'Написать';
-        writeBtn.onclick = () => {
-            openChat(u);
-        };
-        card.appendChild(writeBtn);
+        if (!isBanned) {
+            const writeBtn = document.createElement('button');
+            writeBtn.className = 'btn-sm outline';
+            writeBtn.textContent = 'Написать';
+            writeBtn.onclick = () => {
+                openChat(u);
+            };
+            card.appendChild(writeBtn);
+        }
         searchResults.appendChild(card);
     }
 }
@@ -2364,8 +2697,11 @@ function renderFriends() {
     for (const u of friends) {
         const user = allUsersCache[u];
         if (!user) continue;
+        const isBanned = isUserBanned(u);
         const card = document.createElement('div');
         card.className = 'user-card';
+        if (isBanned) card.style.opacity = '0.5';
+        
         const info = document.createElement('div');
         info.className = 'info';
         const nameWrapper = document.createElement('div');
@@ -2377,17 +2713,27 @@ function renderFriends() {
         nameWrapper.appendChild(nameSpan);
         const badge = getVerifiedBadge(u);
         if (badge) nameWrapper.innerHTML += badge;
+        if (isBanned) nameWrapper.innerHTML += ' <span style="color:#ff3b30;font-size:10px;">🔨</span>';
         info.appendChild(nameWrapper);
         const uname = document.createElement('div');
         uname.className = 'username';
         uname.textContent = '@' + u;
         info.appendChild(uname);
         card.appendChild(info);
-        const btn = document.createElement('button');
-        btn.className = 'btn-sm';
-        btn.textContent = 'Написать';
-        btn.onclick = () => { openChat(u); };
-        card.appendChild(btn);
+        
+        if (!isBanned) {
+            const btn = document.createElement('button');
+            btn.className = 'btn-sm';
+            btn.textContent = 'Написать';
+            btn.onclick = () => { openChat(u); };
+            card.appendChild(btn);
+        } else {
+            const btn = document.createElement('button');
+            btn.className = 'btn-sm banned';
+            btn.textContent = '🔨 Забанен';
+            btn.style.cursor = 'default';
+            card.appendChild(btn);
+        }
         friendsList.appendChild(card);
     }
 }
@@ -2417,7 +2763,6 @@ function renderProfile() {
     profileBadge.innerHTML = badge;
     profileUsername.textContent = '@' + user.username;
     
-    // Статистика
     const friendsCount = user.friends ? Object.keys(user.friends).length : 0;
     const followersCount = user.followers ? Object.keys(user.followers).length : 0;
     profileFriendsCount.textContent = friendsCount;
@@ -2521,7 +2866,10 @@ postText.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey
 
 console.log('🐱 BarsikNet готов!');
 console.log('📱 Адаптировано для iPhone');
-console.log('👤 При клике на имя в чате открывается профиль!');
+console.log('👑 Расширенная админ-панель:');
+console.log('  • Удаление постов/рилсов (выбор)');
+console.log('  • Режим чтения (все не могут писать/публиковать)');
+console.log('  • Бан пользователей (на выбор минут)');
 </script>
 </body>
 </html>
