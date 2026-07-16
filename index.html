@@ -229,6 +229,7 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
+            display: block;
         }
         .avatar.online { border-color: var(--online); }
         .post-content { margin: 6px 0 10px; word-wrap: break-word; }
@@ -236,9 +237,10 @@
             width: 100%;
             border-radius: 12px;
             margin: 8px 0;
-            max-height: 300px;
-            object-fit: cover;
-            background: var(--border);
+            max-height: 400px;
+            object-fit: contain;
+            background: var(--bg);
+            display: block;
         }
         .post-time {
             font-size: 11px;
@@ -276,6 +278,9 @@
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 2px;
         }
         .reel-view {
             position: fixed;
@@ -297,6 +302,7 @@
             max-height: 70vh;
             border-radius: 16px;
             box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+            object-fit: contain;
         }
         .reel-view .close {
             position: absolute;
@@ -454,6 +460,11 @@
             font-size: 36px;
             margin-bottom: 8px;
         }
+        .profile-header .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
         .profile-header .name-wrapper {
             display: flex;
             align-items: center;
@@ -571,7 +582,7 @@
             border-color: var(--primary);
         }
         
-        /* ============ ГАЛОЧКА ВЕРИФИКАЦИИ (INSTAGRAM СТИЛЬ) ============ */
+        /* ============ ГАЛОЧКА ВЕРИФИКАЦИИ ============ */
         .verified-badge {
             display: inline-flex;
             align-items: center;
@@ -592,29 +603,57 @@
         .dark .verified-badge {
             border-color: #1a1a2e;
         }
-        
-        /* Для маленьких размеров */
         .verified-badge-sm {
             width: 14px;
             height: 14px;
             font-size: 7px;
         }
-        
-        .verified-badge img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            border-radius: 50%;
-        }
-        
         .name-wrapper {
             display: flex;
             align-items: center;
             gap: 4px;
         }
-        
         .post-header .name-wrapper {
             font-weight: 600;
+        }
+        .post-media-container {
+            position: relative;
+            width: 100%;
+            border-radius: 12px;
+            overflow: hidden;
+            background: var(--bg);
+            margin: 8px 0;
+        }
+        .post-media-container img {
+            width: 100%;
+            display: block;
+            border-radius: 12px;
+            max-height: 400px;
+            object-fit: contain;
+            background: var(--bg);
+        }
+        .post-media-container .fallback {
+            padding: 30px;
+            text-align: center;
+            background: var(--bg);
+            border-radius: 12px;
+            color: var(--text);
+            opacity: 0.5;
+            font-size: 14px;
+        }
+        .post-media-container .fallback span {
+            font-size: 11px;
+            display: block;
+            margin-top: 4px;
+        }
+        @media (max-width: 480px) {
+            .post-media-container img {
+                max-height: 300px;
+            }
+            .post-media-container .fallback {
+                padding: 20px;
+                font-size: 12px;
+            }
         }
     </style>
 </head>
@@ -797,13 +836,32 @@ function getVerifiedBadge(username, size = 'normal') {
     return '';
 }
 
-// Для вставки в элементы
-function addBadgeToElement(element, username, size = 'normal') {
-    if (!element) return;
-    const badge = getVerifiedBadge(username, size);
-    if (badge) {
-        element.innerHTML = element.textContent + badge;
+// ============ ФУНКЦИЯ ДЛЯ АВАТАРКИ С ОБРЕЗКОЙ ============
+function createAvatarElement(username, size = 'normal') {
+    const user = allUsersCache[username];
+    if (!user) return '🐱';
+    
+    const sizeClass = size === 'small' ? ' avatar-sm' : '';
+    const wrapper = document.createElement('div');
+    wrapper.className = 'avatar' + sizeClass;
+    
+    if (user.avatar && user.avatar.startsWith('http')) {
+        const img = document.createElement('img');
+        img.src = user.avatar;
+        img.alt = 'avatar';
+        img.loading = 'lazy';
+        img.onerror = function() {
+            this.style.display = 'none';
+            wrapper.textContent = '🐱';
+        };
+        wrapper.appendChild(img);
+    } else {
+        wrapper.textContent = user.avatar || '🐱';
     }
+    
+    if (user.online) wrapper.classList.add('online');
+    
+    return wrapper;
 }
 
 // Auth switch
@@ -991,7 +1049,7 @@ publishPostBtn.onclick = () => {
         alert('Напишите текст или добавьте фото');
         return;
     }
-    if (imageUrl && !imageUrl.match(/\.(jpeg|jpg|gif|png|webp|svg|bmp)/i)) {
+    if (imageUrl && !imageUrl.match(/\.(jpeg|jpg|gif|png|webp|svg|bmp|ico)/i)) {
         alert('Ссылка на фото должна быть на изображение');
         return;
     }
@@ -1046,10 +1104,19 @@ function renderFeed() {
         av.className = 'avatar';
         const user = allUsersCache[p.username];
         if (user && user.avatar && user.avatar.startsWith('http')) {
-            av.innerHTML = `<img src="${user.avatar}" />`;
+            const img = document.createElement('img');
+            img.src = user.avatar;
+            img.alt = 'avatar';
+            img.loading = 'lazy';
+            img.onerror = function() {
+                this.style.display = 'none';
+                av.textContent = '🐱';
+            };
+            av.appendChild(img);
         } else {
             av.textContent = (user && user.avatar) || '🐱';
         }
+        if (user && user.online) av.classList.add('online');
         header.appendChild(av);
         
         const nameWrapper = document.createElement('span');
@@ -1057,7 +1124,6 @@ function renderFeed() {
         const nameSpan = document.createElement('span');
         nameSpan.textContent = p.name || p.username;
         nameWrapper.appendChild(nameSpan);
-        // Добавляем галочку
         const badge = getVerifiedBadge(p.username);
         if (badge) {
             nameWrapper.innerHTML += badge;
@@ -1071,13 +1137,36 @@ function renderFeed() {
             text.textContent = p.text;
             card.appendChild(text);
         }
-        if (p.url && p.url.match(/\.(jpeg|jpg|gif|png|webp|svg)/i)) {
+        
+        if (p.url && p.url.match(/\.(jpeg|jpg|gif|png|webp|svg|bmp|ico)/i)) {
+            const container = document.createElement('div');
+            container.className = 'post-media-container';
+            
             const img = document.createElement('img');
-            img.className = 'post-media';
             img.src = p.url;
             img.alt = 'медиа';
-            card.appendChild(img);
+            img.loading = 'lazy';
+            img.crossOrigin = 'anonymous';
+            
+            img.onerror = function() {
+                this.style.display = 'none';
+                const fallback = document.createElement('div');
+                fallback.className = 'fallback';
+                fallback.innerHTML = '🖼️ Фото не загрузилось<br><span>Попробуйте обновить</span>';
+                container.appendChild(fallback);
+            };
+            
+            img.onclick = function(e) {
+                e.stopPropagation();
+                if (window.innerWidth < 768) {
+                    window.open(this.src, '_blank');
+                }
+            };
+            
+            container.appendChild(img);
+            card.appendChild(container);
         }
+        
         const timeDiv = document.createElement('div');
         timeDiv.className = 'post-time';
         timeDiv.textContent = new Date(p.time).toLocaleString();
@@ -1086,11 +1175,11 @@ function renderFeed() {
     }
 }
 
-// ============ РИЛСЫ (BARSIKNET ВИДЯТ ВСЕ) ============
+// ============ РИЛСЫ ============
 publishReelBtn.onclick = () => {
     const url = reelInput.value.trim();
     if (!url) return;
-    if (!url.match(/\.(jpeg|jpg|gif|png|webp|svg|bmp)/i)) {
+    if (!url.match(/\.(jpeg|jpg|gif|png|webp|svg|bmp|ico)/i)) {
         alert('Пожалуйста, введите ссылку на фото (jpeg, png, gif, webp, svg, bmp)');
         return;
     }
@@ -1151,7 +1240,15 @@ function renderReelsStrip() {
         avatarDiv.className = 'avatar';
         const user = allUsersCache[reel.username];
         if (user && user.avatar && user.avatar.startsWith('http')) {
-            avatarDiv.innerHTML = `<img src="${user.avatar}" />`;
+            const img = document.createElement('img');
+            img.src = user.avatar;
+            img.alt = 'avatar';
+            img.loading = 'lazy';
+            img.onerror = function() {
+                this.style.display = 'none';
+                avatarDiv.textContent = '🐱';
+            };
+            avatarDiv.appendChild(img);
         } else {
             avatarDiv.textContent = (user && user.avatar) || '🐱';
         }
@@ -1159,7 +1256,6 @@ function renderReelsStrip() {
         
         const label = document.createElement('span');
         label.textContent = reel.username;
-        // Добавляем галочку маленькую
         const badge = getVerifiedBadge(reel.username, 'small');
         if (badge) {
             label.innerHTML += badge;
@@ -1198,7 +1294,15 @@ function renderChatList() {
         const av = document.createElement('div');
         av.className = 'avatar';
         if (user.avatar && user.avatar.startsWith('http')) {
-            av.innerHTML = `<img src="${user.avatar}" />`;
+            const img = document.createElement('img');
+            img.src = user.avatar;
+            img.alt = 'avatar';
+            img.loading = 'lazy';
+            img.onerror = function() {
+                this.style.display = 'none';
+                av.textContent = '🐱';
+            };
+            av.appendChild(img);
         } else {
             av.textContent = user.avatar || '🐱';
         }
@@ -1539,7 +1643,16 @@ function renderProfile() {
     if (!currentUser) return;
     const user = currentUser;
     if (user.avatar && user.avatar.startsWith('http')) {
-        profileAvatar.innerHTML = `<img src="${user.avatar}" />`;
+        const img = document.createElement('img');
+        img.src = user.avatar;
+        img.alt = 'avatar';
+        img.loading = 'lazy';
+        img.onerror = function() {
+            this.style.display = 'none';
+            profileAvatar.textContent = '🐱';
+        };
+        profileAvatar.innerHTML = '';
+        profileAvatar.appendChild(img);
     } else {
         profileAvatar.textContent = user.avatar || '🐱';
     }
@@ -1595,6 +1708,8 @@ console.log('🐱 BarsikNet готов!');
 console.log('📝 Посты видят все пользователи');
 console.log('📹 Рилсы BarsikNet видят все, остальные - только друзья');
 console.log('✅ Синяя галочка верификации как в Instagram');
+console.log('📱 Фикс для фото на телефонах');
+console.log('🖼️ Аватарки обрезаются под круг (object-fit: cover)');
 console.log('💡 Чтобы добавить галочку: в Firebase у пользователя поставь verified: true');
 </script>
 </body>
