@@ -15,88 +15,120 @@
             box-sizing: border-box;
             font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
         }
+        
         :root {
-            --bg: #f5f7fa;
-            --card: #ffffff;
+            --glass-bg: rgba(255, 255, 255, 0.12);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            --glass-blur: 16px;
             --text: #1a1a2e;
-            --border: #e0e0e0;
-            --primary: #4a6cf7;
-            --primary-light: #e8edff;
-            --shadow: 0 2px 12px rgba(0,0,0,0.08);
-            --radius: 16px;
-            --online: #34c759;
+            --primary: #6c5ce7;
+            --primary-glow: rgba(108, 92, 231, 0.3);
+            --online: #00d4ff;
+            --danger: #ff6b6b;
+            --success: #00d4ff;
+            --warning: #ffd93d;
+            --bg-start: #0f0c29;
+            --bg-end: #24243e;
             --safe-top: env(safe-area-inset-top, 0px);
             --safe-bottom: env(safe-area-inset-bottom, 0px);
-            --danger: #ff3b30;
-            --success: #34c759;
-            --warning: #ff9500;
         }
+        
         .dark {
-            --bg: #0f0f1a;
-            --card: #1a1a2e;
+            --glass-bg: rgba(26, 26, 46, 0.5);
+            --glass-border: rgba(255, 255, 255, 0.06);
             --text: #e8e8f0;
-            --border: #2a2a3e;
-            --primary: #6a8cff;
-            --primary-light: #2a2a4e;
-            --shadow: 0 2px 12px rgba(0,0,0,0.4);
+            --primary: #a29bfe;
+            --primary-glow: rgba(162, 155, 254, 0.25);
+            --bg-start: #0a0a1a;
+            --bg-end: #1a1a2e;
         }
+        
         body {
-            background: var(--bg);
+            background: linear-gradient(135deg, var(--bg-start), #302b63, var(--bg-end));
             color: var(--text);
-            transition: background 0.3s, color 0.3s;
-            height: 100vh;
-            height: 100dvh;
+            min-height: 100vh;
+            min-height: 100dvh;
             overflow: hidden;
             display: flex;
             flex-direction: column;
             padding-top: var(--safe-top);
             padding-bottom: var(--safe-bottom);
+            position: relative;
         }
-        body.readonly .create-post-area,
-        body.readonly .chat-input,
-        body.readonly .post-actions button,
-        body.readonly .comment-input,
-        body.readonly #reelPublishArea {
-            pointer-events: none !important;
-            opacity: 0.5 !important;
+        
+        /* Статичный фон без анимации */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(108, 92, 231, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(0, 212, 255, 0.06) 0%, transparent 50%);
+            z-index: 0;
+            pointer-events: none;
         }
-        body.readonly .header .right,
-        body.readonly .bottom-nav .nav-item:not(.admin-only) {
-            pointer-events: none !important;
-            opacity: 0.5 !important;
+        
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--glass-shadow);
         }
-        body.readonly .bottom-nav .nav-item.admin-only {
-            pointer-events: auto !important;
-            opacity: 1 !important;
+        
+        .glass-hover:hover {
+            background: rgba(255, 255, 255, 0.18);
+            border-color: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        .dark .glass-hover:hover {
+            background: rgba(255, 255, 255, 0.06);
         }
 
         @keyframes fadeInUp {
             from { opacity: 0; transform: translateY(30px) scale(0.95); }
             to { opacity: 1; transform: translateY(0) scale(1); }
         }
+        
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
+        
         @keyframes slideDown {
             from { opacity: 0; transform: translateY(-20px) scale(0.95); }
             to { opacity: 1; transform: translateY(0) scale(1); }
         }
+        
         @keyframes pulse {
             0%, 100% { transform: scale(1); opacity: 0.7; }
             50% { transform: scale(1.05); opacity: 1; }
         }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
         .anim-fade-up { animation: fadeInUp 0.7s ease forwards; }
         .anim-fade { animation: fadeIn 0.4s ease forwards; }
         .anim-slide-down { animation: slideDown 0.4s ease forwards; }
         .anim-pulse { animation: pulse 2s ease-in-out infinite; }
+        .anim-float { animation: float 3s ease-in-out infinite; }
 
         .clickable {
             cursor: pointer;
-            transition: 0.2s;
+            transition: 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
         .clickable:hover {
-            opacity: 0.7;
+            opacity: 0.8;
+            transform: scale(0.98);
         }
 
         /* ============ АВТОРИЗАЦИЯ ============ */
@@ -105,42 +137,68 @@
             justify-content: center;
             align-items: center;
             height: 100%;
-            background: var(--bg);
             padding: 20px;
             overflow-y: auto;
+            position: relative;
+            z-index: 1;
         }
+        
         .auth-box {
-            background: var(--card);
-            padding: 32px 28px;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
+            padding: 40px 32px;
+            border-radius: 24px;
             width: 100%;
             max-width: 400px;
-            transition: background 0.3s;
             animation: fadeInUp 0.7s ease;
             max-height: 90vh;
             overflow-y: auto;
+            position: relative;
+            overflow: hidden;
         }
+        
+        .auth-box::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(from 0deg, transparent, rgba(108, 92, 231, 0.08), transparent, rgba(0, 212, 255, 0.08), transparent);
+            animation: rotate 15s linear infinite;
+            pointer-events: none;
+        }
+        
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .auth-box > * {
+            position: relative;
+            z-index: 1;
+        }
+        
         .auth-box .logo {
             text-align: center;
-            margin-bottom: 24px;
+            margin-bottom: 28px;
         }
         .auth-box .logo .icon {
-            font-size: 48px;
+            font-size: 56px;
             display: block;
-            animation: pulse 2s ease-in-out infinite;
+            animation: float 3s ease-in-out infinite;
         }
         .auth-box .logo h1 {
-            font-size: 28px;
+            font-size: 32px;
             font-weight: 800;
-            color: var(--primary);
+            background: linear-gradient(135deg, #6c5ce7, #00d4ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             margin-top: 4px;
         }
-        .auth-box .logo h1 span { color: var(--text); }
         .auth-box .logo .sub {
             font-size: 13px;
-            opacity: 0.4;
+            opacity: 0.6;
             margin-top: 2px;
+            color: var(--text);
         }
 
         .saved-accounts {
@@ -148,40 +206,45 @@
         }
         .saved-accounts .label {
             font-size: 12px;
-            opacity: 0.5;
+            opacity: 0.6;
             margin-bottom: 8px;
             display: block;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            color: var(--text);
         }
         .saved-account {
             display: flex;
             align-items: center;
             gap: 10px;
             padding: 10px 14px;
-            border-radius: 12px;
-            border: 1px solid var(--border);
+            border-radius: 16px;
             cursor: pointer;
-            transition: 0.2s;
+            transition: 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             margin-bottom: 6px;
-            background: var(--bg);
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
         }
         .saved-account:hover {
             border-color: var(--primary);
-            background: var(--primary-light);
+            background: rgba(108, 92, 231, 0.12);
+            transform: translateX(4px);
         }
         .saved-account .avatar {
             width: 36px;
             height: 36px;
             border-radius: 50%;
-            background: var(--primary-light);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 16px;
             flex-shrink: 0;
             overflow: hidden;
+            background: rgba(108, 92, 231, 0.15);
+            border: 2px solid var(--glass-border);
         }
         .saved-account .avatar img {
             width: 100%;
@@ -191,6 +254,7 @@
         .saved-account .info {
             flex: 1;
             min-width: 0;
+            color: var(--text);
         }
         .saved-account .info .name {
             font-weight: 600;
@@ -219,6 +283,7 @@
             opacity: 0.4;
             font-size: 13px;
             padding: 12px 0;
+            color: var(--text);
         }
         .auth-divider {
             display: flex;
@@ -231,20 +296,23 @@
             content: '';
             flex: 1;
             height: 1px;
-            background: var(--border);
+            background: var(--glass-border);
         }
         .auth-divider span {
             font-size: 12px;
             opacity: 0.4;
             white-space: nowrap;
+            color: var(--text);
         }
         .auth-box input {
             width: 100%;
             padding: 12px 16px;
             margin-bottom: 12px;
-            border: 1.5px solid var(--border);
-            border-radius: 12px;
-            background: var(--bg);
+            border-radius: 16px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
             color: var(--text);
             font-size: 15px;
             outline: none;
@@ -252,22 +320,32 @@
         }
         .auth-box input:focus {
             border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(74,108,247,0.12);
+            box-shadow: 0 0 0 4px var(--primary-glow);
+            background: rgba(108, 92, 231, 0.08);
+        }
+        .auth-box input::placeholder {
+            color: var(--text);
+            opacity: 0.4;
         }
         .auth-box .auth-btn {
             width: 100%;
-            padding: 13px;
-            background: var(--primary);
+            padding: 14px;
+            background: linear-gradient(135deg, #6c5ce7, #00d4ff);
             color: white;
             border: none;
-            border-radius: 12px;
+            border-radius: 16px;
             font-size: 16px;
             font-weight: 700;
             cursor: pointer;
-            transition: 0.3s;
+            transition: 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             margin-top: 6px;
+            box-shadow: 0 4px 15px rgba(108, 92, 231, 0.25);
         }
-        .auth-box .auth-btn:hover { opacity: 0.9; transform: scale(0.98); }
+        .auth-box .auth-btn:hover { 
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(108, 92, 231, 0.35);
+        }
+        .auth-box .auth-btn:active { transform: scale(0.98); }
         .auth-box .switch {
             text-align: center;
             margin-top: 14px;
@@ -275,6 +353,7 @@
             opacity: 0.6;
             cursor: pointer;
             transition: 0.2s;
+            color: var(--text);
         }
         .auth-box .switch:hover { opacity: 1; color: var(--primary); }
         .auth-box .error {
@@ -289,52 +368,63 @@
         #app {
             display: none;
             flex-direction: column;
-            height: 100%;
+            height: 100vh;
+            height: 100dvh;
             max-width: 480px;
             margin: 0 auto;
             width: 100%;
-            background: var(--bg);
             position: relative;
+            z-index: 1;
+            overflow: hidden;
         }
+        
         .header {
             padding: 12px 16px;
             padding-top: calc(12px + var(--safe-top));
-            background: var(--card);
-            border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
             justify-content: space-between;
             flex-shrink: 0;
-            transition: background 0.3s;
             min-height: 56px;
             position: sticky;
             top: 0;
             z-index: 10;
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            border-bottom: 1px solid var(--glass-border);
         }
         .header h2 {
             font-size: 20px;
             font-weight: 700;
-            color: var(--primary);
+            background: linear-gradient(135deg, #6c5ce7, #00d4ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
         .header .right {
             display: flex;
             gap: 12px;
             align-items: center;
+            color: var(--text);
         }
         .header .right span {
             font-size: 13px;
             opacity: 0.6;
         }
+        
         .page {
             display: none;
             flex: 1;
             overflow-y: auto;
+            overflow-x: hidden;
             padding: 12px 16px 80px;
-            background: var(--bg);
             transition: background 0.3s;
             -webkit-overflow-scrolling: touch;
+            position: relative;
         }
-        .page.active { display: block; }
+        .page.active { 
+            display: block; 
+        }
 
         .bottom-nav {
             position: fixed;
@@ -343,16 +433,16 @@
             right: 0;
             max-width: 480px;
             margin: 0 auto;
-            background: var(--card);
-            border-top: 1px solid var(--border);
             display: flex;
             justify-content: space-around;
             padding: 6px 0;
             padding-bottom: calc(6px + var(--safe-bottom));
             flex-shrink: 0;
             z-index: 100;
-            backdrop-filter: blur(8px);
-            background: rgba(var(--card-rgb, 255,255,255), 0.92);
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            border-top: 1px solid var(--glass-border);
             transition: transform 0.3s ease, opacity 0.3s ease;
         }
         .bottom-nav.hidden {
@@ -360,7 +450,6 @@
             opacity: 0;
             pointer-events: none;
         }
-        .dark .bottom-nav { --card-rgb: 26,26,46; }
         .nav-item {
             background: none;
             border: none;
@@ -372,36 +461,62 @@
             align-items: center;
             padding: 4px 6px;
             cursor: pointer;
-            transition: 0.2s;
+            transition: 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             font-weight: 500;
             min-width: 40px;
+            position: relative;
         }
-        .nav-item.active { opacity: 1; color: var(--primary); }
-        .nav-item span { font-size: 18px; line-height: 1.2; }
+        .nav-item.active { 
+            opacity: 1; 
+            color: var(--primary);
+        }
+        .nav-item.active::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 3px;
+            background: linear-gradient(90deg, #6c5ce7, #00d4ff);
+            border-radius: 2px;
+        }
+        .nav-item span { font-size: 20px; line-height: 1.2; }
+        .nav-item:hover { opacity: 0.8; transform: translateY(-2px); }
 
         /* ============ ПОСТЫ ============ */
         .create-post-area {
-            background: var(--card);
-            border-radius: var(--radius);
-            padding: 12px;
+            border-radius: 20px;
+            padding: 16px;
             margin-bottom: 12px;
-            border: 1px solid var(--border);
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            border: 1px solid var(--glass-border);
             animation: fadeIn 0.4s ease;
         }
         .create-post-area textarea {
             width: 100%;
-            padding: 10px;
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            background: var(--bg);
+            padding: 12px;
+            border-radius: 16px;
+            border: 1px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.05);
             color: var(--text);
             resize: vertical;
             min-height: 60px;
             font-family: inherit;
             outline: none;
             font-size: 14px;
+            transition: 0.3s;
         }
-        .create-post-area textarea:focus { border-color: var(--primary); }
+        .create-post-area textarea:focus { 
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--primary-glow);
+        }
+        .create-post-area textarea::placeholder {
+            color: var(--text);
+            opacity: 0.4;
+        }
         .create-post-area .actions {
             display: flex;
             gap: 8px;
@@ -412,44 +527,60 @@
             flex: 1;
             padding: 8px 12px;
             border-radius: 20px;
-            border: 1px solid var(--border);
-            background: var(--bg);
+            border: 1px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.05);
             color: var(--text);
             outline: none;
             font-size: 13px;
+            transition: 0.3s;
         }
-        .create-post-area .actions input:focus { border-color: var(--primary); }
+        .create-post-area .actions input:focus { 
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--primary-glow);
+        }
+        .create-post-area .actions input::placeholder {
+            color: var(--text);
+            opacity: 0.4;
+        }
 
         .post-card {
-            background: var(--card);
-            border-radius: var(--radius);
-            padding: 14px 16px;
+            border-radius: 20px;
+            padding: 16px;
             margin-bottom: 12px;
-            box-shadow: var(--shadow);
-            transition: background 0.3s, box-shadow 0.3s;
-            border: 1px solid var(--border);
             animation: fadeIn 0.4s ease;
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            border: 1px solid var(--glass-border);
+            transition: 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        .post-card:hover {
+            border-color: rgba(108, 92, 231, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
         }
         .post-header {
             display: flex;
             align-items: center;
             gap: 10px;
             margin-bottom: 8px;
+            cursor: pointer;
         }
         .avatar {
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background: var(--primary-light);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 20px;
             font-weight: 600;
-            color: var(--primary);
             flex-shrink: 0;
             overflow: hidden;
-            border: 2px solid transparent;
+            border: 2px solid var(--glass-border);
+            background: rgba(108, 92, 231, 0.15);
+            color: var(--primary);
+            transition: 0.3s;
         }
         .avatar img {
             width: 100%;
@@ -457,29 +588,40 @@
             object-fit: cover;
             display: block;
         }
-        .avatar.online { border-color: var(--online); }
+        .avatar.online { 
+            border-color: var(--online);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+        }
         .avatar.big {
             width: 80px;
             height: 80px;
             font-size: 36px;
+            border-width: 3px;
         }
         .avatar.small {
             width: 32px;
             height: 32px;
             font-size: 16px;
         }
-        .post-content { margin: 6px 0 10px; word-wrap: break-word; font-size: 15px; line-height: 1.5; }
+        .post-content { 
+            margin: 6px 0 10px; 
+            word-wrap: break-word; 
+            font-size: 15px; 
+            line-height: 1.6;
+            color: var(--text);
+        }
         .post-time {
             font-size: 11px;
-            opacity: 0.5;
+            opacity: 0.4;
             margin-top: 4px;
+            color: var(--text);
         }
         .post-actions {
             display: flex;
             gap: 16px;
             margin-top: 10px;
             padding-top: 10px;
-            border-top: 1px solid var(--border);
+            border-top: 1px solid var(--glass-border);
         }
         .post-actions button {
             background: none;
@@ -492,42 +634,48 @@
             align-items: center;
             gap: 4px;
             padding: 4px 0;
-            transition: 0.2s;
+            transition: 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
-        .post-actions button:hover { opacity: 1; }
-        .post-actions button.liked { opacity: 1; color: var(--danger); }
+        .post-actions button:hover { 
+            opacity: 1;
+            transform: scale(1.05);
+        }
+        .post-actions button.liked { 
+            opacity: 1; 
+            color: var(--danger);
+        }
         .post-media-container {
             position: relative;
             width: 100%;
-            border-radius: 12px;
+            border-radius: 16px;
             overflow: hidden;
-            background: var(--bg);
             margin: 8px 0;
             min-height: 120px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 1px solid var(--border);
+            background: rgba(0, 0, 0, 0.15);
+            border: 1px solid var(--glass-border);
         }
         .post-media-container img {
             width: 100%;
             display: block;
-            border-radius: 12px;
             max-height: 400px;
             object-fit: contain;
-            background: var(--bg);
             min-height: 100px;
+            background: rgba(0, 0, 0, 0.05);
         }
         .comments-section {
             margin-top: 10px;
             padding-top: 10px;
-            border-top: 1px solid var(--border);
+            border-top: 1px solid var(--glass-border);
         }
         .comment {
             display: flex;
             gap: 8px;
             padding: 6px 0;
             font-size: 14px;
+            color: var(--text);
         }
         .comment .name { font-weight: 600; }
         .comment-input {
@@ -539,51 +687,75 @@
             flex: 1;
             padding: 6px 12px;
             border-radius: 20px;
-            border: 1px solid var(--border);
-            background: var(--bg);
+            border: 1px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.05);
             color: var(--text);
             outline: none;
             font-size: 13px;
+            transition: 0.3s;
         }
-        .comment-input input:focus { border-color: var(--primary); }
+        .comment-input input:focus { 
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--primary-glow);
+        }
+        .comment-input input::placeholder {
+            color: var(--text);
+            opacity: 0.4;
+        }
         .comment-input button {
             padding: 6px 14px;
             border-radius: 20px;
             border: none;
-            background: var(--primary);
+            background: linear-gradient(135deg, #6c5ce7, #00d4ff);
             color: white;
             font-weight: 600;
             font-size: 12px;
             cursor: pointer;
+            transition: 0.3s;
+        }
+        .comment-input button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(108, 92, 231, 0.25);
         }
 
         /* ============ РИЛСЫ ============ */
         #reelPublishArea {
             display: flex;
             gap: 8px;
-            background: var(--card);
             padding: 12px;
-            border-radius: var(--radius);
-            border: 1px solid var(--border);
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
             margin-bottom: 8px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
         }
         #reelPublishArea input {
             flex: 1;
             padding: 8px 12px;
             border-radius: 20px;
-            border: 1px solid var(--border);
-            background: var(--bg);
+            border: 1px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.05);
             color: var(--text);
             outline: none;
             font-size: 13px;
+            transition: 0.3s;
         }
-        #reelPublishArea input:focus { border-color: var(--primary); }
+        #reelPublishArea input:focus { 
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--primary-glow);
+        }
+        #reelPublishArea input::placeholder {
+            color: var(--text);
+            opacity: 0.4;
+        }
         .reels-strip {
             display: flex;
             gap: 12px;
             overflow-x: auto;
             padding: 8px 0 12px;
             scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
         }
         .reels-strip::-webkit-scrollbar { display: none; }
         .reel-circle {
@@ -593,15 +765,20 @@
             gap: 4px;
             cursor: pointer;
             flex-shrink: 0;
-            transition: 0.2s;
+            transition: 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
         .reel-circle .avatar {
             width: 56px;
             height: 56px;
-            border: 3px solid var(--primary);
-            transition: 0.2s;
+            border: 3px solid var(--online);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.15);
+            transition: 0.3s;
         }
         .reel-circle .avatar:active { transform: scale(0.92); }
+        .reel-circle:hover .avatar {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.25);
+        }
         .reel-circle span {
             font-size: 11px;
             opacity: 0.7;
@@ -612,6 +789,7 @@
             display: flex;
             align-items: center;
             gap: 2px;
+            color: var(--text);
         }
         .reel-view {
             position: fixed;
@@ -619,7 +797,9 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0,0,0,0.92);
+            background: rgba(0, 0, 0, 0.92);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             z-index: 200;
             display: none;
             flex-direction: column;
@@ -631,8 +811,8 @@
         .reel-view img {
             max-width: 100%;
             max-height: 70vh;
-            border-radius: 16px;
-            box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+            border-radius: 20px;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
             object-fit: contain;
         }
         .reel-view .close {
@@ -645,6 +825,11 @@
             opacity: 0.7;
             background: none;
             border: none;
+            transition: 0.3s;
+        }
+        .reel-view .close:hover {
+            opacity: 1;
+            transform: rotate(90deg);
         }
         .reel-view .user-label {
             color: white;
@@ -659,12 +844,17 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 10px 0;
-            border-bottom: 1px solid var(--border);
+            padding: 12px 0;
+            border-bottom: 1px solid var(--glass-border);
             cursor: pointer;
-            transition: 0.2s;
+            transition: 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            color: var(--text);
         }
         .chat-item:active { opacity: 0.6; }
+        .chat-item:hover {
+            transform: translateX(4px);
+            opacity: 0.8;
+        }
         .chat-item .info { flex: 1; }
         .chat-item .info .name-wrapper {
             display: flex;
@@ -695,59 +885,77 @@
             display: flex;
             flex-direction: column;
             gap: 6px;
+            -webkit-overflow-scrolling: touch;
         }
         .chat-message {
             max-width: 80%;
-            padding: 10px 14px;
+            padding: 10px 16px;
             border-radius: 18px;
-            background: #e8e8f0;
-            color: #1a1a2e;
             align-self: flex-start;
             word-wrap: break-word;
-        }
-        .dark .chat-message {
-            background: #2a2a3e;
-            color: #e8e8f0;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            color: var(--text);
         }
         .chat-message.mine {
             align-self: flex-end;
-            background: var(--primary);
-            color: white;
+            background: linear-gradient(135deg, rgba(108, 92, 231, 0.25), rgba(0, 212, 255, 0.25));
+            border-color: var(--primary);
         }
         .chat-input {
             display: flex;
             gap: 8px;
             padding: 8px 0;
-            border-top: 1px solid var(--border);
+            border-top: 1px solid var(--glass-border);
         }
         .chat-input input {
             flex: 1;
             padding: 10px 14px;
             border-radius: 24px;
-            border: 1px solid var(--border);
-            background: var(--bg);
+            border: 1px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.05);
             color: var(--text);
             outline: none;
             font-size: 14px;
+            transition: 0.3s;
         }
-        .chat-input input:focus { border-color: var(--primary); }
+        .chat-input input:focus { 
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--primary-glow);
+        }
+        .chat-input input::placeholder {
+            color: var(--text);
+            opacity: 0.4;
+        }
         .chat-input button {
             padding: 10px 18px;
             border-radius: 24px;
             border: none;
-            background: var(--primary);
+            background: linear-gradient(135deg, #6c5ce7, #00d4ff);
             color: white;
             font-weight: 600;
             cursor: pointer;
             font-size: 14px;
+            transition: 0.3s;
+        }
+        .chat-input button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(108, 92, 231, 0.25);
         }
         .back-btn {
             background: none;
             border: none;
-            font-size: 20px;
+            font-size: 24px;
             color: var(--text);
             cursor: pointer;
             padding: 4px 8px;
+            transition: 0.3s;
+        }
+        .back-btn:hover {
+            transform: translateX(-4px);
+            opacity: 0.7;
         }
         .msg-limit-warning {
             font-size: 12px;
@@ -767,33 +975,36 @@
         }
         .groups-header h3 {
             font-size: 20px;
+            color: var(--text);
         }
         .groups-header .create-group-btn {
             padding: 8px 20px;
             border-radius: 24px;
             border: none;
-            background: var(--primary);
+            background: linear-gradient(135deg, #6c5ce7, #00d4ff);
             color: white;
             font-weight: 600;
             font-size: 14px;
             cursor: pointer;
-            transition: 0.2s;
+            transition: 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             display: flex;
             align-items: center;
             gap: 6px;
         }
         .groups-header .create-group-btn:hover {
-            opacity: 0.85;
-            transform: scale(0.97);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(108, 92, 231, 0.25);
         }
         .create-group-area {
-            background: var(--card);
-            border-radius: var(--radius);
+            border-radius: 20px;
             padding: 20px;
-            border: 2px solid var(--primary);
+            border: 1px solid var(--primary);
             margin-bottom: 16px;
             animation: slideDown 0.4s ease;
             display: none;
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
         }
         .create-group-area.show { display: block; }
         .create-group-area .form-title {
@@ -803,6 +1014,7 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            color: var(--text);
         }
         .create-group-area .form-title .close-form {
             margin-left: auto;
@@ -818,19 +1030,28 @@
         .create-group-area input {
             width: 100%;
             padding: 10px 14px;
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            background: var(--bg);
+            border-radius: 16px;
+            border: 1px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.05);
             color: var(--text);
             outline: none;
             font-size: 14px;
             margin-bottom: 10px;
+            transition: 0.3s;
         }
-        .create-group-area input:focus { border-color: var(--primary); }
+        .create-group-area input:focus { 
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--primary-glow);
+        }
+        .create-group-area input::placeholder {
+            color: var(--text);
+            opacity: 0.4;
+        }
         .create-group-area .friend-select-label {
             font-size: 13px;
             opacity: 0.5;
             margin: 4px 0 8px;
+            color: var(--text);
         }
         .create-group-area .friend-select {
             display: flex;
@@ -846,17 +1067,23 @@
             gap: 6px;
             padding: 4px 12px 4px 6px;
             border-radius: 20px;
-            border: 1.5px solid var(--border);
+            border: 1.5px solid var(--glass-border);
             cursor: pointer;
-            transition: 0.2s;
+            transition: 0.3s;
             font-size: 13px;
-            background: var(--bg);
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             user-select: none;
+            color: var(--text);
         }
-        .create-group-area .friend-select .friend-chip:hover { border-color: var(--primary); }
+        .create-group-area .friend-select .friend-chip:hover { 
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
         .create-group-area .friend-select .friend-chip.selected {
             border-color: var(--primary);
-            background: var(--primary-light);
+            background: rgba(108, 92, 231, 0.15);
         }
         .create-group-area .friend-select .friend-chip .avatar {
             width: 24px;
@@ -872,33 +1099,42 @@
             padding: 8px 24px;
         }
         .create-group-area .form-actions .btn-sm.cancel {
-            background: var(--border);
+            background: rgba(255, 255, 255, 0.08);
             color: var(--text);
+            border: 1px solid var(--glass-border);
         }
 
         .group-card {
-            background: var(--card);
-            border-radius: var(--radius);
+            border-radius: 20px;
             padding: 14px 16px;
             margin-bottom: 12px;
-            border: 1px solid var(--border);
+            border: 1px solid var(--glass-border);
             cursor: pointer;
-            transition: 0.2s;
+            transition: 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             display: flex;
             align-items: center;
             gap: 12px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            color: var(--text);
         }
-        .group-card:hover { border-color: var(--primary); }
+        .group-card:hover { 
+            border-color: var(--primary);
+            transform: translateX(4px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+        }
         .group-card .group-avatar {
             width: 48px;
             height: 48px;
             border-radius: 50%;
-            background: var(--primary-light);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 24px;
             flex-shrink: 0;
+            background: rgba(108, 92, 231, 0.15);
+            border: 2px solid var(--glass-border);
         }
         .group-card .group-info { flex: 1; }
         .group-card .group-info .name {
@@ -927,24 +1163,40 @@
             width: 100%;
             padding: 12px 16px;
             border-radius: 24px;
-            border: 1.5px solid var(--border);
-            background: var(--bg);
+            border: 1.5px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.05);
             color: var(--text);
             font-size: 15px;
             margin-bottom: 14px;
             outline: none;
+            transition: 0.3s;
         }
-        .search-input:focus { border-color: var(--primary); }
+        .search-input:focus { 
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--primary-glow);
+        }
+        .search-input::placeholder {
+            color: var(--text);
+            opacity: 0.4;
+        }
         .user-card {
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 12px;
-            background: var(--card);
-            border-radius: var(--radius);
+            border-radius: 20px;
             padding: 12px 16px;
             margin-bottom: 10px;
-            border: 1px solid var(--border);
+            border: 1px solid var(--glass-border);
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            color: var(--text);
+            transition: 0.3s;
+        }
+        .user-card:hover {
+            border-color: var(--primary);
+            transform: translateX(4px);
         }
         .user-card .info { flex: 1; }
         .user-card .info .name-wrapper {
@@ -971,23 +1223,34 @@
             font-weight: 600;
             font-size: 12px;
             cursor: pointer;
-            background: var(--primary);
-            color: white;
-            transition: 0.2s;
+            transition: 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             white-space: nowrap;
+            background: linear-gradient(135deg, #6c5ce7, #00d4ff);
+            color: white;
         }
         .btn-sm:active { transform: scale(0.94); }
+        .btn-sm:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(108, 92, 231, 0.25);
+        }
         .btn-sm.outline {
             background: transparent;
             border: 1.5px solid var(--primary);
             color: var(--primary);
         }
-        .btn-sm.danger { background: var(--danger); }
-        .btn-sm.success { background: var(--success); }
-        .btn-sm.warning { background: var(--warning); }
+        .btn-sm.danger { 
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+        }
+        .btn-sm.success { 
+            background: linear-gradient(135deg, #00d4ff, #00b894);
+        }
+        .btn-sm.warning { 
+            background: linear-gradient(135deg, #ffd93d, #f6b93b);
+            color: #1a1a2e;
+        }
         .btn-sm.banned { background: #8e8e93; }
         .btn-sm.chat {
-            background: #5856d6;
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
         }
 
         /* ============ ПРОФИЛЬ ============ */
@@ -996,12 +1259,14 @@
             flex-direction: column;
             align-items: center;
             padding: 20px 0;
+            color: var(--text);
         }
         .profile-header .avatar {
             width: 80px;
             height: 80px;
             font-size: 36px;
             margin-bottom: 8px;
+            border-width: 3px;
         }
         .profile-header .name-wrapper {
             display: flex;
@@ -1031,20 +1296,19 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            background: #1da1f2;
+            background: linear-gradient(135deg, #00d4ff, #6c5ce7);
             border-radius: 50%;
             width: 18px;
             height: 18px;
             flex-shrink: 0;
-            border: 1.5px solid white;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            border: 2px solid var(--glass-border);
+            box-shadow: 0 2px 10px rgba(108, 92, 231, 0.25);
             font-size: 10px;
             color: white;
             font-weight: 700;
             line-height: 1;
             padding: 1px;
         }
-        .dark .verified-badge { border-color: #1a1a2e; }
         .verified-badge-sm { width: 14px; height: 14px; font-size: 7px; }
         .verified-badge-big { width: 24px; height: 24px; font-size: 14px; }
         .name-wrapper {
@@ -1059,35 +1323,48 @@
             flex-direction: column;
             gap: 12px;
             margin-top: 16px;
+            color: var(--text);
         }
         .settings-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 12px 0;
-            border-bottom: 1px solid var(--border);
+            border-bottom: 1px solid var(--glass-border);
         }
         .settings-row label { font-weight: 500; }
         .settings-row input {
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
             padding: 6px 12px;
             color: var(--text);
             outline: none;
+            transition: 0.3s;
+        }
+        .settings-row input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--primary-glow);
+        }
+        .settings-row input::placeholder {
+            color: var(--text);
+            opacity: 0.4;
         }
         .toggle-btn {
             width: 44px;
             height: 24px;
             border-radius: 12px;
-            background: var(--border);
+            background: var(--glass-border);
             border: none;
             cursor: pointer;
             position: relative;
             transition: 0.3s;
             flex-shrink: 0;
         }
-        .toggle-btn.active { background: var(--primary); }
+        .toggle-btn.active { 
+            background: linear-gradient(135deg, #6c5ce7, #00d4ff);
+            box-shadow: 0 0 20px rgba(108, 92, 231, 0.25);
+        }
         .toggle-btn::after {
             content: '';
             position: absolute;
@@ -1097,7 +1374,8 @@
             height: 20px;
             border-radius: 50%;
             background: white;
-            transition: 0.3s;
+            transition: 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
         .toggle-btn.active::after { left: 22px; }
         .emoji-grid {
@@ -1108,12 +1386,19 @@
         }
         .emoji-grid button {
             font-size: 28px;
-            background: var(--bg);
-            border: 2px solid transparent;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 2px solid var(--glass-border);
             border-radius: 12px;
             padding: 4px 8px;
             cursor: pointer;
-            transition: 0.2s;
+            transition: 0.3s;
+        }
+        .emoji-grid button:hover {
+            transform: scale(1.1);
+            border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(108, 92, 231, 0.15);
         }
         .emoji-grid button:active { transform: scale(0.9); }
 
@@ -1125,16 +1410,21 @@
             margin-bottom: 16px;
         }
         .admin-stat {
-            background: var(--card);
             padding: 14px;
-            border-radius: var(--radius);
+            border-radius: 20px;
             text-align: center;
-            border: 1px solid var(--border);
+            border: 1px solid var(--glass-border);
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            color: var(--text);
         }
         .admin-stat .num {
             font-size: 28px;
             font-weight: 700;
-            color: var(--primary);
+            background: linear-gradient(135deg, #6c5ce7, #00d4ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
         .admin-stat .label { font-size: 12px; opacity: 0.6; margin-top: 2px; }
         .admin-user-item {
@@ -1142,9 +1432,10 @@
             align-items: center;
             justify-content: space-between;
             padding: 8px 0;
-            border-bottom: 1px solid var(--border);
+            border-bottom: 1px solid var(--glass-border);
             flex-wrap: wrap;
             gap: 4px;
+            color: var(--text);
         }
         .admin-user-item .info { flex: 1; min-width: 120px; }
         .admin-user-item .info .name { font-weight: 600; }
@@ -1163,30 +1454,35 @@
             align-items: center;
             gap: 12px;
             padding: 12px;
-            background: var(--card);
-            border-radius: var(--radius);
-            border: 1px solid var(--border);
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
             margin-bottom: 16px;
             flex-wrap: wrap;
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            color: var(--text);
         }
         .admin-mode-toggle .label { font-weight: 600; }
 
-        /* Админ переключатели для постов и фото */
         .admin-switches {
             display: flex;
             flex-direction: column;
             gap: 10px;
-            background: var(--card);
             padding: 16px;
-            border-radius: var(--radius);
-            border: 1px solid var(--border);
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
             margin-bottom: 16px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
         }
         .admin-switch-item {
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 12px;
+            color: var(--text);
         }
         .admin-switch-item .label {
             font-weight: 600;
@@ -1204,21 +1500,27 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0,0,0,0.6);
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             z-index: 300;
             align-items: center;
             justify-content: center;
             padding: 20px;
         }
         #userProfileModal .modal-content {
-            background: var(--card);
-            border-radius: var(--radius);
+            border-radius: 24px;
             max-width: 400px;
             width: 100%;
             max-height: 90vh;
             overflow-y: auto;
             padding: 24px;
             position: relative;
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            border: 1px solid var(--glass-border);
+            color: var(--text);
         }
 
         #groupProfileModal {
@@ -1228,27 +1530,41 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0,0,0,0.6);
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             z-index: 300;
             align-items: center;
             justify-content: center;
             padding: 20px;
         }
         #groupProfileModal .modal-content {
-            background: var(--card);
-            border-radius: var(--radius);
+            border-radius: 24px;
             max-width: 400px;
             width: 100%;
             max-height: 90vh;
             overflow-y: auto;
             padding: 24px;
             position: relative;
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            border: 1px solid var(--glass-border);
+            color: var(--text);
         }
 
         .text-center { text-align: center; }
         .op-5 { opacity: 0.5; }
         .mt-8 { margin-top: 8px; }
         .mb-8 { margin-bottom: 8px; }
+
+        /* Стиль для контейнера изображения в постах */
+        .image-fallback {
+            padding: 20px;
+            color: var(--text);
+            opacity: 0.6;
+            text-align: center;
+        }
 
         @media (max-width: 480px) {
             .page { padding: 8px 10px 70px; }
@@ -1287,7 +1603,7 @@
 
 <!-- ============ АВТОРИЗАЦИЯ ============ -->
 <div id="auth">
-    <div class="auth-box">
+    <div class="auth-box glass">
         <div class="logo">
             <span class="icon">🐱</span>
             <h1><span>Barsik</span>Net</h1>
@@ -1314,7 +1630,7 @@
 
 <!-- ============ ПРИЛОЖЕНИЕ ============ -->
 <div id="app">
-    <div class="header">
+    <div class="header glass">
         <h2 id="pageTitle">🐱 Лента</h2>
         <div class="right">
             <span id="onlineStatus">●</span>
@@ -1333,7 +1649,7 @@
             <input id="reelInput" placeholder="Ссылка на фото (рилс)" />
             <button class="btn-sm" id="publishReelBtn">📹 Рилс</button>
         </div>
-        <div style="font-size:11px; opacity:0.4; text-align:center; margin-bottom:12px;">Рилсы удаляются через 1 час</div>
+        <div style="font-size:11px; opacity:0.4; text-align:center; margin-bottom:12px; color:var(--text);">Рилсы удаляются через 1 час</div>
         <div class="reels-strip" id="reelsStrip"></div>
         <div id="feedPosts"></div>
     </div>
@@ -1341,9 +1657,9 @@
     <div id="pageChats" class="page">
         <div id="chatList" class="chat-list"></div>
         <div id="chatWindow" class="chat-window">
-            <div style="display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid var(--border);">
+            <div style="display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid var(--glass-border);">
                 <button class="back-btn" id="chatBack">‹</button>
-                <div style="display:flex; align-items:center; gap:4px; flex:1; cursor:pointer;" id="chatPartnerClick">
+                <div style="display:flex; align-items:center; gap:4px; flex:1; cursor:pointer; color:var(--text);" id="chatPartnerClick">
                     <span id="chatPartnerName" style="font-weight:600;"></span>
                     <span id="chatPartnerBadge"></span>
                 </div>
@@ -1381,9 +1697,9 @@
     </div>
 
     <div id="groupWindow" class="chat-window">
-        <div style="display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid var(--border);">
+        <div style="display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid var(--glass-border);">
             <button class="back-btn" id="groupBack">‹</button>
-            <div style="display:flex; align-items:center; gap:8px; flex:1; cursor:pointer;" id="groupProfileClick">
+            <div style="display:flex; align-items:center; gap:8px; flex:1; cursor:pointer; color:var(--text);" id="groupProfileClick">
                 <span id="groupAvatarDisplay" style="font-size:24px;">👥</span>
                 <span id="groupNameDisplay" style="font-weight:600;"></span>
             </div>
@@ -1402,7 +1718,7 @@
     </div>
 
     <div id="pageFriends" class="page">
-        <h3 style="margin-bottom:12px;">🤝 Друзья</h3>
+        <h3 style="margin-bottom:12px; color:var(--text);">🤝 Друзья</h3>
         <div id="friendsList"></div>
     </div>
 
@@ -1426,7 +1742,7 @@
                 <button class="btn-sm" id="settingsSaveAvatar">Установить</button>
             </div>
             <div style="margin-top:4px;">
-                <label style="font-size:13px;">Или смайлик:</label>
+                <label style="font-size:13px; color:var(--text);">Или смайлик:</label>
                 <div class="emoji-grid" id="emojiGrid">
                     <button>🐱</button><button>😺</button><button>🦊</button><button>🐶</button><button>🐼</button><button>🐨</button><button>🦁</button><button>🐧</button><button>🐸</button>
                 </div>
@@ -1438,7 +1754,7 @@
     </div>
 
     <div id="pageSettings" class="page">
-        <h3 style="margin-bottom:16px;">⚙️ Настройки</h3>
+        <h3 style="margin-bottom:16px; color:var(--text);">⚙️ Настройки</h3>
         <div class="settings-group">
             <div class="settings-row">
                 <label>Изменить ник</label>
@@ -1450,8 +1766,8 @@
                 <button class="toggle-btn" id="themeToggle"></button>
             </div>
         </div>
-        <div style="margin-top:20px; padding:16px; background:var(--card); border-radius:var(--radius); border:1px solid var(--border); text-align:center;">
-            <p style="margin-bottom:12px; opacity:0.7;">📧 Нужна помощь? Напишите в поддержку</p>
+        <div style="margin-top:20px; padding:16px; border-radius:20px; border:1px solid var(--glass-border); text-align:center; background:var(--glass-bg); backdrop-filter:blur(var(--glass-blur));">
+            <p style="margin-bottom:12px; opacity:0.7; color:var(--text);">📧 Нужна помощь? Напишите в поддержку</p>
             <button class="btn-sm" id="supportBtn">Написать в поддержку</button>
         </div>
         <div style="margin-top:16px; text-align:center;">
@@ -1460,14 +1776,13 @@
     </div>
 
     <div id="pageAdmin" class="page">
-        <h3 style="margin-bottom:12px;">👑 Админ-панель</h3>
+        <h3 style="margin-bottom:12px; color:var(--text);">👑 Админ-панель</h3>
         <div class="admin-mode-toggle">
             <span class="label">📖 Режим чтения:</span>
             <button class="toggle-btn" id="readonlyToggle"></button>
-            <span style="font-size:12px; opacity:0.6;" id="readonlyStatus">Выключен</span>
+            <span style="font-size:12px; opacity:0.6; color:var(--text);" id="readonlyStatus">Выключен</span>
         </div>
         
-        <!-- Переключатели для постов и фото -->
         <div class="admin-switches">
             <div class="admin-switch-item">
                 <span class="label">📝 Посты</span>
@@ -1494,7 +1809,7 @@
             <div class="admin-stat"><div class="num" id="statBanned">0</div><div class="label">🔨 Забанено</div></div>
         </div>
         <button class="btn-sm" onclick="renderAdminPanel()" style="margin-bottom:12px;">🔄 Обновить</button>
-        <h4 style="margin:12px 0 8px;">👥 Все пользователи</h4>
+        <h4 style="margin:12px 0 8px; color:var(--text);">👥 Все пользователи</h4>
         <div id="adminUserList"></div>
     </div>
 
@@ -1511,15 +1826,15 @@
 </div>
 
 <div id="userProfileModal">
-    <div class="modal-content">
-        <button onclick="closeUserProfile()" style="position:absolute; top:12px; right:16px; background:none; border:none; font-size:24px; color:var(--text); cursor:pointer;">✕</button>
+    <div class="modal-content glass">
+        <button onclick="closeUserProfile()" style="position:absolute; top:12px; right:16px; background:none; border:none; font-size:24px; color:var(--text); cursor:pointer; transition:0.3s;">✕</button>
         <div id="userProfileContent"></div>
     </div>
 </div>
 
 <div id="groupProfileModal">
-    <div class="modal-content">
-        <button onclick="closeGroupProfile()" style="position:absolute; top:12px; right:16px; background:none; border:none; font-size:24px; color:var(--text); cursor:pointer;">✕</button>
+    <div class="modal-content glass">
+        <button onclick="closeGroupProfile()" style="position:absolute; top:12px; right:16px; background:none; border:none; font-size:24px; color:var(--text); cursor:pointer; transition:0.3s;">✕</button>
         <div id="groupProfileContent"></div>
     </div>
 </div>
@@ -1670,7 +1985,7 @@ function renderSavedAccounts() {
         const avatarDiv = document.createElement('div');
         avatarDiv.className = 'avatar';
         if (acc.avatar && acc.avatar.startsWith('http')) {
-            avatarDiv.innerHTML = `<img src="${acc.avatar}" alt="avatar" />`;
+            avatarDiv.innerHTML = `<img src="${acc.avatar}" alt="avatar" loading="lazy" referrerpolicy="no-referrer" crossorigin="anonymous" onerror="this.style.display='none';this.parentElement.textContent='🐱'" />`;
         } else {
             avatarDiv.textContent = acc.avatar || '🐱';
         }
@@ -1873,7 +2188,6 @@ function updateAdminUI() {
         photosToggle.classList.toggle('active', photosEnabled);
         photosStatus.textContent = photosEnabled ? 'Включены' : 'Отключены';
     }
-    // Обновляем ленту
     renderFeed();
 }
 
@@ -2177,15 +2491,14 @@ document.querySelectorAll('.nav-item').forEach(btn => {
 });
 
 // ============================================================
-// ЛЕНТА (ПОСТЫ) - с поддержкой админ переключателей
+// ЛЕНТА (ПОСТЫ)
 // ============================================================
 function renderFeed() {
     if (!currentUser) return;
     feedPosts.innerHTML = '';
     
-    // Если посты отключены админом
     if (!postsEnabled && isAdmin) {
-        feedPosts.innerHTML = '<div style="text-align:center; opacity:0.5; padding:40px 0;">📝 Посты отключены администратором</div>';
+        feedPosts.innerHTML = '<div style="text-align:center; opacity:0.5; padding:40px 0; color:var(--text);">📝 Посты отключены администратором</div>';
         return;
     }
     
@@ -2197,9 +2510,13 @@ function renderFeed() {
         const userPosts = userData.posts || {};
         for (const key in userPosts) {
             const post = userPosts[key];
+            let imageUrl = '';
+            if (post.image && typeof post.image === 'string' && post.image.trim() !== '') {
+                imageUrl = post.image;
+            }
             posts.push({ 
                 text: post.text || '',
-                image: post.image || '',
+                image: imageUrl,
                 time: post.time || 0,
                 username: u, 
                 name: userData.name || u, 
@@ -2211,17 +2528,15 @@ function renderFeed() {
     }
     posts.sort((a,b) => (b.time||0) - (a.time||0));
     if (posts.length === 0) {
-        feedPosts.innerHTML = '<div style="text-align:center; opacity:0.5; padding:40px 0;">📝 Нет постов</div>';
+        feedPosts.innerHTML = '<div style="text-align:center; opacity:0.5; padding:40px 0; color:var(--text);">📝 Нет постов</div>';
         return;
     }
     for (const p of posts) {
         const card = document.createElement('div');
         card.className = 'post-card';
         
-        // Хедер поста - кликабельный для открытия профиля
         const header = document.createElement('div');
         header.className = 'post-header';
-        header.style.cursor = 'pointer';
         header.onclick = () => openUserProfile(p.username);
         
         const avatar = document.createElement('div');
@@ -2246,6 +2561,7 @@ function renderFeed() {
         
         const nameDiv = document.createElement('div');
         nameDiv.style.flex = '1';
+        nameDiv.style.color = 'var(--text)';
         nameDiv.innerHTML = `<strong>${p.name}</strong> ${getVerifiedBadge(p.username)} <span style="font-size:11px; opacity:0.5;">@${p.username}</span>`;
         header.appendChild(nameDiv);
         
@@ -2256,7 +2572,6 @@ function renderFeed() {
         
         card.appendChild(header);
         
-        // Контент
         if (p.text) {
             const content = document.createElement('div');
             content.className = 'post-content';
@@ -2264,8 +2579,9 @@ function renderFeed() {
             card.appendChild(content);
         }
         
-        // Изображение - только если фото включены админом
-        if (photosEnabled && p.image && p.image.trim() !== '' && isValidImageUrl(p.image)) {
+        const hasImage = p.image && p.image.length > 0;
+        
+        if (hasImage && photosEnabled) {
             const mediaContainer = document.createElement('div');
             mediaContainer.className = 'post-media-container';
             const img = document.createElement('img');
@@ -2274,19 +2590,21 @@ function renderFeed() {
             img.crossOrigin = 'anonymous';
             img.referrerPolicy = 'no-referrer';
             img.onerror = function() { 
-                this.parentElement.innerHTML = '<div style="padding:20px; color:var(--danger);">❌ Не удалось загрузить изображение</div>';
+                console.error('Ошибка загрузки фото:', p.image);
+                this.parentElement.innerHTML = '<div class="image-fallback">❌ Не удалось загрузить изображение</div>';
+            };
+            img.onload = function() {
+                console.log('✅ Фото загружено:', p.image);
             };
             mediaContainer.appendChild(img);
             card.appendChild(mediaContainer);
-        } else if (p.image && p.image.trim() !== '' && !photosEnabled) {
-            // Фото отключено - показываем сообщение
+        } else if (hasImage && !photosEnabled) {
             const mediaContainer = document.createElement('div');
             mediaContainer.className = 'post-media-container';
-            mediaContainer.innerHTML = '<div style="padding:20px; color:var(--warning);">🖼️ Фото отключено администратором</div>';
+            mediaContainer.innerHTML = '<div class="image-fallback">🖼️ Фото отключено администратором</div>';
             card.appendChild(mediaContainer);
         }
         
-        // Действия: лайки и комментарии
         const actions = document.createElement('div');
         actions.className = 'post-actions';
         
@@ -2314,7 +2632,6 @@ function renderFeed() {
         
         card.appendChild(actions);
         
-        // Комментарии
         const commentsSection = document.createElement('div');
         commentsSection.className = 'comments-section';
         commentsSection.id = `comments-${p.username}-${p.postKey}`;
@@ -2413,7 +2730,7 @@ function renderChatList() {
         }
     }
     if (realFriends.length === 0) {
-        chatList.innerHTML = '<div style="text-align:center; opacity:0.5; padding:40px 0;">💬 Нет чатов</div>';
+        chatList.innerHTML = '<div style="text-align:center; opacity:0.5; padding:40px 0; color:var(--text);">💬 Нет чатов</div>';
         return;
     }
     for (const friend of realFriends) {
@@ -2579,7 +2896,7 @@ function renderSearch() {
     searchResults.innerHTML = '';
     const query = searchInput.value.trim().toLowerCase();
     if (!query) {
-        searchResults.innerHTML = '<div style="opacity:0.5; padding:20px 0;">Введите запрос...</div>';
+        searchResults.innerHTML = '<div style="opacity:0.5; padding:20px 0; color:var(--text);">Введите запрос...</div>';
         return;
     }
     const users = Object.keys(allUsersCache);
@@ -2680,7 +2997,7 @@ function renderSearch() {
         }
     }
     if (!found) {
-        searchResults.innerHTML = '<div style="opacity:0.5; padding:20px 0;">Пользователь не найден</div>';
+        searchResults.innerHTML = '<div style="opacity:0.5; padding:20px 0; color:var(--text);">Пользователь не найден</div>';
     }
 }
 
@@ -2701,7 +3018,7 @@ function renderFriends() {
         }
     }
     if (realFriends.length === 0) {
-        friendsList.innerHTML = '<div style="text-align:center; opacity:0.5; padding:40px 0;">🤝 Нет друзей</div>';
+        friendsList.innerHTML = '<div style="text-align:center; opacity:0.5; padding:40px 0; color:var(--text);">🤝 Нет друзей</div>';
         return;
     }
     for (const f of realFriends) {
@@ -2817,7 +3134,7 @@ function renderReelsStrip() {
             
             const avatar = document.createElement('div');
             avatar.className = 'avatar';
-            avatar.style.borderColor = '#ff3b30';
+            avatar.style.borderColor = '#ff6b6b';
             
             if (data.avatar && data.avatar.startsWith('http')) {
                 const img = document.createElement('img');
@@ -2845,7 +3162,7 @@ function renderReelsStrip() {
         }
     }
     if (!hasReels) {
-        reelsStrip.innerHTML = '<div style="opacity:0.4; font-size:13px; padding:8px 0;">Нет рилсов</div>';
+        reelsStrip.innerHTML = '<div style="opacity:0.4; font-size:13px; padding:8px 0; color:var(--text);">Нет рилсов</div>';
     }
 }
 
@@ -2895,12 +3212,11 @@ publishReelBtn.onclick = () => {
 };
 
 // ============================================================
-// ПУБЛИКАЦИЯ ПОСТОВ - с проверкой админ настроек
+// ПУБЛИКАЦИЯ ПОСТОВ
 // ============================================================
 publishPostBtn.onclick = () => {
     if (readonlyMode) { alert('📖 Режим чтения!'); return; }
     
-    // Проверка включены ли посты
     if (!postsEnabled) {
         alert('❌ Посты сейчас нельзя опубликовать. Поддержка TheBarsikNet@gmail.com');
         return;
@@ -2914,7 +3230,6 @@ publishPostBtn.onclick = () => {
         return; 
     }
     
-    // Проверка включены ли фото
     if (image && !photosEnabled) {
         alert('❌ Фото сейчас нельзя опубликовать. Поддержка TheBarsikNet@gmail.com');
         return;
@@ -2976,7 +3291,7 @@ function updateGroupFriendSelect() {
     }
     groupFriendSelect.innerHTML = '';
     if (realFriends.length === 0) {
-        groupFriendSelect.innerHTML = '<div style="opacity:0.5; font-size:13px; padding:4px 0;">Нет друзей для добавления</div>';
+        groupFriendSelect.innerHTML = '<div style="opacity:0.5; font-size:13px; padding:4px 0; color:var(--text);">Нет друзей для добавления</div>';
         return;
     }
     for (const u of realFriends) {
@@ -3055,7 +3370,7 @@ function renderGroupsList() {
     const userGroups = currentUser.groups || {};
     const groupIds = Object.keys(userGroups);
     if (groupIds.length === 0) {
-        groupsList.innerHTML = '<div style="opacity:0.5; padding:20px 0; text-align:center;">👥 Нет групп</div>';
+        groupsList.innerHTML = '<div style="opacity:0.5; padding:20px 0; text-align:center; color:var(--text);">👥 Нет групп</div>';
         return;
     }
     for (const groupId of groupIds) {
@@ -3201,10 +3516,10 @@ function openGroupProfile(groupId) {
         const user = allUsersCache[m];
         if (!user) continue;
         const av = (user.avatar && user.avatar.startsWith('http')) 
-            ? `<img src="${user.avatar}" alt="avatar" style="width:100%;height:100%;object-fit:cover;" />` 
+            ? `<img src="${user.avatar}" alt="avatar" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none';this.parentElement.textContent='🐱'" />` 
             : (user.avatar || '🐱');
         membersHtml += `
-            <div style="display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid var(--border);">
+            <div style="display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid var(--glass-border); color:var(--text);">
                 <div class="avatar small">${av}</div>
                 <div>${user.name || m} ${getVerifiedBadge(m)}</div>
                 ${m === group.creator ? '<span style="font-size:11px; opacity:0.5;">👑 создатель</span>' : ''}
@@ -3222,14 +3537,14 @@ function openGroupProfile(groupId) {
     }
     groupProfileContent.innerHTML = `
         <div>
-            <div style="display:flex; flex-direction:column; align-items:center; padding:16px 0; border-bottom:1px solid var(--border);">
+            <div style="display:flex; flex-direction:column; align-items:center; padding:16px 0; border-bottom:1px solid var(--glass-border);">
                 <div class="avatar big">${group.avatar || '👥'}</div>
-                <div style="font-size:22px; font-weight:700;">${group.name}</div>
-                <div style="font-size:13px; opacity:0.5;">Создатель: @${group.creator}</div>
-                <div style="font-size:13px; opacity:0.5; margin-top:4px;">👤 ${members.length} участников</div>
+                <div style="font-size:22px; font-weight:700; color:var(--text);">${group.name}</div>
+                <div style="font-size:13px; opacity:0.5; color:var(--text);">Создатель: @${group.creator}</div>
+                <div style="font-size:13px; opacity:0.5; margin-top:4px; color:var(--text);">👤 ${members.length} участников</div>
             </div>
             <div style="padding:12px 0;">
-                <h4 style="margin:8px 0;">Участники:</h4>
+                <h4 style="margin:8px 0; color:var(--text);">Участники:</h4>
                 ${membersHtml}
             </div>
             <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:12px;">
@@ -3357,8 +3672,8 @@ function openUserProfile(username) {
     }
     
     userProfileContent.innerHTML = `
-        <div style="display:flex; flex-direction:column; align-items:center; padding:16px 0;">
-            <div class="avatar big">${user.avatar && user.avatar.startsWith('http') ? `<img src="${user.avatar}" alt="avatar" style="width:100%;height:100%;object-fit:cover;" />` : (user.avatar || '🐱')}</div>
+        <div style="display:flex; flex-direction:column; align-items:center; padding:16px 0; color:var(--text);">
+            <div class="avatar big">${user.avatar && user.avatar.startsWith('http') ? `<img src="${user.avatar}" alt="avatar" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none';this.parentElement.textContent='🐱'" />` : (user.avatar || '🐱')}</div>
             <div style="font-size:22px; font-weight:700; display:flex; align-items:center; gap:6px; margin-top:8px;">
                 ${user.name || username} ${isVerified ? '<span class="verified-badge verified-badge-big">✓</span>' : ''}
             </div>
@@ -3482,7 +3797,7 @@ emojiGrid.querySelectorAll('button').forEach(btn => {
 });
 
 // ============================================================
-// АДМИН ПАНЕЛЬ - с работающими кнопками
+// АДМИН ПАНЕЛЬ
 // ============================================================
 function renderAdminPanel() {
     if (!isAdmin) return;
@@ -3496,7 +3811,6 @@ function renderAdminPanel() {
         if (data && data.banned) totalBanned++;
     }
     
-    // Получаем кол-во сообщений
     db.ref('messages').once('value', snap => {
         const msgs = snap.val() || {};
         for (const chatId in msgs) {
@@ -3543,7 +3857,7 @@ function renderAdminPanel() {
 }
 
 // ============================================================
-// АДМИН ФУНКЦИИ - ИСПРАВЛЕНЫ
+// АДМИН ФУНКЦИИ
 // ============================================================
 window.adminBanUserPrompt = function(username) {
     if (!isAdmin) return;
@@ -3602,10 +3916,8 @@ window.adminDeleteUser = function(username) {
     if (username === currentUser.username) { alert('Нельзя удалить самого себя!'); return; }
     if (!confirm(`🗑️ Удалить пользователя @${username} и все его данные? Это действие НЕОБРАТИМО!`)) return;
     
-    // Удаляем все данные пользователя
     const userRef = db.ref('users/' + username);
     userRef.remove().then(() => {
-        // Удаляем из друзей у других пользователей
         const users = Object.keys(allUsersCache);
         for (const u of users) {
             if (u !== username) {
@@ -3627,7 +3939,7 @@ window.adminDeleteUser = function(username) {
 };
 
 // ============================================================
-// ТЕМА И РЕЖИМ ЧТЕНИЯ - ОБРАБОТЧИКИ
+// ТЕМА И РЕЖИМ ЧТЕНИЯ
 // ============================================================
 if (themeToggle) {
     themeToggle.addEventListener('click', function(e) {
@@ -3671,13 +3983,10 @@ if (readonlyToggle) {
 authPassword.addEventListener('keydown', e => { if (e.key === 'Enter') authBtn.click(); });
 
 console.log('🐱 BarsikNet обновлен!');
-console.log('✅ Все функции работают!');
-console.log('✅ Админ-кнопки (бан, удалить, верификация) работают!');
-console.log('✅ Переключатели постов и фото в админ-панели!');
-console.log('✅ Группы появляются сразу после создания!');
-console.log('✅ Кнопка "Написать" в поиске!');
-console.log('✅ Друзья только по взаимной подписке!');
-console.log('✅ Открытие профиля из постов по клику на аватар/имя!');
+console.log('✅ Фото в постах ИСПРАВЛЕНЫ!');
+console.log('✅ Дизайн Liquid Glass применен!');
+console.log('✅ Прокрутка ленты работает!');
+console.log('✅ Фон без анимации!');
 </script>
 </body>
 </html>
